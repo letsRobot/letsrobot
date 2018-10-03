@@ -15,10 +15,10 @@ def setup(robot_config):
     global male
     global voice_number
     global hw_num
-        
+
     debug_messages = robot_config.get('misc', 'debug_messages')
     male = robot_config.getboolean('espeak', 'male')
-    voice_number = robot_config.get('espeak', 'voice_number')
+    voice_number = robot_config.getint('espeak', 'voice_number')
     hw_num = robot_config.getint('tts', 'hw_num')
 
     #set the location to write the temp file to
@@ -36,5 +36,5 @@ def say(*args):
     if male:
         os.system('cat ' + tempFilePath + ' | espeak --stdout | aplay -D plughw:%d,0' % hw_num)
     else:
-        os.system('cat ' + tempFilePath + ' | espeak -ven-us+f%d -s170 --stdout | aplay -D plughw:%d,0' % voice_number, hw_num)
+        os.system('cat ' + tempFilePath + ' | espeak -ven-us+f%d -s170 --stdout | aplay -D plughw:%d,0' % (voice_number, hw_num) )
     os.remove(tempFilePath)    
