@@ -21,6 +21,7 @@ Edit runmyrobot/letsrobot.sample.conf:
 * Enter your owner, robot_id, camera_id from LetsRobot.tv
 * change [robot] `type=none` to `type=cozmo`
 * change [tts] `type=none` to `type=cozmo_tts`
+* change [ffmpeg] `type=ffmpeg` to `type=none`
 * Save file as letsrobot.conf
 
 ## Extra Mac setup instructions:

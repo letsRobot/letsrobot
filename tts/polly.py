@@ -4,25 +4,36 @@ from botocore.exceptions import ClientError
 from subprocess import Popen, PIPE
 import os
 import random
+import networking
 
 client = None
 polly = None
 random_voice = None
-voices = [ 'Nicole', 'Russell', 'Amy', 'Brian', 'Emma', 'Raveena', 'Ivy', 'Joanna', 'Joey', 'Justin',
-             'Kendra', 'Kimberly', 'Matthew', 'Salli', 'Geraint' ]             
+#voices = [ 'Nicole', 'Russell', 'Amy', 'Brian', 'Emma', 'Raveena', 'Ivy', 'Joanna', 'Joey', 'Justin',
+#             'Kendra', 'Kimberly', 'Matthew', 'Salli', 'Geraint' ]
+voices = [ 'Geraint', 'Gwyneth', 'Mads', 'Naja',  'Hans', 'Marlene', 'Nicole', 'Russell', 'Amy', 'Brian', 'Emma', 'Raveena', 'Ivy', 'Joanna', 'Joey',
+ 'Justin', 'Kendra', 'Kimberly', 'Salli', 'Conchita', 'Enrique', 'Miguel', 'Penelope', 'Chantal', 'Celine', 'Mathieu', 'Dora', 'Karl', 'Carla',
+ 'Giorgio', 'Mizuki', 'Liv', 'Lotte', 'Ruben', 'Ewa', 'Jacek', 'Jan', 'Maja', 'Ricardo', 'Vitoria', 'Cristiano',  'Ines', 'Carmen', 'Maxim', 'Tatyana', 
+ 'Astrid', 'Filiz', 'Takumi' ]             
 users = {}
 robot_voice = None
 hw_num = None
 fallback_tts = None
+messenger = None
 
-def new_voice(*args):
+def new_voice(command, args):
     global users
 
-    print(args)
-    if (args[1]['anonymous'] != True):
-        users[args[1]['name']] = random.choice(voices)
-   
-    
+    if (args['anonymous'] != True):
+        user = args['name']
+        if len(command) > 1:
+            if command[1] in voices:
+                users[user] = command[1]
+            else:
+                users[user] = random.choice(voices)
+
+        if messenger:
+            networking.sendChatMessage(".%s your voice is now %s" %(user, users[user]))
 
 def setup(robot_config):
     global client
@@ -32,6 +43,7 @@ def setup(robot_config):
     global hw_num
     global random_voice
     global fallback_tts
+    global messenger
     
     owner = robot_config.get('robot', 'owner')
     owner_voice = robot_config.get('polly', 'owner_voice')
@@ -42,6 +54,7 @@ def setup(robot_config):
     access_key=robot_config.get('polly', 'access_key')
     secrets_key=robot_config.get('polly', 'secrets_key')
     region_name=robot_config.get('polly', 'region_name')
+    messenger = robot_config.getboolean('messenger', 'enable')
     
     client = boto3.Session(aws_access_key_id=access_key,
                             aws_secret_access_key=secrets_key,
@@ -52,7 +65,9 @@ def setup(robot_config):
                             region_name=region_name)
                             
     users[owner] = owner_voice
-    users['jill'] = 'Amy'
+#    users['jill'] = 'Amy'
+    users['jill'] = 'Mizuki'
+    users['Hep'] = 'Justin'
 
     if random_voice: # random voices enabled
         if robot_config.getboolean('tts', 'ext_chat'): #ext_chat enabled, add voice command
@@ -62,7 +77,7 @@ def setup(robot_config):
     # Setup the fallback tts
     fallback_tts = mod_utils.import_module('tts', 'espeak')
     fallback_tts.setup(robot_config)
-        
+
 def say(*args):
     message = args[0]
     response = None
@@ -104,13 +119,13 @@ def say(*args):
             print("TTS Error! Falling back on espeak.")
             fallback_tts.say(message, args[1])
 
-        if "AudioStream" in response:
-#        out = open ('/tmp/polly.mp3', 'w+')
-#        out.write(response['AudioStream'].read())
-#        out.close()
-#        player = Popen(['/usr/bin/mpg123-alsa', '-a', 'hw:1,1', '-q', '/tmp/polly.mp3'], stdin=PIPE, bufsize=1)
-#        os.remove('/tmp/polly.mp3')
-            play = Popen(['/usr/bin/mpg123-alsa', '-a', 'hw:%d,0' % hw_num, '-q', '-'], stdin=PIPE, bufsize=1)
-            play.communicate(response['AudioStream'].read())
+    if "AudioStream" in response:
+#     out = open ('/tmp/polly.mp3', 'w+')
+#     out.write(response['AudioStream'].read())
+#     out.close()
+#     player = Popen(['/usr/bin/mpg123-alsa', '-a', 'hw:1,1', '-q', '/tmp/polly.mp3'], stdin=PIPE, bufsize=1)
+#     os.remove('/tmp/polly.mp3')
+        play = Popen(['/usr/bin/mpg123-alsa', '-a', 'hw:%d,0' % hw_num, '-q', '-'], stdin=PIPE, bufsize=1)
+        play.communicate(response['AudioStream'].read())
             
 

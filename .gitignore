@@ -1,0 +1,27 @@
+snapshot.jpg
+single_frame_image.jpg
+robotoutput.txt
+nohup.out
+npm-debug.log
+gpio.conf
+
+#ignore jetbrains files
+.idea/
+
+#ignore (open?) files with ~ in name:
+*~
+*.pyc
+*.swp
+
+#ignore emacs temporary files
+\#*\#
+.\#*
+
+*.bak
+letsrobot.conf
+hardware/hardware_custom.py
+tts/tts_custom.py
+chat_custom.py
+tts/secret.py
+
+hardware/maestro.py

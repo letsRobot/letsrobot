@@ -29,11 +29,13 @@ apiServer = None
 robot_id = None
 camera_id = None
 
+messengerEnabled = None
 messengerHost = None
 messengerPort = None
 messengerName = None
 messengerUsername = None
 messengerPassword = None
+messengerQueue = []
 
 appServerSocketIO = None
 controlSocketIO = None
@@ -42,6 +44,8 @@ messengerSocket = None
 no_chat_server = None
 secure_cert = None
 debug_messages = None
+
+onHandleChatMesasge = None
 
 def getControlHostPort():
     url = 'https://%s/get_control_host_port/%s' % (infoServer, robot_id)
@@ -102,38 +106,71 @@ def waitForControlServer():
                 print("Warning: Control Server Socket not connected.");
 
 def waitForChatServer():
+    global chatSocket
+
     while True:
         try:
             chatSocket.wait(seconds=1)        
         except AttributeError:
             if debug_messages:
                 print("Warning: Chat Server Socket not connected.");
+        except IndexError:
+                print("Error: Chat Server Socket has FAILED");
+                startListenForChatServer()
+                return
         
 def waitForMessengerServer():
     while True:
+        if len(messengerQueue):
+            messengerSocket.emit('chat_message', messengerQueue.pop(0))
         try:
-            chatSocket.wait(seconds=1)        
+            messengerSocket.wait(seconds=1)        
         except AttributeError:
             if debug_messages:
-                print("Warning: Messenger Chat Socket not connected.");
+                print("Warning: Messenger Chat Socket not connected.");a
+                startListenForMessengerServer()
+                return
         
 def startListenForAppServer():
-#   thread.start_new_thread(waitForAppServer, ())
     watchdog.start("AppServerListen", waitForAppServer)
 
 def startListenForControlServer():
-#   thread.start_new_thread(waitForControlServer, ())
     watchdog.start("ControlServerListen", waitForControlServer)
 
 def startListenForChatServer():
-#   thread.start_new_thread(waitForChatServer, ())
+    global chatSocket
+
+    chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace)
+
+    print("Connected to chat socket.io")
+    chatSocket.on('chat_message_with_name', onHandleChatMessage)
+    chatSocket.on('connect', onHandleChatConnect)
+    chatSocket.on('reconnect', onHandleChatReconnect)
+    if debug_messages:
+        chatSocket.on('disconnect', onHandleChatDisconnect)
     watchdog.start("ChatServerListen", waitForChatServer)
+    return chatSocket
 
 def startListenForMessengerServer():
-#   thread.start_new_thread(waitForChatServer, ())
+    global messengerSocket
+
+    cookie = getMessengerAuthToken()
+
+    if not cookie.status_code == 200:
+        print('ERROR : Messenger username / password rejected by server')
+        sys.exit()
+
+    messengerSocket = SocketIO('https://%s' % messengerHost, messengerPort, LoggingNamespace, cookies={'connect.sid': cookie.cookies['connect.sid']})
+
+    print("Connected to messenger chat socket.io")
+    messengerSocket.on('connect', onHandleMessengerConnect)
+    messengerSocket.on('reconnect', onHandleMessengerReconnect)
+    if debug_messages:
+        messengerSocket.on('disconnect', onHandleMessengerDisconnect)
+
     watchdog.start("MessengerServerListen", waitForMessengerServer)
-
-
+    return messengerSocket
+   
 def onHandleAppServerConnect(*args):
     identifyRobotID()    
     if debug_messages:
@@ -233,6 +270,7 @@ def setupSocketIO(robot_config):
     global secure_cert
     global debug_messages
 
+    global messengerEnable
     global messengerHost
     global messengerPort
     global messengerName
@@ -240,13 +278,14 @@ def setupSocketIO(robot_config):
     global messengerPassword
 
     debug_messages = robot_config.getboolean('misc', 'debug_messages') 
-    robot_id = robot_config.getint('robot', 'robot_id')
+    robot_id = robot_config.get('robot', 'robot_id')
     camera_id = robot_config.getint('robot', 'camera_id')
     infoServer = robot_config.get('misc', 'info_server')
     apiServer =robot_config.get('misc', 'api_server')
     no_chat_server = robot_config.getboolean('misc', 'no_chat_server')
     secure_cert = robot_config.getboolean('misc', 'secure_cert')
 
+    messengerEnable = robot_config.get('messenger', 'enable')
     messengerHost = robot_config.get('messenger', 'host')
     messengerPort = robot_config.getint('messenger', 'port')
     messengerUsername = robot_config.get('messenger', 'username')
@@ -286,21 +325,13 @@ def setupControlSocket(on_handle_command):
     return controlSocketIO
 
 def setupChatSocket(on_handle_chat_message):
-    global chatSocket
-    
+    global onHandleChatMessage
+
     if not no_chat_server:
         if debug_messages:
             print('Connecting socket.io to chat host port', chatHostPort)
-
-        chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace)
-
-        print("Connected to chat socket.io")
+        onHandleChatMessage = on_handle_chat_message
         startListenForChatServer()
-        chatSocket.on('chat_message_with_name', on_handle_chat_message)
-        chatSocket.on('connect', onHandleChatConnect)
-        chatSocket.on('reconnect', onHandleChatReconnect)    
-        if debug_messages:
-            chatSocket.on('disconnect', onHandleChatDisconnect)
         return chatSocket
     else:
         print("chat server connection disabled")
@@ -325,21 +356,7 @@ def setupMessengerSocket():
     if not no_chat_server:
         if debug_messages:
             print('Connecting socket.io to messenger chat host port', "%s %s" % (messengerHost, messengerPort))
-        cookie = getMessengerAuthToken()
-        
-        if not cookie.status_code == 200:
-            print('ERROR : Messenger username / password rejected by server')
-            sys.exit() 
-       
-        messengerSocket = SocketIO('https://%s' % messengerHost, messengerPort, LoggingNamespace, cookies={'connect.sid': cookie.cookies['connect.sid']})
-
-        print("Connected to messenger chat socket.io")
         startListenForMessengerServer()
-        messengerSocket.on('connect', onHandleMessengerConnect)
-        messengerSocket.on('reconnect', onHandleMessengerReconnect)    
-        if debug_messages:
-            messengerSocket.on('disconnect', onHandleMessengerDisconnect)
-
         return messengerSocket
     else:
         print("messenger chat server connection disabled")
@@ -364,8 +381,12 @@ def sendOnlineState(state):
     print("online state: %s" % onlineState)
 
 def ipInfoUpdate():
-    appServerSocketIO.emit('ip_information',
-                  {'ip': subprocess.check_output(["hostname", "-I"]).decode('utf-8'), 'robot_id': robot_id})
+    try:
+        appServerSocketIO.emit('ip_information', 
+            {'ip': subprocess.check_output(["hostname", "-I"]).decode('utf-8'), 'robot_id': robot_id})
+    except AttributeError:
+        if debug_messages:
+            print("Error: Cant send ip address update, no app socket")
 
 def identifyRobotID():
     """tells the server which robot is using the connection"""
@@ -404,7 +425,14 @@ def internetStatus_task():
 
 def sendChatMessage(message):
     new_message = "[%s] %s" % (messengerName, message)
-    print ("%s %s %d" % (new_message, "CozmoTester", robot_id)) 
-#    messengerSocket.emit('chat_message', { 'message': new_message, 'robot_id': robot_id, 'robot_name': messengerName, "secret": "iknowyourelookingatthisthatsfine"})
-    messengerSocket.emit('chat_message', { 'message': new_message, 'robot_id': robot_id, "secret": "iknowyourelookingatthisthatsfine"})
-        
+
+    print ("%s %s %s" % (new_message, messengerName, robot_id)) 
+    chat_message = { 'message': new_message,
+                     'robot_id': robot_id,
+                     'robot_name': messengerName,
+                     'secret': "iknowyourelookingatthisthatsfine" }
+
+    if messengerEnable:
+        if not no_chat_server:
+            messengerQueue.append(chat_message)
+

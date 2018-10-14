@@ -38,9 +38,10 @@ except:
     print ("Error in letsrobot.conf:", sys.exc_info()[0])
     sys.exit()
 
-
 handlingCommand = False    
 chat_module = None
+move_handler = None
+terminate = thread.allocate_lock()
 
 # This is required to allow us to get True / False boolean values from the
 # command line    
@@ -55,17 +56,15 @@ def str2bool(v):
 # TODO assess these and other options in the config to see which ones are most 
 # appropriate to be overidden from the command line.
 # check the command line for and config file overrides.
-
-
-
-
 parser = argparse.ArgumentParser(description='start robot control program')
 parser.add_argument('--robot-id', help='Robot ID', default=robot_config.get('robot', 'robot_id'))
 parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default=robot_config.get('misc', 'info_server'))
 parser.add_argument('--type', help="Serial or motor_hat or gopigo2 or gopigo3 or l298n or motozero or pololu", default=robot_config.get('robot', 'type'))
+parser.add_argument('--video', default=robot_config.get('camera', 'type'))
 parser.add_argument('--custom-hardware', type=str2bool, default=robot_config.getboolean('misc', 'custom_hardware'))
 parser.add_argument('--custom-tts', type=str2bool, default=robot_config.getboolean('misc', 'custom_tts'))
 parser.add_argument('--custom-chat', type=str2bool, default=robot_config.getboolean('misc', 'custom_chat'))
+parser.add_argument('--custom-video', type=str2bool, default=robot_config.getboolean('misc', 'custom_video'))
 parser.add_argument('--ext-chat-command', type=str2bool, default=robot_config.getboolean('tts', 'ext_chat'))
 parser.add_argument('--secure-cert', type=str2bool, default=robot_config.getboolean('misc', 'secure_cert'))
 parser.add_argument('--debug-messages', type=str2bool, default=robot_config.getboolean('misc', 'debug_messages'))
@@ -187,6 +186,11 @@ def handle_command(args):
         global handlingCommand
         handlingCommand = True
 
+        # catch move commands that happen before the controller has fully
+        # loaded and set a move handler.
+        if move_handler == None:
+           return
+
         if 'command' in args and 'robot_id' in args and args['robot_id'] == robotID:
         
             if debug_messages:
@@ -235,6 +239,11 @@ def auto_wifi_task():
     t = Timer(10, auto_wifi_task)
     t.daemon = True
     t.start()
+
+def restart_controller(command, args):
+    if extended_command.is_authed(args['name']) == 2: # Owner
+        terminate.acquire()
+
                     
 # TODO : This really doesn't belong here, should probably be in start script.
 # watch dog timer
@@ -259,15 +268,6 @@ appServerSocketIO = networking.setupAppSocket(on_handle_exclusive_control)
 # If messenger is enabled, connect a chat socket for return messages
 if robot_config.getboolean('messenger', 'enable'):
     messengerSocket = networking.setupMessengerSocket()
-    messengerSocket.emit('chat_message', { 'message': '[Hello Bot] Hello world!', 'robot_id': '60582868', 'robot_name': 'Hello Bot', "secret": "iknowyourelookingatthisthatsfine"})
-
-
-# If reverse SSH is enabled and if the key file exists, import it and hook it in.
-if robot_config.getboolean('misc', 'reverse_ssh') and os.path.isfile(robot_config.get('misc', 'reverse-ssh-key-file')):
-    import reverse_ssh
-    setupReverseSsh(robot_config)
-
-global drivingSpeed
 
 # If custom hardware extensions have been enabled, load them if they exist. Otherwise load the default
 # controller for the specified hardware type.
@@ -294,6 +294,36 @@ module.setup(robot_config)
 move_handler = module.move
 
 # Load a custom chat handler if enabled and exists
+if commandArgs.custom_video:
+    if os.path.exists('video/video_custom.py'):
+        if (sys.version_info > (3, 0)):
+            video_module = importlib.import_module('video.video_custom')
+        else:
+            video_module = __import__('video.video_custom', fromlist=['video_custom'])
+    else:
+        print("Unable to find video/video_custom.py")    
+        if (sys.version_info > (3, 0)):
+            video_module = importlib.import_module('video.'+commandArgs.video)
+        else:
+            video_module = __import__("video."+commandArgs.video, fromlist=[commandArgs.video])
+else:
+    if (sys.version_info > (3, 0)):
+        video_module = importlib.import_module('video.'+commandArgs.video)
+    else:
+        video_module = __import__("video."+commandArgs.video, fromlist=[commandArgs.video])
+
+# Setup the video encoding
+video_module.setup(robot_config)
+video_module.start()
+
+#load the extended chat commands
+if ext_chat:
+    extended_command.setup(robot_config)
+    extended_command.move_handler=move_handler
+    move_handler = extended_command.move_auth
+    extended_command.add_command('.restart', restart_controller)
+
+# Load the video handler
 if commandArgs.custom_chat:
     if os.path.exists('chat_custom.py'):
         if (sys.version_info > (3, 0)):
@@ -305,18 +335,16 @@ if commandArgs.custom_chat:
     
     else:
        print("Unable to find chat_custom.py")
-
-#load the extended chat commands
-if ext_chat:
-    extended_command.setup(robot_config)
-    extended_command.move_handler=move_handler
-    move_handler = extended_command.move_auth
     
 # add auto wifi task
 if auto_wifi:
     auto_wifi_task()
 
-while True:
+import atexit
+atexit.register(print, "Attempting to clean up and exit nicely")
+
+while not terminate.locked():
     time.sleep(1)
     watchdog.watch()
-                                
+
+sys.exit()

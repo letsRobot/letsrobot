@@ -45,6 +45,7 @@ def setup(robot_config):
         mode=GPIO.getmode()
         print(" mode ="+str(mode))
 
+    GPIO.setwarnings(False)
     GPIO.cleanup()
     
     if robot_config.getboolean('tts', 'ext_chat'): #ext_chat enabled, add motor commands

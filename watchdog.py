@@ -21,3 +21,7 @@ def start(name, startFunction, *args, **kwargs):
     thread.setDaemon(True)
     thread.start()
     watches[name] = [thread, startFunction, args, kwargs]
+
+def stop(name):
+    del watches[name]
+

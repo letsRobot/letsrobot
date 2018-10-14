@@ -55,7 +55,6 @@ dev_mode = None
 dev_mode_mods = False
 anon_control = True
 owner = None
-v4l2_ctl = None
 robot_id = None
 api_key = None
 stationary = None
@@ -64,13 +63,11 @@ mods=[]
 
 def setup(robot_config):
     global owner
-    global v4l2_ctl
     global robot_id
     global api_key
     global buttons_json
     
     owner = robot_config.get('robot', 'owner')
-    v4l2_ctl = robot_config.get('misc', 'v4l2-ctl')
     robot_id = robot_config.get('robot', 'robot_id')
 
     if robot_config.has_option('robot', 'api_key'):
@@ -277,24 +274,6 @@ def show_exclusive_handler(command, args):
                     robot_util.setShowExclusive(True, robot_id, api_key)
                     return
 
-def brightness(command, args):
-    if len(command) > 1:
-        if is_authed(args['name']): # Moderator
-            os.system(v4l2_ctl + " --set-ctrl brightness=" + command[1])
-            print("brightness set to " + command[1])
-
-def contrast(command, args):
-    if len(command) > 1:
-        if is_authed(args['name']): # Moderator
-            os.system(v4l2_ctl + " --set-ctrl contrast=" + command[1])
-            print("contrast set to " + command[1])
-
-def saturation(command, args):
-    if len(command) > 2:
-        if is_authed(args['name']): # Moderator
-            os.system(v4l2_ctl + " --set-ctrl saturation=" + command[1])
-            print("saturation set to " + command[1])
-	
 # This is a dictionary of commands and their handler functions
 commands={    '.anon'       :    anon_handler,
 	            '.ban'        :    ban_handler,
@@ -308,9 +287,6 @@ commands={    '.anon'       :    anon_handler,
               '.public'    :    public_mode_handler,
               '.show_exclusive':     show_exclusive_handler,
               '.word_filter':    word_filter_handler,
-              '.brightness' :    brightness,
-              '.contrast'   :    contrast,    
-              '.saturation' :    saturation,
               '.stationary' :    stationary_handler
 	        }
 
@@ -318,8 +294,12 @@ def handler(args):
     command = args['message']
 # TODO : This will not work with robot names with spaces, update it to split on ']'
 # [1:]
-    command = command.split(']')[1:][0].split(' ')[1:]
-    print(command)
+
+    try:	
+        command = command.split(']')[1:][0].split(' ')[1:]
+        print(command)
+    except IndexError: # catch empty messages
+        return
     
     if command != None:
         if command[0] in commands:
