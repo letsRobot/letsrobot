@@ -20,10 +20,12 @@ calc_wt_size() {
     WT_MENU_HEIGHT=$(($WT_HEIGHT-7))
 }
 
+# TODO write to file instead of returning 0 on everything
+
 do_robot_owner() {
     ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
-        #sed -i -e "s/<Username>/$ROBOT_OWNER/g" letsrobot.conf
+        # Set the robot owner
         return 0
     fi
 }
@@ -82,9 +84,9 @@ do_stream_key() {
 }
 
 do_api_key() {
-    API_KEY=$(whiptail --passwordbox "Please enter your API key" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    API_KEY=$(whiptail --passwordbox "Please enter your API key" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)  
     RET=$?
-    if [ $ret -eq 1 ]; then
+    if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
         #sed -i -e "s/<APIKey>/$API_KEY/g" letsrobot.conf
@@ -241,28 +243,63 @@ do_no_camera() {
 }
 
 do_video_type() {
-    return 0
-
+    VIDEO_TYPE=$(whiptail --radiolist "Choose a video encoder type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
+               "ffmpeg" "FFMPEG" ON \
+               "none" "None" OFF \
+               3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the video type
+        return 0
+    fi
 }
 
-do_video_xres() {
-    return 0
+# TODO set xres and yres at the same time
 
+do_video_xres() {
+    XRES=$(whiptail --inputbox "Enter an x resolution" 20 60 "640" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the x resolution
+        return 0
+    fi
 }
 
 do_video_yres() {
-    return 0
-
+    YRES=$(whiptail --inputbox "Enter a y resolution" 20 60 "480" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the y resolution
+        return 0
+    fi
 }
 
 do_video_device_number() {
-    return 0
-
+    VIDEO_DEVICE_NUM=$(whiptail --inputbox "Enter a video device number" 20 60 "0" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set device number
+        return 0
+    fi
 }
 
 do_video_bitrate() {
-    return 0
-
+    VIDEO_BITRATE=$(whiptail --inputbox "Enter a bitrate" 20 60 "512" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set bitrate
+        return 0
+    fi
 }
 
 do_video_menu() {
@@ -291,23 +328,53 @@ do_video_menu() {
 }
 
 do_no_mic() {
-    return 0
-
+    NO_MIC=$(whiptail --yesno "Disable the microphone?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        # Disable the microphone
+        return 0
+    elif [ $RET -eq 1 ]; then
+        # Enable the microphone
+        return 0
+    else
+        return $RET
+    fi
 }
 
 do_mic_type() {
-    return 0
-
+    MIC_TYPE=$(whiptail --radiolist "Choose a microphone encoder type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
+               "ffmpeg" "FFMPEG" ON \
+               "none" "None" OFF \
+               3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the microphone type
+        return 0
+    fi
 }
 
 do_mic_device_number() {
-    return 0
-
+    MIC_DEVICE_NUM=$(whiptail --inputbox "enter a microphone device number" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # set the microphone device number
+        return 0
+    fi
 }
 
 do_mic_bitrate() {
-    return 0
-
+    MIC_BITRATE=$(whiptail --inputbox "Enter a bitrate" 20 60 "512" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set bitrate
+        return 0
+    fi
 }
 
 do_microphone_menu() {
@@ -338,6 +405,8 @@ do_finish() {
     fi
 }
 
+# In testing, the next 3 lines will cause an error that can safely be ignored
+# the copy command will fail. "cp: cannot stat '~/letsrobot/letsrobot.sample.conf': no such file or directory"
 CONF_FILE="~/letsrobot.conf"
 REPO_DIR="~/letsrobot"
 cp ${REPO_DIR}/letsrobot.sample.conf $CONF_FILE
