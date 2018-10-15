@@ -4,4 +4,4 @@
 # (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot
 
 cd /home/pi/runmyrobot
-nohup scripts/repeat_start python letsrobot_control.py &> /dev/null &
+nohup scripts/repeat_start python letsrobot.py &> /dev/null &
