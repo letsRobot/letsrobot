@@ -47,7 +47,7 @@ echo '# (1) Put in the ids for your robot, YOURROBOTID and YOURCAMERAID' >> ~/st
 echo '# (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot' >> ~/start_robot
 echo 'cd /home/pi/letsrobot' >> ~/start_robot
 echo "nohup scripts/repeat_start python reverse_ssh.py ${input_robot} &> /dev/null &" >> ~/start_robot
-echo "nohup scripts/repeat_start python letsrobot_control.py ${input_robot} &> /dev/null &" >> ~/start_robot
+echo "nohup scripts/repeat_start python letsrobot.py ${input_robot} &> /dev/null &" >> ~/start_robot
 
 # Make sure the system is up to date
 sudo apt-get -y update
