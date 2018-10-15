@@ -1,0 +1,216 @@
+#!/bin/bash
+# Let's Robot Install script
+# See LICENSE for copyright and license details
+
+
+
+INTERACTIVE=true
+calc_wt_size() {
+    WT_HEIGHT=17
+    WT_WIDTH=$(tput cols)
+
+    if [ -z "$WT_WIDTH" ] || [ "$WT_WIDTH" -lt 60 ]; then
+        WT_WIDTH = 78
+    fi
+
+    if [ "$WT_WIDTH" -gt 178 ]; then
+        WT_WIDTH=118
+    fi
+
+    WT_MENU_HEIGHT=$(($WT_HEIGHT-7))
+}
+
+do_robot_owner() {
+    ROBOT_OWNER=$(whiptial --inputbox "Please enter your letsrobot.tv username" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    if [ $? -eq 0 ]; then
+        sed -i -e "s/<Username>/$ROBOT_OWNER/g" letsrobot.conf
+    fi
+}
+
+do_robot_id() {
+    ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    if [ $? -eq 0 ]; then
+        sed -i -e "s/<RobotID>/$ROBOT_ID/g" letsrobot.conf
+    fi
+}
+
+do_camera_id() {
+    CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    if [ $? -eq 0 ]; then
+        sed -i -e "s/<CameraID>/$CAMERA_ID/g" letsrobot.conf
+    fi
+}
+
+do_robot_type() {
+    ROBOT_TYPE=$(whiptail --radiolist "Choose a robot type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
+        "serial_board" "Serial" ON \
+        "motor_hat" "Adafruit Motor Hat" OFF \
+        "gopigo2" "GoPiGo2" OFF \
+        "gopigo3" "GoPiGo3" OFF \
+        "l298n" "L298N" OFF \
+        "motozero" "Motozero" OFF \
+        "pololu" "Pololu" OFF \
+        "adafruit_pwm" "Adafruit PWM" OFF \
+        "owi_arm" "OWI Arm" OFF \
+        "none" "None" \
+        3>&1 1>&2 3>&1)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i -e "s/<RobotType>/$ROBOT_TYPE/g" letsrobot.conf
+    fi
+}
+
+do_stream_key() {
+    STREAM_KEY=$(whiptail --passwordbox "Please enter your stream key" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i -e "s/<StreamKey>/$STREAM_KEY/g" letsrobot.conf
+    fi
+}
+
+do_api_key() {
+    API_KEY=$(whiptail --passwordbox "Please enter your API key" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $ret -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i -e "s/<APIKey>/$API_KEY/g" letsrobot.conf
+    fi
+}
+
+do_robot_menu() {
+    FUN=$(whiptail --title "Let's Robot Install" --menu "Robot Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "R1 Owner" "This is your username on the letsrobot site." \
+        "R2 Robot ID" "Your robots ID." \
+        "R3 Camera ID" "You robots camera ID." \
+        "R4 Type" "Motor controller type for your robot." \
+        "R5 Stream Key" "Your stream key." \
+        "R6 API Key" "Your API key (Optional)" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            R1\ *) do_robot_owner ;;
+            R2\ *) do_robot_id ;;
+            R3\ *) do_camera_id ;;
+            R4\ *) do_robot_type ;;
+            R5\ *) do_stream_key ;;
+            R6\ *) do_api_key ;;
+            *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+
+
+do_tts_menu() {
+    FUN=$(whiptail --title "Let's Robot Install" --menu "TTS Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "T1 Type" "Specify the TTS Engine you are using here." \
+        "T2 Volume" "How loud you want it to be" \
+        "T3 Anon" "Enable or disable anon messages" \
+        "T4 Filter URLs" "Enable or Disable URls from being spoken" \
+        "T5 Extended Chat" "Enable or Disable extended chat commands" \
+        "T6 Hardware Number" "ALSA HW Number for your playback device" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            T1\ *) do_tts_type ;;
+            T2\ *) do_tts_volume ;;
+            T3\ *) do_tts_anon ;;
+            T4\ *) do_tts_urls ;;
+            T5\ *) do_tts_ext_chat ;;
+            T6\ *) do_tts_hw_number ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_video_menu() {
+    FUN=$(whiptail --title "Let\'s Robot Install" --menu "Video Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "V1 No Camera" "Enable or Disable the camera." \
+        "V2 Type" "Specify the video encoder you are using" \
+        "V3 X res" "X resolution to capture video" \
+        "V4 Y res" "Y resolution to capture video" \
+        "V5 Device Number" "Device Number of your camera" \
+        "V6 Bitrate" "Bitrate to encode video"\
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            V1\ *) do_no_camera ;;
+            V2\ *) do_video_type ;;
+            V3\ *) do_video_xres ;;
+            V4\ *) do_video_yres ;;
+            V5\ *) do_video_device_number ;;
+            V6\ *) do_video_bitrate ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_microphone_menu() {
+    FUN=$(whiptail --title "Let\'s Robot Install" --menu "TTS Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "M1 No Mic" "Enable or Disable the Microphone" \
+        "M2 Type" "Specify the audio encoder" \
+        "M3 Device Number" "Microphone device number" \
+        "M4 Bitrate" "Bitrate to encode video" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            M1\ *) do_no_mic ;;
+            M2\ *) do_mic_type ;;
+            M3\ *) do_mic_device_number ;;
+            M4\ *) do_mic_bitrate ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_finish() {
+    whiptail --yesno "Are you sure you're finished?" 20 60 2
+    if [ $? -eq 0 ]; then # yes
+        exit 0
+    fi
+}
+
+CONF_FILE="~/letsrobot.conf"
+REPO_DIR="~/letsrobot"
+cp ${REPO_DIR}/letsrobot.sample.conf $CONF_FILE
+if [ "$INTERACTIVE" = true ]; then
+    calc_wt_size
+    while true; do
+        FUN=$(whiptail --title "Let's Robot Install" --menu "Main Menu" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Finish --ok-button Select \
+            "1  Robot" "Set basic robot parameters here" \
+            "2  TTS" "Set TTS Settings here" \
+            "3  Video" "Set Video Settings here" \
+            "4  Microphone" "Set Microphone settings here" \
+            3>&1 1>&2 2>&3)
+    
+        RET=$?
+        if [ $RET -eq 1 ]; then
+            do_finish
+        elif [ $RET -eq 0 ]; then
+            case "$FUN" in
+                1\ *) do_robot_menu ;;
+                2\ *) do_tts_menu ;;
+                3\ *) do_video_menu ;;
+                4\ *) do_microphone_menu ;;
+                *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+            esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+        fi
+    done
+fi
