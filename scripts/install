@@ -136,7 +136,7 @@ do_tts_type() {
 }
 
 do_tts_volume() {
-    TTS_VOLUME=$(whiptail --inputbox "Choose how loud you want TTS to be (0-100)" 60 20 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    TTS_VOLUME=$(whiptail --inputbox "Choose how loud you want TTS to be (0-100)" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
@@ -148,22 +148,56 @@ do_tts_volume() {
 }
 
 do_tts_anon() {
-    return 0
+    TTS_ANON=$(whiptail --yesno "Would you like to enable TTS For guest accounts?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        # enable anons
+        return 0
+    elif [ $RET -eq 1 ]; then
+        # disable anons
+        return 0
+    else
+        return $RET
+    fi
 }
 
 do_tts_urls() {
-    return 0
-
+    TTS_URLS=$(whiptail --yesno "Would you like to have TTS speak URLs?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        # enable TTS URLs
+        return 0
+    elif [ $RET -eq 1 ]; then
+        # disable TTS URLs
+        return 0
+    else
+        return $RET
+    fi
 }
 
 do_tts_ext_chat() {
-    return 0
-
+    TTS_EXT_CHAT=$(whiptail --yesno "Would you like to enable extended chat commands?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        # Enable extended chat
+        return 0
+    elif [ $RET -eq 1 ]; then
+        # disable extended chat
+        return 0
+    else
+        return $RET
+    fi
 }
 
 do_tts_hw_number() {
-    return 0
-
+    TTS_HW_NUM=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "0" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the hardware number
+        return 0
+    fi
 }
 
 do_tts_menu() {
@@ -192,7 +226,17 @@ do_tts_menu() {
 }
 
 do_no_camera() {
-    return 0
+    NO_CAMERA=$(whiptail --yesno "Disable the camera?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        # Disable the camera
+        return 0
+    elif [ $RET -eq 1 ]; then
+        # Enable the camera
+        return 0
+    else
+        return $RET
+    fi
 
 }
 
