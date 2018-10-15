@@ -3,84 +3,125 @@
 
 ## Open Robot Control Code For Connecting to LetsRobot.tv 
 
-LetsRobot.tv is a site for interacts with other using telepresence robots. User create their own robots and add them to the site.
-https://letsrobot.tv
+LetsRobot.tv is a robotic telepresence network. Anyone can connect a robot and allow users all over the world to interact with it. Our vision is to have a social platform that powers robots worldwide. These robots will be controlled by the crowd to offer experiences unlike that of any current media experience, turning passive viewers into active doers.
 
-## Installing robot control and video scripts on a Raspberry Pi
+You can find additional documentation including information about our API on our [readme.io](https://letsrobot.readme.io/) page as well.
 
+## Initializing and Setting up the Raspberry Pi
 
-The RasPi will need the following things install so it can talk to your motor and talk to the internet.
+The brain of your robot is the Raspberry Pi, it connects everything to LetsRobot.tv and runs all of the hardware. The first step is to set up your Pi.
 
-1. Install python serial, gnutls, python-dev, espeak, and python-smbus:
+1. ### Flash a MicroSD Card
 
-   ```
-   sudo apt-get install python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
-   ```
+   Start by flashing an 8GB microSD card on your PC or Mac. You will need a micro SD card reader, or an adapter and a standard SD card reader.
 
+   Download  [Etcher](https://etcher.io/)  and flash an 8GB (or more) micro SD card with the  [Raspian Stretch Lite disk image (.img file)](https://www.raspberrypi.org/downloads/raspbian/). You can also do it  [manually](https://howchoo.com/g/ndg2mtbmnmn/how-to-install-raspbian-stretch-on-the-raspberry-pi).
 
-2. Install configparser and socket.io client for python:
+2. ### Connect to your Raspberry Pi
+   If it is your first time with a Raspberry Pi you should connect an HDMI monitor and keyboard as well as power the Pi with a quality micro USB cord with a power supply that is providing 5V and at least 2.0 amps. The  [official Raspberry Pi power supply](https://www.raspberrypi.org/products/raspberry-pi-universal-power-supply/)provides 5V 2.5 amps.
 
-   ```
-   sudo pip install socketIO-client configparser
-   ```
+      _One of the major issues most robot builders come across is poor quality USB Power packs and USB cables. Many batteries will not actually provide the amperage they say they are rated for. The Raspberry Pi should optimally be run at a steady 5V 2.4amps_
 
+   We will be doing things in a non GUI (Graphical User Interface) fashion and instead setting things up using the command line. This is so that you begin to better familiarize yourself with programming and navigating the brain of your robot this way. There are many ways to do this part but learning to navigate the terminal and command line will be important an important step.
 
-3. Install alsa-lib
-   ```
-   cd ~
-   mkdir src
-   cd ~/src
-   wget ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.0.25.tar.bz2 
-   tar xjf alsa-lib-1.0.25.tar.bz2
-   cd ~/src/alsa-lib-1.0.25 
-   ./configure --host=arm-unknown-linux-gnueabi 
-   make -j4 
-   sudo make install
-   ```
+   You can find some commonly used commands or the raspberry pi [here](https://howchoo.com/g/ythizdrmnwu/the-most-common-raspberry-pi-commands-and-what-they-do).
 
-4. Install x264
-   ```
-   cd ~/src
-   git clone git://git.videolan.org/x264
-   cd x264
-   ./configure --host=arm-unknown-linux-gnueabi --enable-static --disable-opencl
-   make -j4
-   sudo make install
-   ```
-
-5. Install FFmpeg
-   ```
-   cd ~/src
-   git clone https://github.com/FFmpeg/FFmpeg.git
-   cd FFmpeg
-   ./configure --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree --enable-gnutls --extra-libs=-ldl
-   make -j4
-   sudo make install
-   ```
-
-
-## Bring your Bot to life: Programs to run on the Raspberry Pi
-
-1. Start by cloning the LetsRobot repository
-   ```
-   cd ~
-   git clone https://github.com/letsrobot/letsrobot
-   cd letsrobot
-   ```
-
-2. Go to new robot page to create a robot. If you already have one, go to manage robots. There you'll find your Robot ID and Camera ID.
-
-3. These two scripts need to be running in the background to bring your robot to life: controller.py and send_video.py. Here are instructions about how to start them. Copy the 'start_robot' Script from runmyrobot/Scripts to the pi home folder
+3. ### The login prompt
+   Once your raspberry pi has finished booting, the first prompt you should see is the login prompt. Enter the default username and pasword.
 
    ```
-   cp ~/letsrobot/scripts/start_robot ~/
+   Username: pi 
+   Password: raspberry
    ```
 
-4. Edit the script so you can adjust the settings for controller.py and send_video.py.  
+4. ### Set Up your Raspberry Pi using raspi-config
+
+   1. Enter raspi-config by entering the following at the command prompt:
+
+      ```sudo raspi-config```
+
+   2.  If this is your first time running raspi-config, it will ask you to  Setup Locale, Timezone, and Wifi Country as soon as you start raspi-config. Choose appropriate settings for your location.
+    
+   3. Change your password! This is very important as leaving the password as the default, will allow anyone on the same network to gain direct access to you robot.
+   ![raspi-config main screen](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/raspi-config.png)
+
+
+   4.   Network Options. Add your wifi SSID and Password, if that fails to connect try these  [instructions](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) after exiting raspi-config.
+![raspi-config networking options screen](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/raspi-config-network.png)
+
+   5.   Interfacing Options. Enable SSH, you will want to be able to connect to your robot using your computer remote. If for no other reason to copy and paste the command line instructions to avoid typos.  You may want to also enable I2C here if you plan on using the Adafruit Motor Hat or others that use I2C.
+![raspi-config interfacing options screen](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/raspi-config-interfacing.png)
+   6.   Exit the Raspi-config. To exit use your right arrow key to move and select `<Back>`, hit enter. Then do the same thing to select the `<Finish>` button.
+5. ### Reboot your Raspberry Pi
+
+   To restart your Raspberry Pi, type the following into the command prompt:
+   ```sudo reboot```
+
+   When you reboot to the command line your IP address should be shown in the last few messages before the login prompt. Write it down.
+
+6. ### [](https://github.com/runmyrobot/runmyrobot/blob/master/README.md#connect-via-ssh-to-the-raspberry-pi)Connect via SSH to your Raspberry Pi
+
+   Switch over to your computer on the connected to the same network as the Raspberry pi is connected.
+
+   1. Open the Terminal program on your PC or Mac.
+
+      ```ssh pi@YOUR-PI-IPADDRESS```
+
+   2. Enter your login details.
    ```
-   nano ~/start_robot
-   ```  
-   Change YOURROBOTID and YOURCAMERAID to your robots robot ID and camera ID. You are provided with both IDs when you create a new bot on the website in step 2.
+   username: pi 
+   password: the new password you just set
+   ```
+
+   3.   Copy and paste all of the commands below into the terminal instead of typing them arduously line by line.
+
+7. ### Update your Raspberry Pi
+   Run the following command through the ssh terminal.
+   ```sudo apt-get update```
+
+## Create A Robot on Your LetsRobot.tv Account
+1. Load LetsRobot.tv and select  _sign up / log in_  on the upper right of the page.
+
+2. Login or create an account
+
+   ![letsrobot login](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-login.png)
+
+3. Navigate to your profile and click + Add a new Robot!
+
+   ![letsrobot add new](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-add-new.png)
+
+4. Now edit your new robot.
+
+   ![letsrobot create new robot](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-create-robot.png)
+
+5. Fill out the Name and Description, then select a resolution.
+  
+   ![letsrobot robot profile](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-robot-profile.png)
+   
+6. Enter a Stream Key and  **BE SURE TO SAVE**
+ 
+   ![letsrobot robot settings](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-robot-settings.png)
+   
+
+## Installing LetsRobot control scripts on a Raspberry Pi
+
+The RasPi will need the following things install so it can talk to your motors and talk to the internet. Make sure you don’t get any errors in the console when doing the step below. If you have an issue, you can run this line again, and that will usually fix it!
+
+1. Install the required software libraries and tools. Make sure you don’t get any errors in the console when doing the step below. If you have an issue, you can run this line again, and that will usually fix it!
+   ```
+   sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
+   ```
+
+2. Download the LetsRobot control scripts from our github
+   ```
+   git clone https://github.com/letsRobot/letsrobot.git ~/letsrobot
+   ```
+
+3. Install python requirements
+
+   ```
+   sudo python -m pip install -r ~/letsrobot/requirements.txt
+   ```
 
 
 5. Copy letsrobot.sample.conf to letsrobot.conf
@@ -93,14 +134,14 @@ The RasPi will need the following things install so it can talk to your motor an
 
 1. Edit the letsrobot.conf file created in the previous section.
    ```
-   nano letsrobot.conf
+   nano ~letsrobot.conf
    ```
 2. Configure the [robot] section
    * owner should be the username you have registered the robot under on the LetsRobot site.
    * robot_id should be the robot ID for your robot, obtained in step 2 of the Bring your Bot to life section.
    * camera_id should be the camera ID for your robot, obtained in same step as robot ID.
-   * turn_delay is only used by the motor_hat, mdd10 and telly. This changes how long your bot turns for. I suggest you leave this at the default value until after you bot is moving.
-   * straight_delay is only used by the motor_hat, mdd10 and telly. This changes how long your bot turns for. I suggest you leave this at the default value until after you bot is moving.
+   * turn_delay is only used by the motor_hat and mdd10. This changes how long your bot turns for. I suggest you leave this at the default value until after you bot is moving.
+   * straight_delay is only used by the motor_hat and mdd10. This changes how long your bot turns for. I suggest you leave this at the default value until after you bot is moving.
    * type should be the hardware type for the motor controller of your bot. Available types are currently.
       * adafruit_pwm
       * cozmo
@@ -120,7 +161,15 @@ The RasPi will need the following things install so it can talk to your motor an
       * telly
    * Configure your hardwares section. Each hardware type can have their own section it the controller. Look through the file for a section named the same as your hardware controller. If the section exists, read through it and adjust the variable as required.
 
-3. Configure the [tts] section 
+3. Configure the [camera] section
+   * no-mic This allows the microphone to be disabled.
+   * no-camera This allows the camera to be disabled.
+   * type This sets the audio / video handler to use. Currently only ffmpeg and ffmpeg-arecord are supported.
+   * x_res Sets the resolution for the x axis. 
+   * y_res Sets the resolution for the y axis.
+   * camera_device Sets the device name for the camera.
+   * audio_hw_num Set the audio hardware number for the microphone.
+5. Configure the [tts] section 
    * tts_volume This is the volume level you want your bot to start with.
    * anon_tts This allows you to enable or disable anonymous users access to your bots TTS features.
    * filter_url_tts This option allows URLs pasted into chat to be blocked from the TTS function.
@@ -132,20 +181,59 @@ The RasPi will need the following things install so it can talk to your motor an
       * Amazon Polly
       * cozmo_tts
 
-## Start scripts on boot
-1. Use crontab to start the start_robot script on booting:
+## Setting up your start_robot file on the Raspberry Pi
+
+1. Copy the start_robot script to your home directory.
+
+   ```cp ~/runmyrobots/scipts/start_robot ~```
+
+2. Add the startup script to the crontab
+   ```
+   crontab -e 
+   ```
+
+   Note: If you accidently use the wrong editor try
+
+   `EDITOR=nano crontab -e`
+
+3. Insert the following text at the bottom
+
+   `@reboot /bin/bash /home/pi/start_robot`
+
+   Example:
 
    ```
-   crontab -e
-   ```
+   # Edit this file to introduce tasks to be run by cron.
+   #
+   # Each task to run has to be defined through a single line
+   # indicating with different fields when the task will be run
+   # and what command to run for the task
+   #
+   # To define the time you can provide concrete values for
+   # minute (m), hour (h), day of month (dom), month (mon),
+   # and day of week (dow) or use '*' in these fields (for 'any').#
+   # Notice that tasks will be started based on the cron's system
+   # daemon's notion of time and timezones.
+   #
+   # Output of the crontab jobs (including errors) is sent through
+   # email to the user the crontab file belongs to (unless redirected).
+   #
+   # For example, you can run a backup of all your user accounts
+   # at 5 a.m every week with:
+   # 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+   #
+   # For more information see the manual pages of crontab(5) and cron(8)
+   #
+   # m h  dom mon dow   command
 
-2. insert following line and save:
-
-   ```
    @reboot /bin/bash /home/pi/start_robot
    ```
 
-That's it!
+4. Now just plug in the Camera and USB Speaker and reboot
+
+   `sudo reboot`
+
+Hopefully you’ll hear your robot say “OK” and everything will be working! If not, it is time to checking the Technical FAQ and Troubleshooting Tips. Also drop in to our  [Discord Channel](https://discord.gg/uGmTWd)  and ask for help.
 
 ## How does this work
 
@@ -153,11 +241,9 @@ We use ffmpeg to stream audio and socket.io to send control messages.
 
 ## How to contribute
 
-The is a community project. Making your own bot? Adding your own control stuff? Cool! We'd like to hear from you.
-
+The is a community project. Making your own bot? Adding your own control stuff? Cool! We'd like to hear from you. Drop in to our [Discord Channel](https://discord.gg/uGmTWd) and say Hi!
 
 # Hardware Compatibility
----
 The following hardware is supported.
 
 * Adafruit Motor Hat
@@ -200,8 +286,8 @@ Hardware modules can have their own hardware specific TTS commands.
 
 ## Cozmo
 
-For Anki Cozmo on Mac or Linux, please see the intructions [here](COZMO_MAC.md).
-For Windows instructions, please see the instructions [here](COZMO_WIN.md).
+For Anki Cozmo on Mac or Linux, please see the intructions [here](documentation/COZMO_MAC.md).
+For Windows instructions, please see the instructions [here](documentation/COZMO_WIN.md).
 
 ## GoPiGo3
 
@@ -228,7 +314,6 @@ Install [Maestro Servon controller library]( https://github.com/FRC4564/Maestro)
 ## Pololu DRV8835 Motor Driver
 Install [DRV8835 Motor Driver library](https://github.com/pololu/drv8835-motor-driver-rpi)
 
-<<<<<<< HEAD
 ## Pololu MC33926 Motor Driver
 Install [MC33926 Motor Driver library](https://github.com/pololu/dual-mc33926-motor-driver-rpi)
 
