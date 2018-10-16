@@ -26,24 +26,21 @@ do_robot_owner() {
     ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         # Set the robot owner
-        return 0
+        sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
     fi
 }
 
 do_robot_id() {
     ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
-        #sed -i -e "s/<RobotID>/$ROBOT_ID/g" letsrobot.conf
-        return 0
-
+        sed -i "/^\[robot]/,/^\[/{s/^robot_id[[:space:]]*=.*/robot_id=$ROBOT_ID/}" $CONF_FILE
     fi
 }
 
 do_camera_id() {
     CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
-        #sed -i -e "s/<CameraID>/$CAMERA_ID/g" letsrobot.conf
-        return 0
+        sed -i "/^\[robot]/,/^\[/{s/^camera_id[[:space:]]*=.*/camera_id=$CAMERA_ID/}" $CONF_FILE
 
     fi
 }
@@ -65,8 +62,7 @@ do_robot_type() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<RobotType>/$ROBOT_TYPE/g" letsrobot.conf
-        return 0
+        sed -i "/^\[robot]/,/^\[/{s/^type[[:space:]]*=.*/type=$ROBOT_TYPE/}" $CONF_FILE
 
     fi
 }
@@ -77,8 +73,7 @@ do_stream_key() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<StreamKey>/$STREAM_KEY/g" letsrobot.conf
-        return 0
+        sed -i "/^\[robot]/,/^\[/{s/^streak_key[[:space:]]*=.*/streak_key=$STREAM_KEY/}" $CONF_FILE
 
     fi
 }
@@ -89,8 +84,7 @@ do_api_key() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<APIKey>/$API_KEY/g" letsrobot.conf
-        return 0
+        sed -i "/^\[robot]/,/^\[/{s/^api_key[[:space:]]*=.*/api_key=$API_KEY/}" $CONF_FILE
 
     fi
 }
@@ -131,8 +125,7 @@ do_tts_type() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<TTSType>/$TTS_TYPE/g" letsrobot.conf
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^type[[:space:]]*=.*/type=$TTS_TYPE/}" $CONF_FILE
 
     fi
 }
@@ -143,8 +136,7 @@ do_tts_volume() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Do the thing
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^tts_volume[[:space:]]*=.*/tts_volume=$TTS_VOLUME/}" $CONF_FILE
 
     fi
 }
@@ -154,10 +146,10 @@ do_tts_anon() {
     RET=$?
     if [ $RET -eq 0 ]; then
         # enable anons
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^anon_tts[[:space:]]*=.*/anon_tts=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
         # disable anons
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^anon_tts[[:space:]]*=.*/anon_tts=false/}" $CONF_FILE
     else
         return $RET
     fi
@@ -168,10 +160,10 @@ do_tts_urls() {
     RET=$?
     if [ $RET -eq 0 ]; then
         # enable TTS URLs
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^filter_url_tts[[:space:]]*=.*/filter_url_tts=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
         # disable TTS URLs
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^filter_url_tts[[:space:]]*=.*/filter_url_tts=false/}" $CONF_FILE
     else
         return $RET
     fi
@@ -182,10 +174,10 @@ do_tts_ext_chat() {
     RET=$?
     if [ $RET -eq 0 ]; then
         # Enable extended chat
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^ext_chat[[:space:]]*=.*/ext_chat=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
         # disable extended chat
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^ext_chat[[:space:]]*=.*/ext_chat=false/}" $CONF_FILE
     else
         return $RET
     fi
@@ -197,8 +189,7 @@ do_tts_hw_number() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the hardware number
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$TTS_HW_NUM/}" $CONF_FILE
     fi
 }
 
@@ -232,10 +223,10 @@ do_no_camera() {
     RET=$?
     if [ $RET -eq 0 ]; then
         # Disable the camera
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^no_camera[[:space:]]*=.*/no_camera=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
         # Enable the camera
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^no_camera[[:space:]]*=.*/no_camera=false/}" $CONF_FILE
     else
         return $RET
     fi
@@ -252,7 +243,7 @@ do_video_type() {
         return 0
     elif [ $RET -eq 0 ]; then
         # Set the video type
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^type[[:space:]]*=.*/type=$VIDEO_TYPE/}" $CONF_FILE
     fi
 }
 
@@ -265,7 +256,7 @@ do_video_xres() {
         return 0
     elif [ $RET -eq 0 ]; then
         # Set the x resolution
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^x_res[[:space:]]*=.*/x_res=$XRES/}" $CONF_FILE
     fi
 }
 
@@ -276,7 +267,7 @@ do_video_yres() {
         return 0
     elif [ $RET -eq 0 ]; then
         # Set the y resolution
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^y_res[[:space:]]*=.*/y_res=$YRES/}" $CONF_FILE
     fi
 }
 
@@ -287,7 +278,7 @@ do_video_device_number() {
         return 0
     elif [ $RET -eq 0 ]; then
         # Set device number
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^camera_device[[:space:]]*=.*/camera_device=$VIDEO_DEVICE_NUM/}" $CONF_FILE
     fi
 }
 
@@ -298,7 +289,7 @@ do_video_bitrate() {
         return 0
     elif [ $RET -eq 0 ]; then
         # Set bitrate
-        return 0
+        sed -i "/^\[ffmpeg]/,/^\[/{s/^video_bitrate[[:space:]]*=.*/video_bitrate=$VIDEO_BITRATE/}" $CONF_FILE
     fi
 }
 
@@ -332,10 +323,10 @@ do_no_mic() {
     RET=$?
     if [ $RET -eq 0 ]; then
         # Disable the microphone
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^no_mic[[:space:]]*=.*/no_mic=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
         # Enable the microphone
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^no_mic[[:space:]]*=.*/no_mic=false/}" $CONF_FILE
     else
         return $RET
     fi
@@ -373,7 +364,7 @@ do_mic_bitrate() {
         return 0
     elif [ $RET -eq 0 ]; then
         # Set bitrate
-        return 0
+        sed -i "/^\[ffmpeg]/,/^\[/{s/^audio_bitrate[[:space:]]*=.*/audio_bitrate=$MIC_BITRATE/}" $CONF_FILE
     fi
 }
 
@@ -407,8 +398,8 @@ do_finish() {
 
 # In testing, the next 3 lines will cause an error that can safely be ignored
 # the copy command will fail. "cp: cannot stat '~/letsrobot/letsrobot.sample.conf': no such file or directory"
-CONF_FILE="~/letsrobot.conf"
-REPO_DIR="~/letsrobot"
+CONF_FILE="/home/$USER/letsrobot/letsrobot.conf"
+REPO_DIR="/home/$USER/letsrobot"
 cp ${REPO_DIR}/letsrobot.sample.conf $CONF_FILE
 if [ "$INTERACTIVE" = true ]; then
     calc_wt_size
