@@ -4,6 +4,7 @@
 # Look at making it so the ffmpeg process toggles a boolean, that is used to 
 # update the server with online state appropriately. 
 
+import audio_util
 import networking
 import watchdog
 import subprocess
@@ -31,6 +32,7 @@ ffmpeg_location = None
 v4l2_ctl_location = None
 
 audio_hw_num = None
+audio_device = None
 audio_codec = None
 audio_channels = None
 audio_bitrate = None
@@ -40,7 +42,6 @@ video_bitrate = None
 video_filter = ''
 video_device = None
 audio_input_format = None
-audio_input_device = None
 audio_input_options = None
 audio_output_options = None
 video_input_options = None
@@ -73,6 +74,7 @@ def setup(robot_config):
     global v4l2_ctl_location
 
     global audio_hw_num
+    global audio_device
     global audio_codec
     global audio_channels
     global audio_bitrate
@@ -82,7 +84,6 @@ def setup(robot_config):
     global video_filter
     global video_device
     global audio_input_format
-    global audio_input_device
     global audio_input_options
     global audio_output_options
     global video_input_format
@@ -141,11 +142,13 @@ def setup(robot_config):
             extended_command.add_command('.saturation', saturationChatHandler)
         
     if not no_mic:
-#    audioDevNum = robotSettings.audio_device_number
-#    if robotSettings.audio_device_name is not None:
-#        audioDevNum = audio_util.getAudioDeviceByName(robotSettings.audio_device_name)
         audio_hw_num = robot_config.get('camera', 'audio_hw_num')
-        
+        audio_device = robot_config.get('camera', 'audio_device')
+        if audio_device != '':
+            temp_hw_num = audio_util.getMicByName(audio_device.encode('utf-8'))
+            if temp_hw_num != None:
+                audio_hw_num = temp_hw_num       
+ 
         audioHost = websocketRelayHost['host']
         audioPort = networking.audioPort
         print ("Relay host for audio: %s:%s" % (audioHost, audioPort))
@@ -155,7 +158,6 @@ def setup(robot_config):
         audio_sample_rate = robot_config.get('ffmpeg', 'audio_sample_rate')
         audio_channels = robot_config.get('ffmpeg', 'audio_channels')
         audio_input_format = robot_config.get('ffmpeg', 'audio_input_format')
-        audio_input_device = robot_config.get('ffmpeg', 'audio_input_device')
         audio_input_options = robot_config.get('ffmpeg', 'audio_input_options')
         audio_output_options = robot_config.get('ffmpeg', 'audio_output_options')
 
@@ -164,7 +166,7 @@ def setup(robot_config):
 
         # format the device for hw number if using alsa
         if audio_input_format == 'alsa':
-            audio_input_device = 'hw:' + audio_hw_num
+            audio_device = 'hw:' + str(audio_hw_num)
 
 def start():
     if not no_camera:
@@ -271,7 +273,7 @@ def restartVideoCapture():
 def startAudioCapture():
     global audio_process
     audioCommandLine = ('{ffmpeg} -f {audio_input_format} -ar {audio_sample_rate} -ac {audio_channels}'
-                       ' {in_options} -i {audio_input_device} -f mpegts'
+                       ' {in_options} -i {audio_device} -f mpegts'
                        ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
                        ' -muxdelay 0.001 {out_options}'
                        ' http://{audio_host}:{audio_port}/{stream_key}/640/480/')
@@ -281,7 +283,7 @@ def startAudioCapture():
                             audio_sample_rate=audio_sample_rate,
                             audio_channels=audio_channels,
                             in_options=audio_input_options,
-                            audio_input_device=audio_input_device,
+                            audio_device=audio_device,
                             audio_codec=audio_codec,
                             audio_bitrate=audio_bitrate,
                             out_options=audio_output_options,
