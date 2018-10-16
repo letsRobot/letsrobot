@@ -1,7 +1,7 @@
 #!/bin/bash
 # Let's Robot Install script
 # See LICENSE for copyright and license details
-
+# Version 1.1
 
 
 INTERACTIVE=true
@@ -89,6 +89,7 @@ do_api_key() {
     fi
 }
 
+# owner, robot id, camera id, type, stream key, api key
 do_robot_menu() {
     FUN=$(whiptail --title "Let's Robot Install" --menu "Robot Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
         "R1 Owner" "This is your username on the letsrobot site." \
@@ -112,6 +113,16 @@ do_robot_menu() {
             *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
         esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
+}
+
+# no camera, no mic, type, x res, y res, camera device, audio hardware number
+do_camera_menu() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu)
+}
+
+# ffmpeg location, v4l2-ctl location, audio codec, audio channels, audio bitrate, audio sample rate, video codec, video bitrate, audio input format, audio input device, autio input options, audio output options, video input format, video input options, video output options, arecord path, arecord format
+do_ffmpeg_menu() {
+
 }
 
 do_tts_type() {
@@ -193,6 +204,7 @@ do_tts_hw_number() {
     fi
 }
 
+# type, volume, anon, filter urls, ext chat, hw number, espeak, festival, polly, pico
 do_tts_menu() {
     FUN=$(whiptail --title "Let's Robot Install" --menu "TTS Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
         "T1 Type" "Specify the TTS Engine you are using here." \
@@ -216,6 +228,11 @@ do_tts_menu() {
             *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
         esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
+}
+
+# cozmo, adafruit pwm, owi arm, serial, motor hat, gopigo2, gopigo3, l298n, motozero, pololu, mc33926, max7219
+do_board_menu() {
+
 }
 
 do_no_camera() {
@@ -405,21 +422,34 @@ if [ "$INTERACTIVE" = true ]; then
     calc_wt_size
     while true; do
         FUN=$(whiptail --title "Let's Robot Install" --menu "Main Menu" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Finish --ok-button Select \
+        #    "1  Robot" "Set basic robot parameters here" \
+        #    "2  TTS" "Set TTS Settings here" \
+        #    "3  Video" "Set Video Settings here" \
+        #    "4  Microphone" "Set Microphone settings here" \
+        #    
             "1  Robot" "Set basic robot parameters here" \
-            "2  TTS" "Set TTS Settings here" \
-            "3  Video" "Set Video Settings here" \
-            "4  Microphone" "Set Microphone settings here" \
+            "2  Camera" "Set camera and microphone settings here" \
+            "3  ffmpeg" "Set FFMPEG settings here" \
+            "4  TTS" "Set Text-To-Speech settings here" \
+            "5  Board" "Set board specific settings here" \
+            "6  Messenger" "Optional settings used when sending messages from the robot back to the chat" \
+            "7  Misc" "Miscellanious options you probably don't need to change" \
             3>&1 1>&2 2>&3)
-    
         RET=$?
         if [ $RET -eq 1 ]; then
             do_finish
         elif [ $RET -eq 0 ]; then
             case "$FUN" in
                 1\ *) do_robot_menu ;;
-                2\ *) do_tts_menu ;;
-                3\ *) do_video_menu ;;
-                4\ *) do_microphone_menu ;;
+                2\ *) do_camera_menu ;;
+                3\ *) do_ffmpeg_menu ;;
+                4\ *) do_tts_menu ;;
+                5\ *) do_board_menu ;;
+
+            #   1\ *) do_robot_menu ;;
+            #   2\ *) do_tts_menu ;;
+            #   3\ *) do_video_menu ;;
+            #   4\ *) do_microphone_menu ;;
                 *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
             esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
         fi
