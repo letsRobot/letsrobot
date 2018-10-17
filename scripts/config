@@ -128,7 +128,7 @@ do_camera_menu() {
 
 # ffmpeg location, v4l2-ctl location, audio codec, audio channels, audio bitrate, audio sample rate, video codec, video bitrate, audio input format, audio input device, autio input options, audio output options, video input format, video input options, video output options, arecord path, arecord format
 do_ffmpeg_menu() {
-
+    return 0
 }
 
 do_tts_type() {
@@ -241,7 +241,7 @@ do_tts_menu() {
 
 # cozmo, adafruit pwm, owi arm, serial, motor hat, gopigo2, gopigo3, l298n, motozero, pololu, mc33926, max7219
 do_board_menu() {
-
+    return 0
 }
 
 do_no_camera() {
@@ -415,6 +415,40 @@ do_microphone_menu() {
     fi
 }
 
+# Setup parallaxy kit
+do_parallaxy_setup() {
+    return 0
+}
+
+# Setup botington kit
+do_bottington_setup() {
+    return 0
+}
+
+# setup telly kit
+do_telly_setup() {
+    
+}
+
+do_kit_menu() {
+    FUN=$(whiptail --title "Let's Robot Install" --menu "Kit Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "K1 Parallaxy" "Setup a Parallaxy kit" \
+        "K2 Bottington" "Setup a Bottington kit" \
+        "K3 Telly" "Setup a Telly Bot kit" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            K1\ *) do_parallaxy_setup ;;
+            K2\ *) do_bottington_setup ;;
+            K3\ *) do_telly_setup ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
 do_finish() {
     whiptail --yesno "Are you sure you're finished?" 20 60 2
     if [ $? -eq 0 ]; then # yes
@@ -431,11 +465,6 @@ if [ "$INTERACTIVE" = true ]; then
     calc_wt_size
     while true; do
         FUN=$(whiptail --title "Let's Robot Install" --menu "Main Menu" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Finish --ok-button Select \
-        #    "1  Robot" "Set basic robot parameters here" \
-        #    "2  TTS" "Set TTS Settings here" \
-        #    "3  Video" "Set Video Settings here" \
-        #    "4  Microphone" "Set Microphone settings here" \
-        #    
             "1  Robot" "Set basic robot parameters here" \
             "2  Camera" "Set camera and microphone settings here" \
             "3  ffmpeg" "Set FFMPEG settings here" \
@@ -443,6 +472,7 @@ if [ "$INTERACTIVE" = true ]; then
             "5  Board" "Set board specific settings here" \
             "6  Messenger" "Optional settings used when sending messages from the robot back to the chat" \
             "7  Misc" "Miscellanious options you probably don't need to change" \
+            "8  Kit" "Quickly set up a standard kit" \
             3>&1 1>&2 2>&3)
         RET=$?
         if [ $RET -eq 1 ]; then
@@ -454,11 +484,9 @@ if [ "$INTERACTIVE" = true ]; then
                 3\ *) do_ffmpeg_menu ;;
                 4\ *) do_tts_menu ;;
                 5\ *) do_board_menu ;;
-
-            #   1\ *) do_robot_menu ;;
-            #   2\ *) do_tts_menu ;;
-            #   3\ *) do_video_menu ;;
-            #   4\ *) do_microphone_menu ;;
+                6\ *) do_messenger_menu ;;
+                7\ *) do_misc_menu ;;
+                8\ *) do_kit_menu ;;
                 *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
             esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
         fi
