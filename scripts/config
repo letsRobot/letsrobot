@@ -1,5 +1,5 @@
 #!/bin/bash
-# Let's Robot Install script
+# Let's Robot Config script
 # See LICENSE for copyright and license details
 # Version 1.1
 
@@ -96,8 +96,9 @@ do_api_key() {
 }
 
 # owner, robot id, camera id, type, stream key, api key
+# Ignore turn_delay and straight_delay for the moment. Handled in other areas
 do_robot_menu() {
-    FUN=$(whiptail --title "Let's Robot Install" --menu "Robot Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Robot Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
         "R1 Owner" "This is your username on the letsrobot site." \
         "R2 Robot ID" "Your robots ID." \
         "R3 Camera ID" "You robots camera ID." \
@@ -121,14 +122,137 @@ do_robot_menu() {
     fi
 }
 
+do_no_camera() {
+    NO_CAMERA=$(whiptail --yesno "Disable the camera?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        # Disable the camera
+        return 0
+    elif [ $RET -eq 1 ]; then
+        # Enable the camera
+        return 0
+    else
+        return $RET
+    fi
+
+}
+
+do_no_mic() {
+    NO_MIC=$(whiptail --yesno "Disable the microphone?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        # Disable the microphone
+        return 0
+    elif [ $RET -eq 1 ]; then
+        # Enable the microphone
+        return 0
+    else
+        return $RET
+    fi
+}
+
+do_camera_type() {
+    CAMERA_TYPE=$(whiptail --radiolist "Choose an a/v encoder type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
+               "ffmpeg" "FFMPEG" ON \
+               "ffmpeg-arecord" OFF \
+               "none" "None" OFF \
+               3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the camera type
+        return 0
+    fi
+}
+
+do_camera_resolution() {
+    return 0
+}
+
+do_camera_device() {
+    CAMERA_DEVICE_NUM=$(whiptail --inputbox "Enter a camera device" 20 60 "/dev/video0" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set device number
+        return 0
+    fi
+}
+
+do_audio_hw_num() {
+    AUDIO_HW_NUM=$(whiptail --inputbox "enter an audio hardware number" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # set the audio hardware number
+        return 0
+    fi
+}
+
+do_audio_device() {
+    AUDIO_HW_NUM=$(whiptail --inputbox "enter an audio device name" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # set the audio device
+        return 0
+    fi
+}
+
 # no camera, no mic, type, x res, y res, camera device, audio hardware number
 do_camera_menu() {
-    FUN=$(whiptail --title "Let's Robot Config" --menu)
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Camera Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "C1 No Camera" "Disable the camera" \
+        "C2 No Mic" "Disable the microphone" \
+        "C3 Type" "Specify the audio/video encoder being used" \
+        "C4 Resolution" "Set the capture resolution" \
+        "C5 Camera Device" "Set the camera device" \
+        "C6 Audio hardware number" "Set the audio hardware number" \
+        "C7 Audio device" "Set the audio device name" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            C1\ *) do_no_camera ;;
+            C2\ *) do_no_mic ;;
+            C3\ *) do_camera_type ;;
+            C4\ *) do_camera_resolution ;;
+            C5\ *) do_camera_device ;;
+            C6\ *) do_audio_hw_num ;;
+            C7\ *) do_audio_device ;;
+            *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
 }
 
 # ffmpeg location, v4l2-ctl location, audio codec, audio channels, audio bitrate, audio sample rate, video codec, video bitrate, audio input format, audio input device, autio input options, audio output options, video input format, video input options, video output options, arecord path, arecord format
 do_ffmpeg_menu() {
-    return 0
+    FUN=$(whiptail --title "Let's Robot Config" --menu "FFMPEG Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "F1 Location" "Set FFMPEG install location" \
+        "F2 v4l2-ctl Location" "Set v4l20-ctl location" \
+        "F4 audio channels" "Specify how many audio channels there are" \
+        "F5 audio bitrate" "Specify the audio bitrate" \
+        "F6 video bitrate" "Specify the video bitrate" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            F1\ *) do_ffmpeg_location ;;
+            F2\ *) do_v4l2_location ;;
+            F3\ *) do_audio_channels ;;
+            F4\ *) do_audio_bitrate ;;
+            F5\ *) do_video_bitrate ;;
+            *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
 }
 
 do_tts_type() {
@@ -215,7 +339,7 @@ do_tts_hw_number() {
 
 # type, volume, anon, filter urls, ext chat, hw number, espeak, festival, polly, pico
 do_tts_menu() {
-    FUN=$(whiptail --title "Let's Robot Install" --menu "TTS Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+    FUN=$(whiptail --title "Let's Robot Config" --menu "TTS Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
         "T1 Type" "Specify the TTS Engine you are using here." \
         "T2 Volume" "How loud you want it to be" \
         "T3 Anon" "Enable or disable anon messages" \
@@ -241,37 +365,45 @@ do_tts_menu() {
 
 # cozmo, adafruit pwm, owi arm, serial, motor hat, gopigo2, gopigo3, l298n, motozero, pololu, mc33926, max7219
 do_board_menu() {
-    return 0
-}
-
-do_no_camera() {
-    NO_CAMERA=$(whiptail --yesno "Disable the camera?" 20 60 2 3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 0 ]; then
-        # Disable the camera
-        return 0
-    elif [ $RET -eq 1 ]; then
-        # Enable the camera
-        return 0
-    else
-        return $RET
-    fi
-
-}
-
-do_video_type() {
-    VIDEO_TYPE=$(whiptail --radiolist "Choose a video encoder type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
-               "ffmpeg" "FFMPEG" ON \
-               "none" "None" OFF \
-               3>&1 1>&2 2>&3)
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Board options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "B1  Cozmo" "Configure Cozmo settings" \
+        "B2  Adafruit PWM" "Configure Adafruit PWM settings" \
+        "B3  OWI Arm" "Configure OWI Arm settings" \
+        "B4  Serial" "Configure Serial settings" \
+        "B5  Motor Hat" "Configure Motor Hat settings" \
+        "B6  GoPiGo2" "Configure GoPiGo2 settings" \
+        "B7  GoPiGo3" "Configure GoPiGo3 settings" \
+        "B7  L298N" "Configure L298N settings" \
+        "B8  Motozero" "Configure Motozero settings" \
+        "B9  Pololu" "Configure Pololu settings" \
+        "B10 MC33926" "Configure MC33926 settings" \
+        "B11 Max7219" "Configure Max7219 settings" \
+        3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the video type
-        return 0
+        case "$FUN" in
+            B1\ *) do_board_cozmo ;;
+            B2\ *) do_board_adafruit ;;
+            B3\ *) do_board_owi ;;
+            B4\ *) do_board_serial ;;
+            B5\ *) do_board_motor_hat ;;
+            B6\ *) do_board_gopigo2 ;;
+            B7\ *) do_board_gopigo3 ;;
+            B8\ *) do_board_l298n ;;
+            B9\ *) do_board_motozero ;;
+            B10\ *) do_board_pololu ;;
+            B11\ *) do_board_mc33926 ;;
+            B12\ *) do_board_max7219 ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
 }
+
+
+
+
 
 # TODO set xres and yres at the same time
 
@@ -297,16 +429,7 @@ do_video_yres() {
     fi
 }
 
-do_video_device_number() {
-    VIDEO_DEVICE_NUM=$(whiptail --inputbox "Enter a video device number" 20 60 "0" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 1 ]; then
-        return 0
-    elif [ $RET -eq 0 ]; then
-        # Set device number
-        return 0
-    fi
-}
+
 
 do_video_bitrate() {
     VIDEO_BITRATE=$(whiptail --inputbox "Enter a bitrate" 20 60 "512" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
@@ -316,102 +439,6 @@ do_video_bitrate() {
     elif [ $RET -eq 0 ]; then
         # Set bitrate
         return 0
-    fi
-}
-
-do_video_menu() {
-    FUN=$(whiptail --title "Let\'s Robot Install" --menu "Video Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
-        "V1 No Camera" "Enable or Disable the camera." \
-        "V2 Type" "Specify the video encoder you are using" \
-        "V3 X res" "X resolution to capture video" \
-        "V4 Y res" "Y resolution to capture video" \
-        "V5 Device Number" "Device Number of your camera" \
-        "V6 Bitrate" "Bitrate to encode video"\
-        3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 1 ]; then
-        return 0
-    elif [ $RET -eq 0 ]; then
-        case "$FUN" in
-            V1\ *) do_no_camera ;;
-            V2\ *) do_video_type ;;
-            V3\ *) do_video_xres ;;
-            V4\ *) do_video_yres ;;
-            V5\ *) do_video_device_number ;;
-            V6\ *) do_video_bitrate ;;
-            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
-        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
-    fi
-}
-
-do_no_mic() {
-    NO_MIC=$(whiptail --yesno "Disable the microphone?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 0 ]; then
-        # Disable the microphone
-        return 0
-    elif [ $RET -eq 1 ]; then
-        # Enable the microphone
-        return 0
-    else
-        return $RET
-    fi
-}
-
-do_mic_type() {
-    MIC_TYPE=$(whiptail --radiolist "Choose a microphone encoder type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
-               "ffmpeg" "FFMPEG" ON \
-               "none" "None" OFF \
-               3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 1 ]; then
-        return 0
-    elif [ $RET -eq 0 ]; then
-        # Set the microphone type
-        return 0
-    fi
-}
-
-do_mic_device_number() {
-    MIC_DEVICE_NUM=$(whiptail --inputbox "enter a microphone device number" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 1 ]; then
-        return 0
-    elif [ $RET -eq 0 ]; then
-        # set the microphone device number
-        return 0
-    fi
-}
-
-do_mic_bitrate() {
-    MIC_BITRATE=$(whiptail --inputbox "Enter a bitrate" 20 60 "512" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 1 ]; then
-        return 0
-    elif [ $RET -eq 0 ]; then
-        # Set bitrate
-        return 0
-    fi
-}
-
-do_microphone_menu() {
-    FUN=$(whiptail --title "Let\'s Robot Install" --menu "TTS Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
-        "M1 No Mic" "Enable or Disable the Microphone" \
-        "M2 Type" "Specify the audio encoder" \
-        "M3 Device Number" "Microphone device number" \
-        "M4 Bitrate" "Bitrate to encode video" \
-        3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 1 ]; then
-        return 0
-    elif [ $RET -eq 0 ]; then
-        case "$FUN" in
-            M1\ *) do_no_mic ;;
-            M2\ *) do_mic_type ;;
-            M3\ *) do_mic_device_number ;;
-            M4\ *) do_mic_bitrate ;;
-            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
-        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
 }
 
@@ -427,11 +454,11 @@ do_bottington_setup() {
 
 # setup telly kit
 do_telly_setup() {
-    
+    return 0
 }
 
 do_kit_menu() {
-    FUN=$(whiptail --title "Let's Robot Install" --menu "Kit Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Kit Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
         "K1 Parallaxy" "Setup a Parallaxy kit" \
         "K2 Bottington" "Setup a Bottington kit" \
         "K3 Telly" "Setup a Telly Bot kit" \
@@ -464,7 +491,7 @@ cp ${REPO_DIR}/letsrobot.sample.conf $CONF_FILE
 if [ "$INTERACTIVE" = true ]; then
     calc_wt_size
     while true; do
-        FUN=$(whiptail --title "Let's Robot Install" --menu "Main Menu" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Finish --ok-button Select \
+        FUN=$(whiptail --title "Let's Robot Config" --menu "Main Menu" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Finish --ok-button Select \
             "1  Robot" "Set basic robot parameters here" \
             "2  Camera" "Set camera and microphone settings here" \
             "3  ffmpeg" "Set FFMPEG settings here" \
