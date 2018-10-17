@@ -26,25 +26,21 @@ do_robot_owner() {
     ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         # Set the robot owner
-        return 0
+        sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
     fi
 }
 
 do_robot_id() {
     ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
-        #sed -i -e "s/<RobotID>/$ROBOT_ID/g" letsrobot.conf
-        return 0
-
+        sed -i "/^\[robot]/,/^\[/{s/^robot_id[[:space:]]*=.*/robot_id=$ROBOT_ID/}" $CONF_FILE
     fi
 }
 
 do_camera_id() {
     CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
-        #sed -i -e "s/<CameraID>/$CAMERA_ID/g" letsrobot.conf
-        return 0
-
+        sed -i "/^\[robot]/,/^\[/{s/^camera_id[[:space:]]*=.*/camera_id=$CAMERA_ID/}" $CONF_FILE
     fi
 }
 
@@ -65,9 +61,7 @@ do_robot_type() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<RobotType>/$ROBOT_TYPE/g" letsrobot.conf
-        return 0
-
+        
     fi
 }
 
@@ -358,7 +352,423 @@ do_tts_menu() {
             T4\ *) do_tts_urls ;;
             T5\ *) do_tts_ext_chat ;;
             T6\ *) do_tts_hw_number ;;
-            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_cozmo_forward_speed() {
+
+}
+
+do_cozmo_turn_speed() {
+
+}
+
+do_cozmo_volume() {
+
+}
+
+do_cozmo_charge_high() {
+
+}
+
+do_cozmo_charge_low() {
+
+}
+
+do_cozmo_send_online() {
+
+}
+
+do_cozmo_stay_on_dock() {
+
+}
+
+do_cozmo_annotate() {
+
+}
+
+do_cozmo_color() {
+
+}
+
+do_board_cozmo() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Cozmo Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "C1 Forward Speed" "Set the forward speed" \
+        "C2 Turn Speed" "Set the turn speed" \
+        "C3 Volume" "Set the volume" \
+        "C4 Charge High" "Set the high charge value" \
+        "C5 Charge Low" "Set the low charge value" \
+        "C6 Send Online Status" "Enable sending status" \
+        "C7 Stay On Dock" "Enable staying on the dock" \
+        "C8 Annotate" "Show CV in stream" \
+        "C9 Color" "Send color stream" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            C1\ *) do_cozmo_forward_speed ;;
+            C2\ *) do_cozmo_turn_speed ;;
+            C3\ *) do_cozmo_volume ;;
+            C4\ *) do_cozmo_charge_high ;;
+            C5\ *) do_cozmo_charge_low ;;
+            C6\ *) do_cozmo_send_online ;;
+            C7\ *) do_cozmo_stay_on_dock ;;
+            C8\ *) do_cozmo_annotate ;;
+            C9\ *) do_cozmo_color ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+
+}
+
+do_adafruit_address() {
+
+}
+
+do_adafruit_frequency() {
+
+}
+
+do_more_debug() {
+
+}
+
+do_board_adafruit() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Adafruit PWM Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "A1 Address" "Set the address" \
+        "A2 Frequency" "Set the PWM Frequency" \
+        "A3 More Debug" "Enable more verbose debugging" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            A1\ *) do_adafruit_address ;;
+            A2\ *) do_adafruit_frequency ;;
+            A3\ *) do_more_debug ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_board_owi() {
+    return 0
+}
+
+do_serial_device() {
+
+}
+
+do_serial_baud_rate() {
+
+}
+
+do_board_serial() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "OWI Arm Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "S1 Serial Device" "Set the serial device" \
+        "S2 Baud Rate" "Set the baud rate" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            S1\ *) do_serial_device ;;
+            S2\ *) do_serial_baud_rate ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_day_speed() {
+
+}
+
+do_night_speed() {
+
+}
+
+do_motor_hat_turning_speed() {
+
+}
+
+do_motor_hat_forward() {
+
+}
+
+do_motor_hat_left() {
+
+}
+
+do_board_motor_hat() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Motor Hat Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "M1  Day speed" "Set the speed during the day" \
+        "M2  Night speed" "Set the speed during the night" \
+        "M3  Turning speed" "Set the turning speed" \
+        "M4  Forward" "Set the forward configuration" \
+        "M5  Left" "Set the left configuration" \
+        "M6  Slow for low battery" "Slow down when the battery is low" \
+        "M7  Charge Hours" "How many hours to charge the battery for" \
+        "M8  Discharge Hours" "How many hours to discharge the battery for" \
+        "M9  Charge Check Interval" "How long between each charge check" \
+        "M10 Charge IO Number" "Charge IO Number" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            M1\ *) do_day_speed ;;
+            M2\ *) do_night_speed ;;
+            M3\ *) do_motor_hat_turning_speed ;;
+            M4\ *) do_motor_hat_forward ;;
+            M5\ *) do_motor_hat_left ;;
+            M6\ *) do_slow_for_low_battery ;;
+            M7\ *) do_charge_hours ;;
+            M8\ *) do_discharge_hours ;;
+            M9\ *) do_charge_check_interval ;;
+            M10\ *) do_charge_io_number ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_gopigo2_drive_time() {
+
+}
+
+do_gopigo2_turn_time() {
+
+}
+
+do_board_gopigo2() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "GoPiGo2 Config" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "G1 Drive Time" "Drive time" \
+        "G2 Turn Time" "Turn time" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            G1\ *) do_gopigo2_drive_time ;;
+            G2\ *) do_gopigo2_turn_time ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_gopigo3_drive_time() {
+
+}
+
+do_gopigo3_turn_time() {
+
+}
+
+do_board_gopigo3() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "GoPiGo3 Config" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "G1 Drive Time" "Drive time" \
+        "G2 Turn Time" "Turn time" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            G1\ *) do_gopigo3_drive_time ;;
+            G2\ *) do_gopigo3_turn_time ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_step_pin_forward() {
+
+}
+
+do_step_pin_backward() {
+
+}
+
+do_step_pin_left() {
+
+}
+
+do_step_pin_right() {
+
+}
+
+do_board_l298n() {
+    FUN=$(whiptail --tile "Let's Robot Config" --menu "L298N Config" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "L1 Step Pin Forward" "Set forward step pin" \
+        "L2 Step Pin Backward" "Set backward step pin" \
+        "L3 Step Pin Left" "Set left step pin" \
+        "L4 Step Pin Right" "Set right step pin" \
+        "L5 Sleep Time" "Set the sleep time" \
+        "L6 Rotate Times" "Set the rotate times" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            L1\ *) do_step_pin_forward ;;
+            L2\ *) do_step_pin_backward ;;
+            L3\ *) do_step_pin_left ;;
+            L4\ *) do_step_pin_right ;;
+            L5\ *) do_sleep_time ;;
+            L6\ *) do_rotate_times ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_motor_delay() {
+
+}
+
+do_motor_1a() {
+
+}
+
+do_motor_1b() {
+
+}
+
+do_motor_1_enable() {
+
+}
+
+do_motor_2a() {
+
+}
+
+do_motor_2b() {
+
+}
+
+do_motor_2_enable() {
+
+}
+
+do_motor_3a() {
+
+}
+
+do_motor_3b() {
+
+}
+
+do_motor_3_enable() {
+
+}
+
+do_motor_4a() {
+
+}
+
+do_motor_4b() {
+
+}
+
+do_motor_4_enable() {
+
+}
+
+do_board_motozero() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Motozero Config" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "M1  Motor Delay" "Set the motor delay" \
+        "M2  Motor 1A" "Set Motor 1A" \
+        "M3  Motor 1B" "Set motor 1b" \
+        "M4  Motor 1 enable" "Set motor 1 enable" \
+        "M5  Motor 2a" "set motor 2a" \
+        "M6  Motor 2b" "set motor 2b" \
+        "M7  Motor 2 enable" "Set motor 2 enable" \
+        "M8  Motor 3a" "set motor 3a" \
+        "M9  Motor 3b" "set motor 3b" \
+        "M10 Motor 3 enable" "Set motor 3 enable" \
+        "M11 Motor 4a" "set motor 4a" \
+        "M12 Motor 4b" "set motor 4b" \
+        "M13 Motor 4 enable" "Set motor 4 enable" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then 
+        case "$FUN" in
+            M1\ *) do_motor_delay ;;
+            M2\ *) do_motor_1a ;;
+            M3\ *) do_motor_1b ;;
+            M4\ *) do_motor_1_enable ;;
+            M5\ *) do_motor_2a ;;
+            M6\ *) do_motor_2b ;;
+            M7\ *) do_motor_2_enable ;;
+            M8\ *) do_motor_3a ;;
+            M9\ *) do_motor_3b ;;
+            M10\ *)do_motor_3_enable ;;
+            M11\ *)do_motor_4a ;;
+            M12\ *)do_motor_4b ;;
+            M13\ *)do_motor_4_enable ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_pololu_driving_speed() {
+
+}
+
+do_board_pololu() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Pololu Config" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "P1 Driving Speed" "Set the driving speed" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            P1\ *) do_pololu_driving_speed ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_mc33926_driving_speed() {
+
+}
+
+do_board_mc33926() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "MC33926 Config" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "M1 Driving Speed" "Set the driving speed" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            M1\ *) do_mc33926_driving_speed ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_board_max7219() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Max7219 Config" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "M1 LED Rotate" "Rotate the LEDs" \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$FUN" in
+            P1\ *) do_led_rotate ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
         esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
 }
@@ -396,50 +806,146 @@ do_board_menu() {
             B10\ *) do_board_pololu ;;
             B11\ *) do_board_mc33926 ;;
             B12\ *) do_board_max7219 ;;
-            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
         esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
 }
 
+do_messenger_enable() {
 
+}
 
+do_messenger_host() {
 
+}
 
-# TODO set xres and yres at the same time
+do_messenger_port() {
 
-do_video_xres() {
-    XRES=$(whiptail --inputbox "Enter an x resolution" 20 60 "640" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+}
+
+do_messenger_username() {
+
+}
+
+do_messenger_password() {
+
+}
+
+do_messenger_name() {
+
+}
+
+do_messenger_menu() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Messenger Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "M1 Enable" "Enable Messenger" \
+        "M2 Host" "Messenger Host" \
+        "M3 Port" "Messenger Port" \
+        "M4 Username" "Messenger Username" \
+        "M5 Password" "Messenger Helper" \
+        "M6 Robot Name" "Username for robot helper" \
+        3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the x resolution
-        return 0
+        case "$FUN" in
+            M1\ *) do_messenger_enable ;;
+            M2\ *) do_messenger_host ;;
+            M3\ *) do_messenger_port ;;
+            M4\ *) do_messenger_username ;;
+            M5\ *) do_messenger_password ;;
+            M6\ *) do_messenger_name ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
 }
 
-do_video_yres() {
-    YRES=$(whiptail --inputbox "Enter a y resolution" 20 60 "480" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
-    RET=$?
-    if [ $RET -eq 1 ]; then
-        return 0
-    elif [ $RET -eq 0 ]; then
-        # Set the y resolution
-        return 0
-    fi
+do_custom_hardware() {
+
 }
 
+do_custom_tts() {
 
+}
 
-do_video_bitrate() {
-    VIDEO_BITRATE=$(whiptail --inputbox "Enter a bitrate" 20 60 "512" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+do_custom_chat() {
+
+}
+
+do_custom_video() {
+
+}
+
+do_watchdog() {
+
+}
+
+do_async() {
+
+}
+
+do_chat_server() {
+
+}
+
+do_debug_messages() {
+
+}
+
+do_api_server() {
+
+}
+
+do_info_server() {
+
+}
+
+do_check_frequency() {
+
+}
+
+do_secure_cert() {
+
+}
+
+do_misc_menu() {
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Miscellaneous Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+        "M1  Custom Hardware" "Enable custom hardware" \
+        "M2  Custom TTS" "Enable custom TTS" \
+        "M3  Custom Chat" "Enable custom chat" \
+        "M4  Custom Video" "Enable custom video" \
+        "M5  Whatdog" "Enable watchdog timer" \
+        "M6  Enable async" "enable asynchronous command handling" \
+        "M7  No Chat Server" "Disable chat server connection" \
+        "M8  Debug Messages" "Enable debug messages" \
+        "M9  Info server" "Server the robot connects to" \
+        "M10 API Server" "API server the robot connects to" \
+        "M11 Check Internet" "enable periodically checking the internet connection" \
+        "M12 Check Frequency" "Frequency to check the internet connection" \
+        "M13 Secure Cert" "Enable requiring valid ssl certs" \
+        3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set bitrate
-        return 0
+        case "$FUN" in
+            M1\ *) do_custom_hardware ;;
+            M2\ *) do_custom_tts ;;
+            M3\ *) do_cutsom_chat ;;
+            M4\ *) do_custom_video ;;
+            M5\ *) do_watchdog ;;
+            M6\ *) do_async ;;
+            M7\ *) do_chat_server ;;
+            M8\ *) do_debug_messages ;;
+            M9\ *) do_info_server ;;
+            M10\ *) do_api_server ;;
+            M11\ *) do_check_internet ;;
+            M12\ *) do_check_frequency ;;
+            M13\ *) do_secure_cert ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
+        esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
+
 }
 
 # Setup parallaxy kit
@@ -471,7 +977,7 @@ do_kit_menu() {
             K1\ *) do_parallaxy_setup ;;
             K2\ *) do_bottington_setup ;;
             K3\ *) do_telly_setup ;;
-            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
         esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
     fi
 }
