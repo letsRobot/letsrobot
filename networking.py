@@ -140,7 +140,7 @@ def startListenForControlServer():
 def startListenForChatServer():
     global chatSocket
 
-    chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace)
+    chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace, transports='websocket')
 
     print("Connected to chat socket.io")
     chatSocket.on('chat_message_with_name', onHandleChatMessage)
@@ -160,7 +160,7 @@ def startListenForMessengerServer():
         print('ERROR : Messenger username / password rejected by server')
         sys.exit()
 
-    messengerSocket = SocketIO('https://%s' % messengerHost, messengerPort, LoggingNamespace, cookies={'connect.sid': cookie.cookies['connect.sid']})
+    messengerSocket = SocketIO('https://%s' % messengerHost, messengerPort, LoggingNamespace, cookies={'connect.sid': cookie.cookies['connect.sid']}, transports='websocket')
 
     print("Connected to messenger chat socket.io")
     messengerSocket.on('connect', onHandleMessengerConnect)
@@ -314,7 +314,7 @@ def setupControlSocket(on_handle_command):
     global controlSocketIO
     if debug_messages:
         print("Connecting socket.io to control host port", controlHostPort)
-    controlSocketIO = SocketIO(controlHostPort['host'], int(controlHostPort['port']), LoggingNamespace)
+    controlSocketIO = SocketIO(controlHostPort['host'], int(controlHostPort['port']), LoggingNamespace, transports='websocket')
     print("Connected to control socket.io")
     startListenForControlServer()
     controlSocketIO.on('connect', onHandleControlConnect)
@@ -340,7 +340,7 @@ def setupAppSocket(on_handle_exclusive_control):
     global appServerSocketIO
     if debug_messages:
         print("Connecting to socket.io to app server")
-    appServerSocketIO = SocketIO('letsrobot.tv', 8022, LoggingNamespace)
+    appServerSocketIO = SocketIO('letsrobot.tv', 8022, LoggingNamespace, transports='websocket')
     print("Connected to app server")
     startListenForAppServer()
     appServerSocketIO.on('exclusive_control', on_handle_exclusive_control)
