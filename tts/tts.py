@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import audio_util
 
 if (sys.version_info > (3, 0)):
     import importlib
@@ -25,6 +26,13 @@ def setup(robot_config):
     debug_messages = robot_config.get('misc', 'debug_messages')
     mute_anon = not robot_config.getboolean('tts', 'anon_tts')
     url_filter = robot_config.getboolean('tts', 'filter_url_tts')
+
+    # get playback device hardware num from name.
+    audio_device = robot_config.get('tts', 'audio_device')
+    if audio_device != '':
+        temp_hw_num = audio_util.getSpeakerByName(audio_device.encode('utf-8'))
+        if temp_hw_num != None:
+            robot_config.set('tts', 'hw_num', str(temp_hw_num))
     
     if type != 'none':
         # set volume level

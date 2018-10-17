@@ -8,6 +8,9 @@ gpio.conf
 #ignore jetbrains files
 .idea/
 
+#ignore VS Code files
+.vscode*
+
 #ignore (open?) files with ~ in name:
 *~
 *.pyc
