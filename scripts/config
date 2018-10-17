@@ -23,7 +23,7 @@ calc_wt_size() {
 # TODO write to file instead of returning 0 on everything
 
 do_robot_owner() {
-    ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "YourLetsRobotUserName" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         # Set the robot owner
         sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
@@ -31,14 +31,14 @@ do_robot_owner() {
 }
 
 do_robot_id() {
-    ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "YourRobotID" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^robot_id[[:space:]]*=.*/robot_id=$ROBOT_ID/}" $CONF_FILE
     fi
 }
 
 do_camera_id() {
-    CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "YourCameraID" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^camera_id[[:space:]]*=.*/camera_id=$CAMERA_ID/}" $CONF_FILE
     fi
@@ -46,7 +46,7 @@ do_camera_id() {
 
 do_robot_type() {
     ROBOT_TYPE=$(whiptail --radiolist "Choose a robot type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
-        "serial_board" "Serial" ON \
+        "serial_board" "Serial" OFF \
         "motor_hat" "Adafruit Motor Hat" OFF \
         "gopigo2" "GoPiGo2" OFF \
         "gopigo3" "GoPiGo3" OFF \
@@ -55,25 +55,23 @@ do_robot_type() {
         "pololu" "Pololu" OFF \
         "adafruit_pwm" "Adafruit PWM" OFF \
         "owi_arm" "OWI Arm" OFF \
-        "none" "None" OFF \
+        "none" "None" ON \
         3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        
+        sed -i "/^\[robot]/,/^\[/{s/^type[[:space:]]*=.*/type=$ROBOT_TYPE/}" $CONF_FILE
     fi
 }
 
 do_stream_key() {
-    STREAM_KEY=$(whiptail --passwordbox "Please enter your stream key" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    STREAM_KEY=$(whiptail --passwordbox "Please enter your stream key" 20 60 "hello" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<StreamKey>/$STREAM_KEY/g" letsrobot.conf
-        return 0
-
+        sed -i "/^\[robot]/,/^\[/{s/^stream_key[[:space:]]*=.*/stream_key=$STREAM_KEY/}" $CONF_FILE
     fi
 }
 
@@ -83,9 +81,7 @@ do_api_key() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<APIKey>/$API_KEY/g" letsrobot.conf
-        return 0
-
+        sed -i "/^\[robot]/,/^\[/{s/^api_key[[:space:]]*=.*/api_key=$API_KEY/}" $CONF_FILE
     fi
 }
 
@@ -117,14 +113,13 @@ do_robot_menu() {
 }
 
 do_no_camera() {
-    NO_CAMERA=$(whiptail --yesno "Disable the camera?" 20 60 2 3>&1 1>&2 2>&3)
+    NO_CAMERA=$(whiptail --yesno "Disable the camera?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 0 ]; then
         # Disable the camera
         return 0
     elif [ $RET -eq 1 ]; then
-        # Enable the camera
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^no_camera[[:space:]]*=.*/no_camera=$NO_CAMERA/}" $CONF_FILE
     else
         return $RET
     fi
@@ -138,8 +133,7 @@ do_no_mic() {
         # Disable the microphone
         return 0
     elif [ $RET -eq 1 ]; then
-        # Enable the microphone
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^no_mic[[:space:]]*=.*/no_mic=$NO_MIC/}" $CONF_FILE
     else
         return $RET
     fi
@@ -155,13 +149,41 @@ do_camera_type() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the camera type
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^type[[:space:]]*=.*/type=$CAMERA_TYPE/}" $CONF_FILE
     fi
 }
 
+do_low_resolution() {
+    sed -i "/^\[camera]/,/^\[/{s/^x_res[[:space:]]*=.*/x_res=640/}" $CONF_FILE
+    sed -i "/^\[camera]/,/^\[/{s/^y_res[[:space:]]*=.*/y_res=480/}" $CONF_FILE
+}
+
+do_default_resolution() {
+    sed -i "/^\[camera]/,/^\[/{s/^x_res[[:space:]]*=.*/x_res=768/}" $CONF_FILE
+    sed -i "/^\[camera]/,/^\[/{s/^y_res[[:space:]]*=.*/y_res=432/}" $CONF_FILE
+}
+
+do_high_resolution() {
+    sed -i "/^\[camera]/,/^\[/{s/^x_res[[:space:]]*=.*/x_res=1280/}" $CONF_FILE
+    sed -i "/^\[camera]/,/^\[/{s/^y_res[[:space:]]*=.*/y_res=720/}" $CONF_FILE
+}
+
 do_camera_resolution() {
-    return 0
+    CAMERA_RESOLUTION=$(whiptail --radiolist "Choose a resolution" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
+                      "640x480" "Low resolution" OFF \
+                      "768x432" "Default" ON \
+                      "1280x720" "High resolution" OFF \
+                      3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        case "$CAMERA_RESOLUTION" in
+            640x480\ *) do_low_resolution ;;
+            768x432\ *) do_default_resolution ;;
+            1280x720\ *) do_high_resolution ;;
+            *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
+        esac || whiptail --msgbox "There was an error running option $CAMERA_RESOLUTION" 20 60 1
 }
 
 do_camera_device() {
@@ -170,30 +192,27 @@ do_camera_device() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set device number
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^camera_device[[:space:]]*=.*/camera_device=$CAMERA_DEVICE/}" $CONF_FILE
     fi
 }
 
 do_audio_hw_num() {
-    AUDIO_HW_NUM=$(whiptail --inputbox "enter an audio hardware number" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    AUDIO_HW_NUM=$(whiptail --inputbox "enter an audio hardware number" 20 60 "1" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # set the audio hardware number
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^audio_hw_num[[:space:]]*=.*/audio_hw_num=$AUDIO_HW_NUM/}" $CONF_FILE
     fi
 }
 
 do_audio_device() {
-    AUDIO_HW_NUM=$(whiptail --inputbox "enter an audio device name" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    AUDIO_DEVICE=$(whiptail --inputbox "enter an audio device name" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # set the audio device
-        return 0
+        sed -i "/^\[camera]/,/^\[/{s/^audio_device[[:space:]]*=.*/audio_device=$AUDIO_DEVICE/}" $CONF_FILE
     fi
 }
 
@@ -225,6 +244,55 @@ do_camera_menu() {
     fi
 }
 
+do_ffmpeg_location() {
+    FFMPEG_LOCATION=$(whiptail --inputbox "Enter the location of ffmpeg" 20 60 "/usr/bin/ffmpeg" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[ffmpeg]/,/^\[/{s/^ffmpeg_location[[:space:]]*=.*/ffmpeg_location=$FFMPEG_LOCATION/}" $CONF_FILE
+}
+
+do_v4l2_location() {
+    V4L2_LOCATION=$(whiptail --inputbox "Enter the location of v4l2-ctl" 20 60 "/usr/bin/v4l2-ctl" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[ffmpeg]/,/^\[/{s/^v4l2-ctl_location[[:space:]]*=.*/v4l2-ctl_location=$V4L2_LOCATION/}" $CONF_FILE
+
+}
+
+do_audio_channels() {
+    AUDIO_CHANNELS=$(whiptail --inputbox "Enter how many audio channels there are" 20 60 "1" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[ffmpeg]/,/^\[/{s/^audio_channels[[:space:]]*=.*/audio_channels=$AUDIO_CHANNELS/}" $CONF_FILE
+
+}
+
+do_audio_bitrate() {
+    AUDIO_BITRATE=$(whiptail --inputbox "enter the sample rate for the audio stream in Kbps" 20 60 "32" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[ffmpeg]/,/^\[/{s/^audio_bitrate[[:space:]]*=.*/audio_bitrate=$AUDIO_BITRATE/}" $CONF_FILE
+
+}
+
+do_video_bitrate() {
+    VIDEO_BITRATE=$(whiptail --inputbox "Enter the sample rate of the video stream in kbps" 20 60 "350" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[ffmpeg]/,/^\[/{s/^video_bitrate[[:space:]]*=.*/video_bitrate=$VIDEO_BITRATE/}" $CONF_FILE
+
+}
+
 # ffmpeg location, v4l2-ctl location, audio codec, audio channels, audio bitrate, audio sample rate, video codec, video bitrate, audio input format, audio input device, autio input options, audio output options, video input format, video input options, video output options, arecord path, arecord format
 do_ffmpeg_menu() {
     FUN=$(whiptail --title "Let's Robot Config" --menu "FFMPEG Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
@@ -251,29 +319,27 @@ do_ffmpeg_menu() {
 
 do_tts_type() {
     TTS_TYPE=$(whiptail --radiolist "Choose a robot type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
-               "ESpeak" "ESpeak" ON \
-               "Pico" "Pico" OFF \
-               "Festival" "Festival" OFF \
+               "espeak" "ESpeak" ON \
+               "pico" "Pico" OFF \
+               "festival" "Festival" OFF \
                "None" "None" OFF \
                3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        #sed -i -e "s/<TTSType>/$TTS_TYPE/g" letsrobot.conf
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^type[[:space:]]*=.*/type=$TTS_TYPE/}" $CONF_FILE
 
     fi
 }
 
 do_tts_volume() {
-    TTS_VOLUME=$(whiptail --inputbox "Choose how loud you want TTS to be (0-100)" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    TTS_VOLUME=$(whiptail --inputbox "Choose how loud you want TTS to be (0-100)" 20 60 "80" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Do the thing
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^tts_volume[[:space:]]*=.*/tts_volume=$TTS_VOLUME/}" $CONF_FILE
 
     fi
 }
@@ -282,25 +348,23 @@ do_tts_anon() {
     TTS_ANON=$(whiptail --yesno "Would you like to enable TTS For guest accounts?" 20 60 2 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 0 ]; then
-        # enable anons
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^anon_tts[[:space:]]*=.*/anon_tts=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
-        # disable anons
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^anon_tts[[:space:]]*=.*/anon_tts=false/}" $CONF_FILE
     else
         return $RET
     fi
 }
 
 do_tts_urls() {
-    TTS_URLS=$(whiptail --yesno "Would you like to have TTS speak URLs?" 20 60 2 3>&1 1>&2 2>&3)
+    TTS_URLS=$(whiptail --yesno "Would you like to have TTS speak URLs?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 0 ]; then
         # enable TTS URLs
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^filter_url_tts[[:space:]]*=.*/filter_url_tts=false/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
         # disable TTS URLs
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^filter_url_tts[[:space:]]*=.*/filter_url_tts=true/}" $CONF_FILE
     else
         return $RET
     fi
@@ -311,23 +375,23 @@ do_tts_ext_chat() {
     RET=$?
     if [ $RET -eq 0 ]; then
         # Enable extended chat
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^ext_chat[[:space:]]*=.*/ext_chat=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
         # disable extended chat
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^ext_chat[[:space:]]*=.*/ext_chat=false/}" $CONF_FILE
     else
         return $RET
     fi
 }
 
 do_tts_hw_number() {
-    TTS_HW_NUM=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "0" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    TTS_HW_NUM=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "1" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
         # Set the hardware number
-        return 0
+        sed -i "/^\[tts]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$TTS_HW_NUM/}" $CONF_FILE
     fi
 }
 
@@ -358,23 +422,58 @@ do_tts_menu() {
 }
 
 do_cozmo_forward_speed() {
-
+    COZ_FWD_SPEED=$(whiptail --inputbox "Please enter a new forward speed." 20 60 "75" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the hardware number
+        sed -i "/^\[cozmo]/,/^\[/{s/^forward_speed[[:space:]]*=.*/forward_speed=$COZ_FWD_SPEED/}" $CONF_FILE
+    fi
 }
 
 do_cozmo_turn_speed() {
-
+    COZ_TURN_SPEED=$(whiptail --inputbox "Please enter a new turn speed." 20 60 "50" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the hardware number
+        sed -i "/^\[cozmo]/,/^\[/{s/^turn_speed[[:space:]]*=.*/turn_speed=$COZ_TURN_SPEED/}" $CONF_FILE
+    fi
 }
 
 do_cozmo_volume() {
-
+    COZ_VOLUME=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "100" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the hardware number
+        sed -i "/^\[cozmo]/,/^\[/{s/^volume[[:space:]]*=.*/volume=$COZ_VOLUME/}" $CONF_FILE
+    fi
 }
 
 do_cozmo_charge_high() {
-
+    COZ_CHARGE_HIGH=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "0" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the hardware number
+        sed -i "/^\[cozmo]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$TTS_HW_NUM/}" $CONF_FILE
+    fi
 }
 
 do_cozmo_charge_low() {
-
+    COZ_CHARGE_LOW=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "0" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        # Set the hardware number
+        sed -i "/^\[cozmo]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$TTS_HW_NUM/}" $CONF_FILE
+    fi
 }
 
 do_cozmo_send_online() {
