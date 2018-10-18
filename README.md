@@ -109,7 +109,7 @@ The RasPi will need the following things install so it can talk to your motors a
 
 1. Install the required software libraries and tools. Make sure you don’t get any errors in the console when doing the step below. If you have an issue, you can run this line again, and that will usually fix it!
    ```
-   sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
+   sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip libttspico-utils git
    ```
 
 2. Download the LetsRobot control scripts from our github
@@ -186,7 +186,7 @@ The RasPi will need the following things install so it can talk to your motors a
 
 1. Copy the start_robot script to your home directory.
 
-   ```cp ~/runmyrobots/scipts/start_robot ~```
+   ```cp ~/letsrobot/scipts/start_robot ~```
 
 2. Add the startup script to the crontab
    ```
