@@ -13,6 +13,14 @@ else:
     import urllib2
     from urllib2 import HTTPError
 
+terminate=None
+
+def terminate_controller():
+    print('Attempting to terminate controller...')
+    if terminate != None:
+        terminate.acquire()
+
+
 # TODO : Think about rewriting this, and using request.
 
 def getWithRetry(url, secure=True):

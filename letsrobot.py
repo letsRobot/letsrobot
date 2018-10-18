@@ -12,6 +12,7 @@ import time
 import schedule
 import sys
 import watchdog
+import robot_util
 
 if (sys.version_info > (3, 0)):
     import importlib
@@ -41,7 +42,10 @@ except:
 handlingCommand = False    
 chat_module = None
 move_handler = None
+
+# pass the lock to robot_util so the controller can be terminated from outside.
 terminate = thread.allocate_lock()
+robot_util.terminate = terminate
 
 # This is required to allow us to get True / False boolean values from the
 # command line    
@@ -72,6 +76,11 @@ parser.add_argument('--right-wheel-forward-speed', type=int)
 parser.add_argument('--right-wheel-backward-speed', type=int)
 parser.add_argument('--left-wheel-forward-speed', type=int)
 parser.add_argument('--left-wheel-backward-speed', type=int)
+
+parser.add_argument('--no-mic', dest='no_mic', action='store_true')
+parser.set_defaults(no_mic=False)
+parser.add_argument('--no-camera', dest='no_camera', action='store_true')
+parser.set_defaults(no_camera=False)
 commandArgs = parser.parse_args()
 
 
@@ -85,6 +94,12 @@ robot_config.set('misc', 'custom_chat', str(commandArgs.custom_chat))
 robot_config.set('tts', 'ext_chat', str(commandArgs.ext_chat_command))
 robot_config.set('misc', 'secure_cert', str(commandArgs.secure_cert))
 robot_config.set('misc', 'debug_messages', str(commandArgs.debug_messages))
+
+if commandArgs.no_mic:
+    robot_config.set('camera', 'no_mic', 'True')
+
+if commandArgs.no_camera:
+    robot_config.set('camera', 'no_camera', 'True')
 
 # set variables pulled from the config
 robotID = commandArgs.robot_id
