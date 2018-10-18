@@ -1,7 +1,7 @@
 #!/bin/bash
 # Let's Robot Config script
 # See LICENSE for copyright and license details
-# Version 1.1
+# Version 1.2
 
 
 INTERACTIVE=true
@@ -25,7 +25,6 @@ calc_wt_size() {
 do_robot_owner() {
     ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "YourLetsRobotUserName" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
-        # Set the robot owner
         sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
     fi
 }
@@ -116,7 +115,6 @@ do_no_camera() {
     NO_CAMERA=$(whiptail --yesno "Disable the camera?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 0 ]; then
-        # Disable the camera
         return 0
     elif [ $RET -eq 1 ]; then
         sed -i "/^\[camera]/,/^\[/{s/^no_camera[[:space:]]*=.*/no_camera=$NO_CAMERA/}" $CONF_FILE
@@ -130,7 +128,6 @@ do_no_mic() {
     NO_MIC=$(whiptail --yesno "Disable the microphone?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 0 ]; then
-        # Disable the microphone
         return 0
     elif [ $RET -eq 1 ]; then
         sed -i "/^\[camera]/,/^\[/{s/^no_mic[[:space:]]*=.*/no_mic=$NO_MIC/}" $CONF_FILE
@@ -184,6 +181,7 @@ do_camera_resolution() {
             1280x720\ *) do_high_resolution ;;
             *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1
         esac || whiptail --msgbox "There was an error running option $CAMERA_RESOLUTION" 20 60 1
+    fi
 }
 
 do_camera_device() {
@@ -251,6 +249,7 @@ do_ffmpeg_location() {
         return 0
     elif [ $RET -eq 0 ]; then
         sed -i "/^\[ffmpeg]/,/^\[/{s/^ffmpeg_location[[:space:]]*=.*/ffmpeg_location=$FFMPEG_LOCATION/}" $CONF_FILE
+    fi
 }
 
 do_v4l2_location() {
@@ -260,6 +259,7 @@ do_v4l2_location() {
         return 0
     elif [ $RET -eq 0 ]; then
         sed -i "/^\[ffmpeg]/,/^\[/{s/^v4l2-ctl_location[[:space:]]*=.*/v4l2-ctl_location=$V4L2_LOCATION/}" $CONF_FILE
+    fi
 
 }
 
@@ -270,6 +270,7 @@ do_audio_channels() {
         return 0
     elif [ $RET -eq 0 ]; then
         sed -i "/^\[ffmpeg]/,/^\[/{s/^audio_channels[[:space:]]*=.*/audio_channels=$AUDIO_CHANNELS/}" $CONF_FILE
+    fi
 
 }
 
@@ -280,6 +281,7 @@ do_audio_bitrate() {
         return 0
     elif [ $RET -eq 0 ]; then
         sed -i "/^\[ffmpeg]/,/^\[/{s/^audio_bitrate[[:space:]]*=.*/audio_bitrate=$AUDIO_BITRATE/}" $CONF_FILE
+    fi
 
 }
 
@@ -290,6 +292,7 @@ do_video_bitrate() {
         return 0
     elif [ $RET -eq 0 ]; then
         sed -i "/^\[ffmpeg]/,/^\[/{s/^video_bitrate[[:space:]]*=.*/video_bitrate=$VIDEO_BITRATE/}" $CONF_FILE
+    fi
 
 }
 
@@ -360,10 +363,8 @@ do_tts_urls() {
     TTS_URLS=$(whiptail --yesno "Would you like to have TTS speak URLs?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 0 ]; then
-        # enable TTS URLs
         sed -i "/^\[tts]/,/^\[/{s/^filter_url_tts[[:space:]]*=.*/filter_url_tts=false/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
-        # disable TTS URLs
         sed -i "/^\[tts]/,/^\[/{s/^filter_url_tts[[:space:]]*=.*/filter_url_tts=true/}" $CONF_FILE
     else
         return $RET
@@ -371,13 +372,11 @@ do_tts_urls() {
 }
 
 do_tts_ext_chat() {
-    TTS_EXT_CHAT=$(whiptail --yesno "Would you like to enable extended chat commands?" 20 60 2 3>&1 1>&2 2>&3)
+    TTS_EXT_CHAT=$(whiptail --yesno "Would you like to enable extended chat?" 20 60 2 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 0 ]; then
-        # Enable extended chat
         sed -i "/^\[tts]/,/^\[/{s/^ext_chat[[:space:]]*=.*/ext_chat=true/}" $CONF_FILE
     elif [ $RET -eq 1 ]; then
-        # disable extended chat
         sed -i "/^\[tts]/,/^\[/{s/^ext_chat[[:space:]]*=.*/ext_chat=false/}" $CONF_FILE
     else
         return $RET
@@ -390,7 +389,6 @@ do_tts_hw_number() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the hardware number
         sed -i "/^\[tts]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$TTS_HW_NUM/}" $CONF_FILE
     fi
 }
@@ -427,7 +425,6 @@ do_cozmo_forward_speed() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the hardware number
         sed -i "/^\[cozmo]/,/^\[/{s/^forward_speed[[:space:]]*=.*/forward_speed=$COZ_FWD_SPEED/}" $CONF_FILE
     fi
 }
@@ -438,7 +435,6 @@ do_cozmo_turn_speed() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the hardware number
         sed -i "/^\[cozmo]/,/^\[/{s/^turn_speed[[:space:]]*=.*/turn_speed=$COZ_TURN_SPEED/}" $CONF_FILE
     fi
 }
@@ -449,47 +445,69 @@ do_cozmo_volume() {
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the hardware number
         sed -i "/^\[cozmo]/,/^\[/{s/^volume[[:space:]]*=.*/volume=$COZ_VOLUME/}" $CONF_FILE
     fi
 }
 
 do_cozmo_charge_high() {
-    COZ_CHARGE_HIGH=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "0" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    COZ_CHARGE_HIGH=$(whiptail --inputbox "Please enter a new charge high state." 20 60 "4.79" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the hardware number
-        sed -i "/^\[cozmo]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$TTS_HW_NUM/}" $CONF_FILE
+        sed -i "/^\[cozmo]/,/^\[/{s/^charge_high[[:space:]]*=.*/charge_high=$COZ_CHARGE_HIGH/}" $CONF_FILE
     fi
 }
 
 do_cozmo_charge_low() {
-    COZ_CHARGE_LOW=$(whiptail --inputbox "Please enter your speaker hardware number." 20 60 "0" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    COZ_CHARGE_LOW=$(whiptail --inputbox "Please enter a new charge low state." 20 60 "3.6" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
     elif [ $RET -eq 0 ]; then
-        # Set the hardware number
-        sed -i "/^\[cozmo]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$TTS_HW_NUM/}" $CONF_FILE
+        sed -i "/^\[cozmo]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$COZ_CHARGE_LOW/}" $CONF_FILE
     fi
 }
 
 do_cozmo_send_online() {
+       whiptail --msgbox "There's nothing here yet." 20 60 1
 
 }
 
 do_cozmo_stay_on_dock() {
-
+    COZ_STAY_ON_DOCK=$(whiptail --yesno "Would you like to enable staying on the dock?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^stay_on_dock[[:space:]]*=.*/stay_on_dock=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^stay_on_dock[[:space:]]*=.*/stay_on_dock=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 }
 
 do_cozmo_annotate() {
-
-}
+    COZ_ANNOTATE=$(whiptail --yesno "Would you like to annotation?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^annotated[[:space:]]*=.*/annotated=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^annotated[[:space:]]*=.*/annotated=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
+}  
 
 do_cozmo_color() {
-
+    COZ_COLOR=$(whiptail --yesno "Would you like to enable color?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^colour[[:space:]]*=.*/colour=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^colour[[:space:]]*=.*/colour=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 }
 
 do_board_cozmo() {
@@ -525,15 +543,37 @@ do_board_cozmo() {
 }
 
 do_adafruit_address() {
-
+    ADAFRUIT_ADDRESS=$(whiptail --inputbox "Please enter a new charge low state." 20 60 "3.6" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$ADAFRUIT_ADDRESS/}" $CONF_FILE
+    fi
 }
 
 do_adafruit_frequency() {
-
+    ADAFRUIT_FREQUENCY=$(whiptail --inputbox "Please enter a new charge low state." 20 60 "3.6" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[cozmo]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$ADAFRUIT_FREQUENCY/}" $CONF_FILE
+    fi
 }
 
 do_more_debug() {
-
+    MORE_DEBUG=$(whiptail --yesno "Would you like to enable more debug?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[adafruit_pwm]/,/^\[/{s/^more_debug[[:space:]]*=.*/more_debug=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[adafruit_pwm]/,/^\[/{s/^more_debug[[:space:]]*=.*/more_debug=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 }
 
 do_board_adafruit() {
@@ -556,19 +596,34 @@ do_board_adafruit() {
 }
 
 do_board_owi() {
-    return 0
+    whiptail --msgbox "There's nothing here yet." 20 60 1
 }
 
 do_serial_device() {
+    SERIAL_DEVICE=$(whiptail --inputbox "Please enter a new serial device." 20 60 "/dev/ttyACM0" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[serial]/,/^\[/{s/^serial_device[[:space:]]*=.*/serial_device=$SERIAL_DEVICE/}" $CONF_FILE
+    fi
 
 }
 
 do_serial_baud_rate() {
+    BAUD_RATE=$(whiptail --inputbox "Please enter a new baud rate." 20 60 "9600" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[serial]/,/^\[/{s/^baud_rate[[:space:]]*=.*/baud_rate=$BAUD_RATE/}" $CONF_FILE
+    fi
 
 }
 
 do_board_serial() {
-    FUN=$(whiptail --title "Let's Robot Config" --menu "OWI Arm Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
+    FUN=$(whiptail --title "Let's Robot Config" --menu "Serial Board Options" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT --cancel-button Back --ok-button Select \
         "S1 Serial Device" "Set the serial device" \
         "S2 Baud Rate" "Set the baud rate" \
         3>&1 1>&2 2>&3)
@@ -585,22 +640,62 @@ do_board_serial() {
 }
 
 do_day_speed() {
+    DAY_SPEED=$(whiptail --inputbox "Please enter a new day speed." 20 60 "255" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motor_hat]/,/^\[/{s/^day_speed[[:space:]]*=.*/day_speed=$DAY_SPEED/}" $CONF_FILE
+    fi
 
 }
 
 do_night_speed() {
+    NIGHT_SPEED=$(whiptail --inputbox "Please enter a new night speed." 20 60 "255" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motor_hat]/,/^\[/{s/^night_speed[[:space:]]*=.*/night_speed=$NIGHT_SPEED/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_hat_turning_speed() {
+    TURNING_SPEED=$(whiptail --inputbox "Please enter a new turning speed." 20 60 "250" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motor_hat]/,/^\[/{s/^turning_speed[[:space:]]*=.*/turning_speed=$TURNING_SPEED/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_hat_forward() {
+    MOTOR_HAT_FORWARD=$(whiptail --inputbox "Please enter a new forward configuration." 20 60 "[-1,1,-1,1]" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motor_hat]/,/^\[/{s/^forward[[:space:]]*=.*/forward=$MOTOR_HAT_FORWARD/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_hat_left() {
+    MOTOR_HAT_LEFT=$(whiptail --inputbox "Please enter a new charge left configuration." 20 60 "[1,1,1,1]" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motor_hat]/,/^\[/{s/^left[[:space:]]*=.*/left=$MOTOR_HAT_LEFT/}" $CONF_FILE
+    fi
 
 }
 
@@ -638,10 +733,26 @@ do_board_motor_hat() {
 }
 
 do_gopigo2_drive_time() {
+    GOPIGO2_DRIVE_TIME=$(whiptail --inputbox "Please enter a new drive time." 20 60 "0.35" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[gopigo2]/,/^\[/{s/^drive_time[[:space:]]*=.*/drive_time=$GOPIGO2_DRIVE_TIME/}" $CONF_FILE
+    fi
 
 }
 
 do_gopigo2_turn_time() {
+    GOPIGO2_TURN_TIME=$(whiptail --inputbox "Please enter a new turn time." 20 60 "0.15" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[gopigo2]/,/^\[/{s/^hw_num[[:space:]]*=.*/hw_num=$GOPIGO2_TURN_TIME/}" $CONF_FILE
+    fi
 
 }
 
@@ -663,10 +774,26 @@ do_board_gopigo2() {
 }
 
 do_gopigo3_drive_time() {
+    GOPIGO3_DRIVE_TIME=$(whiptail --inputbox "Please enter a new drive time." 20 60 "0.35" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[gopigo3]/,/^\[/{s/^drive_time[[:space:]]*=.*/drive_time=$GOPIGO3_DRIVE_TIME/}" $CONF_FILE
+    fi
 
 }
 
 do_gopigo3_turn_time() {
+    GOPIGO3_TURN_TIME=$(whiptail --inputbox "Please enter a new turn time." 20 60 "0.15" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[gopigo3]/,/^\[/{s/^turn_time[[:space:]]*=.*/turn_time=$GOPIGO3_TURN_TIME/}" $CONF_FILE
+    fi
 
 }
 
@@ -688,18 +815,74 @@ do_board_gopigo3() {
 }
 
 do_step_pin_forward() {
+    STEP_PIN_FORWARD=$(whiptail --inputbox "Please enter a new step pin forward." 20 60 "12,16" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[l298n]/,/^\[/{s/^StepPinForward[[:space:]]*=.*/StepPinForward=$STEP_PIN_FORWARD/}" $CONF_FILE
+    fi
 
 }
 
 do_step_pin_backward() {
+    STEP_PIN_BACKWARDS=$(whiptail --inputbox "Please enter a new step pin backward." 20 60 "11,15" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[l298n]/,/^\[/{s/^StepPinBackward[[:space:]]*=.*/StepPinBackward=$STEP_PIN_BACKWARDS/}" $CONF_FILE
+    fi
 
 }
 
 do_step_pin_left() {
+    STEP_PIN_LEFT=$(whiptail --inputbox "Please enter a new step pin left." 20 60 "15,12" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[l298n]/,/^\[/{s/^StepPinLeft[[:space:]]*=.*/StepPinLeft=$STEP_PIN_LEFT/}" $CONF_FILE
+    fi
 
 }
 
 do_step_pin_right() {
+    STEP_PIN_RIGHT=$(whiptail --inputbox "Please enter a new step pin right." 20 60 "11,16" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[l298n]/,/^\[/{s/^StepPinRight[[:space:]]*=.*/StepPinRight=$STEP_PIN_RIGHT/}" $CONF_FILE
+    fi
+
+}
+
+do_sleep_time() {
+    SLEEP_TIME=$(whiptail --inputbox "Please enter a new step pin right." 20 60 "11,16" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[l298n]/,/^\[/{s/^sleeptime[[:space:]]*=.*/sleeptime=$SLEEP_TIME/}" $CONF_FILE
+    fi
+
+}
+
+do_rotate_times() {
+    ROTATE_TIMES=$(whiptail --inputbox "Please enter a new step pin right." 20 60 "11,16" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[l298n]/,/^\[/{s/^rotatetimes[[:space:]]*=.*/rotatetimes=$ROTATE_TIMES/}" $CONF_FILE
+    fi
 
 }
 
@@ -729,54 +912,158 @@ do_board_l298n() {
 }
 
 do_motor_delay() {
+    MOTOR_DELAY=$(whiptail --inputbox "Please enter a new motor delay value." 20 60 "0.3" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^MotorDelay[[:space:]]*=.*/MotorDelay=$MOTOR_DELAY/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_1a() {
+    MOTOR_1A=$(whiptail --inputbox "Please enter a new motor 1a setting." 20 60 "24" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor1A[[:space:]]*=.*/Motor1A=$MOTOR_1A/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_1b() {
+    MOTOR_1B=$(whiptail --inputbox "Please enter a new motor 1b setting." 20 60 "27" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor1B[[:space:]]*=.*/Motor1B=$MOTOR_1B/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_1_enable() {
+    MOTOR_1_ENABLE=$(whiptail --inputbox "Please enter a new motor 1 enable setting." 20 60 "5" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor1Enable[[:space:]]*=.*/Motor1Enable=$MOTOR_1_ENABLE/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_2a() {
+    MOTOR_2A=$(whiptail --inputbox "Please enter a new motor 2a setting." 20 60 "6" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor2A[[:space:]]*=.*/Motor2A=$MOTOR_2A/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_2b() {
+    MOTOR_2B=$(whiptail --inputbox "Please enter a new motor 2b setting." 20 60 "22" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor2B[[:space:]]*=.*/Motor2B=$MOTOR_2B/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_2_enable() {
+    MOTOR_2_ENABLE=$(whiptail --inputbox "Please enter a new motor 2 enable setting." 20 60 "17" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor2Enable[[:space:]]*=.*/Motor2Enable=$MOTOR_2_ENABLE/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_3a() {
+    MOTOR_3A=$(whiptail --inputbox "Please enter a new motor 3a setting." 20 60 "23" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor3A[[:space:]]*=.*/Motor3A=$MOTOR_3A/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_3b() {
+    MOTOR_3B=$(whiptail --inputbox "Please enter a new motor 3b setting." 20 60 "16" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor3B[[:space:]]*=.*/Motor3B=$MOTOR_3B/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_3_enable() {
+    MOTOR_3_ENABLE=$(whiptail --inputbox "Please enter a new motor 3 enable setting." 20 60 "12" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor3Enable[[:space:]]*=.*/Motor3Enable=$MOTOR_3_ENABLE/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_4a() {
+    MOTOR_4A=$(whiptail --inputbox "Please enter a new motor 4a setting." 20 60 "13" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor4A[[:space:]]*=.*/Motor4A=$MOTOR_4A/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_4b() {
+    MOTOR_4B=$(whiptail --inputbox "Please enter a new motor 4b setting." 20 60 "18" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^Motor4B[[:space:]]*=.*/Motor4B=$MOTOR_4B/}" $CONF_FILE
+    fi
 
 }
 
 do_motor_4_enable() {
+    MOTOR_4_ENABLE=$(whiptail --inputbox "Please enter a new motor 4 enable setting." 20 60 "25" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[motozero]/,/^\[/{s/^motor_4_enable[[:space:]]*=.*/motor_4_enable=$MOTOR_4_ENABLE/}" $CONF_FILE
+    fi
 
 }
 
@@ -820,7 +1107,14 @@ do_board_motozero() {
 }
 
 do_pololu_driving_speed() {
-
+    POLOLU_DRIVING_SPEED=$(whiptail --inputbox "Please enter a new pololu driver speed." 20 60 "25" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[pololu]/,/^\[/{s/^drivingSpeed[[:space:]]*=.*/drivingSpeed=$POLOLU_DRIVING_SPEED/}" $CONF_FILE
+    fi
 }
 
 do_board_pololu() {
@@ -839,7 +1133,14 @@ do_board_pololu() {
 }
 
 do_mc33926_driving_speed() {
-
+    MC33926_DRIVING_SPEED=$(whiptail --inputbox "Please enter a new pololu driver speed." 20 60 "25" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[pololu]/,/^\[/{s/^drivingSpeed[[:space:]]*=.*/drivingSpeed=$MC33926_DRIVING_SPEED/}" $CONF_FILE
+    fi
 }
 
 do_board_mc33926() {
@@ -854,6 +1155,17 @@ do_board_mc33926() {
             M1\ *) do_mc33926_driving_speed ;;
             *) whiptail --msgbox "Programmer error: Unrecognized option" 20 60 1 ;;
         esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    fi
+}
+
+do_led_rotate() {
+    LED_ROTATE=$(whiptail --inputbox "Please enter a new LED rotate value." 20 60 "25" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[max7219]/,/^\[/{s/^ledrotate[[:space:]]*=.*/ledrotate=$LED_ROTATE/}" $CONF_FILE
     fi
 }
 
@@ -911,26 +1223,73 @@ do_board_menu() {
 }
 
 do_messenger_enable() {
-
+    MESSENGER_ENABLE=$(whiptail --yesno "Would you like to enable messenger?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[messenger]/,/^\[/{s/^enable[[:space:]]*=.*/enable=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[messenger]/,/^\[/{s/^enable[[:space:]]*=.*/enable=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 }
 
 do_messenger_host() {
-
+    MESSENGER_HOST=$(whiptail --inputbox "Please enter a new messenger host." 20 60 "letsrobot.tv" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[messenger]/,/^\[/{s/^host[[:space:]]*=.*/host=$MESSENGER_HOST/}" $CONF_FILE
+    fi
 }
 
 do_messenger_port() {
-
+    MESSENGER_PORT=$(whiptail --inputbox "Please enter a new messenget port." 20 60 "8000" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[messenger]/,/^\[/{s/^port[[:space:]]*=.*/port=$MESSENGER_PORT/}" $CONF_FILE
+    fi
 }
 
 do_messenger_username() {
+    MESSENGER_USERNAME=$(whiptail --inputbox "Please enter a new username." 20 60 "" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[messenger]/,/^\[/{s/^username[[:space:]]*=.*/username=$MESSENGER_USERNAME/}" $CONF_FILE
+    fi
 
 }
 
 do_messenger_password() {
+    MESSENGER_PASSWD=$(whiptail --passwordbox "Please enter your password" 20 60 "" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[messenger]/,/^\[/{s/^password[[:space:]]*=.*/password=$MESSENGER_PASSWD/}" $CONF_FILE
+    fi
 
 }
 
 do_messenger_name() {
+    MESSENGER_NAME=$(whiptail --inputbox "Please enter a new robot name." 20 60 "" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[messenger]/,/^\[/{s/^robot_name[[:space:]]*=.*/robot_name=$MESSENGER_NAME/}" $CONF_FILE
+    fi
 
 }
 
@@ -960,50 +1319,173 @@ do_messenger_menu() {
 }
 
 do_custom_hardware() {
+    CUSTOM_HARDWARE=$(whiptail --yesno "Would you like to enable custom hardware?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_hardware[[:space:]]*=.*/custom_hardware=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_hardware[[:space:]]*=.*/custom_hardware=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
 do_custom_tts() {
+    CUSTOM_TTS=$(whiptail --yesno "Would you like to enable custom TTS?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_tts[[:space:]]*=.*/custom_tts=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_tts[[:space:]]*=.*/custom_tts=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
 do_custom_chat() {
+    CUSTOM_CHAT=$(whiptail --yesno "Would you like to enable custom chat?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_chat[[:space:]]*=.*/custom_chat=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_chat[[:space:]]*=.*/custom_chat=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
 do_custom_video() {
+    CUSTOM_VIDEO=$(whiptail --yesno "Would you like to enable custom video?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_video[[:space:]]*=.*/custom_video=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^custom_video[[:space:]]*=.*/custom_video=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
 do_watchdog() {
+    WATCHDOG=$(whiptail --yesno "Would you like to enable watchdog??" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^watchdog[[:space:]]*=.*/watchdog=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^watchdog[[:space:]]*=.*/watchdog=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
 do_async() {
+    ASYNC=$(whiptail --yesno "Would you like to enable asynchronous command handling?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^enable_async[[:space:]]*=.*/enable_async=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^enable_async[[:space:]]*=.*/enable_async=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
-do_chat_server() {
+do_no_chat_server() {
+    CHAT_SERVER=$(whiptail --yesno "Would you like to disable connection to the chat server?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^no_chat_server[[:space:]]*=.*/no_chat_server=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^no_chat_server[[:space:]]*=.*/no_chat_server=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
 do_debug_messages() {
+    DEBUG_MESSAGES=$(whiptail --yesno "Would you like to enable debug messages?" --defaultno 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^debug_messages[[:space:]]*=.*/debug_messages=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^debug_messages[[:space:]]*=.*/debug_messages=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
 do_api_server() {
+    MESSENGER_NAME=$(whiptail --inputbox "Please enter a new api server." 20 60 "api.letsrobot.tv" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^api_server[[:space:]]*=.*/api_server=$MESSENGER_NAME/}" $CONF_FILE
+    fi
 
 }
 
 do_info_server() {
+    MESSENGER_NAME=$(whiptail --inputbox "Please enter a new info server." 20 60 "letsrobot.tv" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^info_server[[:space:]]*=.*/info_server=$MESSENGER_NAME/}" $CONF_FILE
+    fi
 
 }
 
 do_check_frequency() {
+    MESSENGER_NAME=$(whiptail --inputbox "Please enter a new check frequency." 20 60 "120" $WT_WIDTH $WT_HEIGHT $WT_MENU_HEIGHT 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^check_freq[[:space:]]*=.*/check_freq=$MESSENGER_NAME/}" $CONF_FILE
+    fi
 
 }
 
 do_secure_cert() {
+    SECURE_CERT=$(whiptail --yesno "Would you like to require secure certs?" 20 60 2 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 0 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^secure_cert[[:space:]]*=.*/secure_cert=true/}" $CONF_FILE
+    elif [ $RET -eq 1 ]; then
+        
+        sed -i "/^\[misc]/,/^\[/{s/^secure_cert[[:space:]]*=.*/secure_cert=false/}" $CONF_FILE
+    else
+        return $RET
+    fi
 
 }
 
@@ -1034,7 +1516,7 @@ do_misc_menu() {
             M4\ *) do_custom_video ;;
             M5\ *) do_watchdog ;;
             M6\ *) do_async ;;
-            M7\ *) do_chat_server ;;
+            M7\ *) do_no_chat_server ;;
             M8\ *) do_debug_messages ;;
             M9\ *) do_info_server ;;
             M10\ *) do_api_server ;;
@@ -1049,17 +1531,17 @@ do_misc_menu() {
 
 # Setup parallaxy kit
 do_parallaxy_setup() {
-    return 0
+    whiptail --msgbox "There's nothing here yet." 20 60 1
 }
 
 # Setup botington kit
 do_bottington_setup() {
-    return 0
+    whiptail --msgbox "There's nothing here yet." 20 60 1
 }
 
 # setup telly kit
 do_telly_setup() {
-    return 0
+    whiptail --msgbox "There's nothing here yet." 20 60 1
 }
 
 do_kit_menu() {
@@ -1090,8 +1572,8 @@ do_finish() {
 
 # In testing, the next 3 lines will cause an error that can safely be ignored
 # the copy command will fail. "cp: cannot stat '~/letsrobot/letsrobot.sample.conf': no such file or directory"
-CONF_FILE="~/letsrobot.conf"
-REPO_DIR="~/letsrobot"
+CONF_FILE="/home/$USER/letsrobot.conf"
+REPO_DIR="/home/$USER/letsrobot"
 cp ${REPO_DIR}/letsrobot.sample.conf $CONF_FILE
 if [ "$INTERACTIVE" = true ]; then
     calc_wt_size
