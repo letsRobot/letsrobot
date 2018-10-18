@@ -178,6 +178,7 @@ The RasPi will need the following things install so it can talk to your motors a
    * type should be the type of TTS software you are using. The currently supported TTS types are. espeak was installed in the previous steps, and makes a good default tts.
       * espeak
       * fesitval
+      * pico
       * Amazon Polly
       * cozmo_tts
 
