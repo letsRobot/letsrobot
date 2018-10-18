@@ -1,8 +1,5 @@
-#   TODO : Look at changing the implimentation so windows / linux use is just 
-# changing the appropriate parts of the config file
-#
-# Look at making it so the ffmpeg process toggles a boolean, that is used to 
-# update the server with online state appropriately. 
+#   TODO :  Look at making it so the ffmpeg process toggles a boolean, that is 
+# used to update the server with online state appropriately. 
 
 import audio_util
 import networking
@@ -18,6 +15,7 @@ import sys
 robotID=None
 no_mic=True
 no_camera=True
+mic_off=False
 audioPort=None
 audioHost=None
 videoPort=None
@@ -53,6 +51,8 @@ audio_process = None
 brightness=None
 contrast=None
 saturation=None
+
+server_override=False
 
 def setup(robot_config):
     global robotID
@@ -93,6 +93,8 @@ def setup(robot_config):
     global brightness
     global contrast
     global saturation
+
+    global server_override
    
     robotID = robot_config.get('robot', 'robot_id')
  
@@ -102,16 +104,17 @@ def setup(robot_config):
 
     ffmpeg_location = robot_config.get('ffmpeg', 'ffmpeg_location')
     v4l2_ctl_location = robot_config.get('ffmpeg', 'v4l2-ctl_location')
-    networking.appServerSocketIO.on('command_to_robot', onCommandToRobot)
-    networking.appServerSocketIO.on('robot_settings_changed', onRobotSettingsChanged)
 
     stream_key = robot_config.get('robot', 'stream_key')
 
     x_res = robot_config.get('camera', 'x_res')
     y_res = robot_config.get('camera', 'y_res')
 
+    server_override = robot_config.getboolean('misc', 'server_override')
+
     print ("getting websocket relay host")
     websocketRelayHost = networking.getWebsocketRelayHost()
+
     if not no_camera:
         if robot_config.has_option('camera', 'brightness'):
             brightness = robot_config.get('camera', 'brightness')
@@ -168,6 +171,31 @@ def setup(robot_config):
         if audio_input_format == 'alsa':
             audio_device = 'hw:' + str(audio_hw_num)
 
+    # load settings from site
+    if not server_override:
+        refreshFromOnlineSettings()
+        networking.appServerSocketIO.on('command_to_robot', onCommandToRobot)
+        networking.appServerSocketIO.on('robot_settings_changed', onRobotSettingsChanged)
+
+def refreshFromOnlineSettings():
+    global x_res
+    global y_res
+    global mic_off
+    print ("refreshing from online settings")
+    onlineSettings = networking.getOnlineRobotSettings(robotID)
+    print(onlineSettings)
+    
+    x_res = onlineSettings['xres']
+    y_res = onlineSettings['yres']
+    print("Setting resolution to %ix%i" %(x_res, y_res))
+
+    if onlineSettings['mic_enabled']:
+        print("Mic Enabled")
+        mic_off = False
+    else:
+        print("Mic Disabled")
+        mic_off = True
+
 def start():
     if not no_camera:
         watchdog.start("FFmpegCameraProcess", startVideoCapture)
@@ -175,12 +203,19 @@ def start():
         atexit.register(networking.sendOnlineState, False)
         
     if not no_mic:
+        if not mic_off:
 #        watchdog.start("FFmpegAudioProcess", startAudioCapture)
-        watchdog.start("FFmpegAudioProcess", startAudioCapture)
+            watchdog.start("FFmpegAudioProcess", startAudioCapture)
 
 def onRobotSettingsChanged(*args):
     print ('set message recieved:', args)
     refreshFromOnlineSettings()        
+
+    if not no_camera:
+        restartVideoCapture()
+ 
+    if not no_mic:
+        restartAudioCapture()
 
 #TODO : Fix this, basically the server can turn video off, but not on again. 
 #       Looks like a bug introduced when it was changed to be able to turn on
@@ -196,16 +231,16 @@ def onCommandToRobot(*args):
         if command == 'VIDOFF':
             print ('disabling camera capture process')
             print ("args", args)
-            robotSettings.camera_enabled = False
-            os.system("killall ffmpeg")
+            stopAudioCapture()
+            stopVideoCapture()
 
         if command == 'VIDON':
-            if robotSettings.camera_enabled:
+            if not no_camera:
                 print ('enabling camera capture process')
                 print ("args", args)
-                robotSettings.camera_enabled = True
-        
-        sys.stdout.flush()
+                startVideoCapture()
+                if not no_mic:       
+                    startAudioCapture()
 
 def startVideoCapture():
     global video_process
@@ -248,11 +283,11 @@ def startVideoCapture():
     print (videoCommandLine)
     video_process=subprocess.Popen(shlex.split(videoCommandLine))
     atexit.register(atExitVideoCapture)
-    video_process.wait()
     try:
         atexit.unregister(atExitVideoCapture) # Only python 3
     except AttributeError:
         pass
+    video_process.wait()
 
 def atExitVideoCapture():
     try:
@@ -272,6 +307,7 @@ def restartVideoCapture():
 
 def startAudioCapture():
     global audio_process
+
     audioCommandLine = ('{ffmpeg} -f {audio_input_format} -ar {audio_sample_rate} -ac {audio_channels}'
                        ' {in_options} -i {audio_device} -f mpegts'
                        ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
@@ -294,11 +330,12 @@ def startAudioCapture():
     print (audioCommandLine)
     audio_process=subprocess.Popen(shlex.split(audioCommandLine))
     atexit.register(atExitAudioCapture)
+    if audio_process != None:
+       try:
+           atexit.unregister(atExitVideoCapture) # Only python 3
+       except AttributeError:
+           pass
     audio_process.wait()
-    try:
-        atexit.unregister(atExitVideoCapture) # Only python 3
-    except AttributeError:
-        pass
     
 def atExitAudioCapture():
     try:
@@ -318,7 +355,8 @@ def stopAudioCapture():
 
 def restartAudioCapture():
     stopAudioCapture()
-    watchdog.start("FFmpegAudioProcess", startAudioCapture)
+    if not mic_off:
+        watchdog.start("FFmpegAudioProcess", startAudioCapture)
 
 def videoChatHandler(command, args):
     global video_process
@@ -390,11 +428,13 @@ def audioChatHandler(command, args):
     if len(command) > 1:
         if extended_command.is_authed(args['name']) == 2: # Owner
             if command[1] == 'start':
+                mic_off = false
                 if audio_process.returncode != None:
                     watchdog.start("FFmpegAudioProcess", startAudioCapture)
             elif command[1] == 'stop':
                 stopAudioCapture()
             elif command[1] == 'restart':
+                mic_off = false
                 stopAudioCapture()
                 watchdog.start("FFmpegAudioProcess", startAudioCapture)
             elif command[1] == 'bitrate':
