@@ -370,7 +370,7 @@ def videoChatHandler(command, args):
             elif command[1] == 'stop':
                 stopVideoCapture()
             elif command[1] == 'restart':
-                retartVideoCapture()
+                restartVideoCapture()
             elif command[1] == 'bitrate':
                 if len(command) > 1:
                     if len(command) == 3:
