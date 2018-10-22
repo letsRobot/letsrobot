@@ -69,6 +69,7 @@ sudo python -m pip install -r /home/$USER/letsrobot/requirements.txt
 cp /home/$USER/letsrobot/letsrobot.sample.conf /home/$USER/letsrobot/letsrobot.conf
 
 echo -e "\e[33mIt is now time to configure the controller. Please go to https://github.com/letsRobot/letsrobot#configure-the-controller for more information.\[e39m"
+sleep 3s
 
 nano /home/$USER/letsrobot/letsrobot.conf
 
