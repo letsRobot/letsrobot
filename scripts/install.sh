@@ -75,6 +75,6 @@ nano /home/$USER/letsrobot/letsrobot.conf
 
 cp /home/$USER/letsrobot/scripts/start_robot /home/$USER/start_robot
 
-echo "@reboot /bin/bash /home/pi/start_robot" >> /var/spool/cron/crontabs/pi
+sudo echo "@reboot /bin/bash /home/pi/start_robot" >> /var/spool/cron/crontabs/pi
 
 echo -e "\e[33mInstall is now complete. Please reboot your robot. See you on letsrobot.tv!\e[39m"
