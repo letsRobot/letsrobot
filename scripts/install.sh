@@ -39,7 +39,7 @@ echo
 #echo -e "\e[33mThank you, sit back and relax, we'll see you on letsrobot.tv\e[39m"
 
 # Write the start_robot file with the ID for robot and camera in
-echo > start_robot <<EOF
+cat > start_robot <<EOF
 #!/bin/bash
 # suggested use for this:
 # (1) Put in the id's for your robot, YOURROBOTID and YOURCAMERAID
