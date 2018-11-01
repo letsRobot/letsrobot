@@ -38,16 +38,27 @@ echo
 
 #echo -e "\e[33mThank you, sit back and relax, we'll see you on letsrobot.tv\e[39m"
 
-# Write the start_robot file with the ID for robot and camera in
-cat > start_robot <<EOF
-#!/bin/bash
-# suggested use for this:
-# (1) Put in the id's for your robot, YOURROBOTID and YOURCAMERAID
-# (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot
-
-cd /home/pi/letsrobot
-nohup scripts/repeat_start python letsrobot.py &> /dev/null &
+# If start_robot exists, append letsrobot stuff to it otherwise overwrite the whole thing.
+if [ -e /home/$USER/start_robot ] 
+then
+    cat >> /home/$USER/start_robot <<EOF
+    
+    cd /home/pi/letsrobot
+    nohup scripts/repeat_start python letsrobot.py &> /dev/null &
 EOF
+else
+    cat > /home/$USER/start_robot <<EOF
+    #!/bin/bash
+    # suggested use for this:
+    # (1) Put in the id's for your robot, YOURROBOTID and YOURCAMERAID
+    # (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot
+
+    cd /home/pi/letsrobot
+    nohup scripts/repeat_start python letsrobot.py &> /dev/null &
+EOF
+fi
+
+echo -e "\e[33mInstalling required software...\e[39m"
 
 # Make sure the system is up to date
 sudo apt-get -y update
@@ -72,8 +83,6 @@ echo -e "\e[33mIt is now time to configure the controller. Please go to https://
 sleep 3s
 
 nano /home/$USER/letsrobot/letsrobot.conf
-
-cp /home/$USER/letsrobot/scripts/start_robot /home/$USER/start_robot
 
 (crontab -l 2>/dev/null; echo "@reboot /home/$USER/start_robot") | crontab -
 
