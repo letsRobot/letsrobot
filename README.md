@@ -1,7 +1,7 @@
 # LetsRobot.tv
 
 # WARNING:
-This repository is probably **NOT** what you're looking for. This repository is still in development and not yet ready for public use! If you stumbled across this repository trying to build or modify your robot, you're probably looking for [RunMyRobot.](https://github.com/runmyrobot/runmyrobot)
+This repository is probably **NOT** what you're looking for. This repository is still in development and not yet ready for mainstream use! If you stumbled across this repository trying to build or modify your robot, you're probably looking for [RunMyRobot.](https://github.com/runmyrobot/runmyrobot)
 
 
 ## Open Robot Control Code For Connecting to LetsRobot.tv 
