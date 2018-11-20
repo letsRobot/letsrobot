@@ -1,5 +1,9 @@
 #from video.ffmpeg import *
 import ffmpeg
+import logging
+
+log = logging.getLogger('video/ffmpeg-arecord')
+
 
 arecord_path = None
 arecord_format = None
