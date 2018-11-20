@@ -1,9 +1,12 @@
-from __future__ import print_function
 import os
 import networking
 import tts.tts as tts
 import schedule
 import robot_util
+import logging
+
+log = logging.getLogger('extended_command')
+
 
 # TODO 
 # If I pull the send_video stuff into controller, the ability to restart the ffmpeg process would
@@ -77,7 +80,7 @@ def setup(robot_config):
     
     mods = networking.getOwnerDetails(owner)['moderators']
 #    mods = networking.getOwnerDetails(owner)['robocaster']['moderators']
-    print("Moderators :", mods)
+    log.info("Moderators : %s", mods)
 
 # check if the user is the owner or moderator, 0 for not, 1 for moderator, 2 for owner
 def is_authed(user):
@@ -98,28 +101,35 @@ def anon_handler(command, args):
 
     if len(command) > 1:
         if is_authed(args['name']): # Moderator
+            log.info("anon chat command called by %s", args['name'])
             if command[1] == 'on':
+                log.info("Anon control / TTS enabled")
                 anon_control = True
                 tts.unmute_anon_tts()
                 robot_util.setAnonControl(True, robot_id, api_key)
             elif command[1] == 'off':
+                log.info("Anon control / TTS disabled");
                 anon_control = False
                 tts.mute_anon_tts()
                 robot_util.setAnonControl(False, robot_id, api_key)
             elif len(command) > 3:
                 if command[1] == 'control':
                     if command[2] == 'on':
+                        log.info("Anon control enabled")
                         anon_control = True
                         robot_util.setAnonControl(True, robot_id, api_key)
                     elif command[2] == 'off':
+                        log.info("Anon control disabled")
                         anon_control = False
                         robot_util.setAnonControl(False, robot_id, api_key)
                 elif command[1] == 'tts':
                     if command[2] == 'on':
+                        log.info("Anon TTS enabled")
                         tts.unmute_anon_tts()
                     elif command[2] == 'off':
+                        log.info("Anon TTS disabled")
                         tts.mute_anon_tts()
-    print("anon_control : " + str(anon_control))
+    log.debug("anon_control : %s", str(anon_control))
 
 def ban_handler(command, args):
     global banned
@@ -128,7 +138,7 @@ def ban_handler(command, args):
         user = command[1]
         if is_authed(args['name']): # Moderator
             banned.append(user)
-            print(user + " added to ban list")
+            log.info("%s added %s to ban list", args['name'], user)
             tts.mute_user_tts(user)            
 
 def unban_handler(command, args):
@@ -139,7 +149,7 @@ def unban_handler(command, args):
         if is_authed(args['name']): # Moderator
             if user in banned:
                 banned.remove(user)
-                print(user + " removed from ban list")
+                log.info("%s removed %s from ban list", args['name'], user)
                 tts.unmute_user_tts(user)            
 
 def timeout_handler(command, args):
@@ -150,7 +160,7 @@ def timeout_handler(command, args):
         if is_authed(args['name']): # Moderator
             banned.append(user)
             schedule.single_task(5, untimeout_user, user)
-            print(user + " added to timeout list")
+            log.info("%s added %s to timeout list", args['name'], user)
             tts.mute_user_tts(user)            
             
     
@@ -159,7 +169,7 @@ def untimeout_user(user):
 
     if user in banned:  
         banned.remove(user)
-        print(user + " timeout expired")
+        log.info("%s timeout expired", user)
         tts.unmute_user_tts(user)            
 
 
@@ -171,7 +181,7 @@ def untimeout_handler(command, args):
         if is_authed(args['name']): # Moderator
             if user in banned:
                 banned.remove(user)
-                print(user = " removed from timeout list")
+                log.info("%s removed %s from timeout list", args['name'], user)
                 tts.unmute_user_tts(user)            
     
 
@@ -180,9 +190,10 @@ def public_mode_handler(command, args):
         if api_key != None:
             if is_authed(args['name']) == 2: # Owner
                 if command[1] == 'on':
-                    robot_util.setAllowed('roboempress', robot_id, api_key)
+                    log.info("Owner enabled private mode")
                     robot_util.setPrivateMode(True, robot_id, api_key)
                 elif command[1] == 'off':
+                    log.info("Owner disabled private mode")
                     robot_util.setPrivateMode(False, robot_id, api_key)
     
 def devmode_handler(command, args):
@@ -192,46 +203,56 @@ def devmode_handler(command, args):
     if len(command) > 1:
         if is_authed(args['name']) == 2: # Owner
             if command[1] == 'on':
+                log.info("Owner enabled dev mode")
                 dev_mode = True
                 dev_mode_mods = False
                 if api_key != None:
                     robot_util.setDevMode(True, robot_id, api_key)
             elif command[1] == 'off':
+                log.info("Owner disabled dev mode")
                 dev_mode = False
                 if api_key != None:
                     robot_util.setDevMode(False, robot_id, api_key)
             elif command[1] == 'mods':
+                log.info("Owner enabled dev mode with mod control")
                 dev_mode = True
                 dev_mode_mods = True
-    print("dev_mode : " + str(dev_mode))
-    print("dev_mode_mods : " + str(dev_mode_mods))
+    log.debug("dev_mode : %s", str(dev_mode))
+    log.debug("dev_mode_mods : %s", str(dev_mode_mods))
 
+#TODO : Since audio / video has been integrated into the server, this should
+# probably be updated to mute the mic directly, rather than just doing it on
+# the server settings. 
 def mic_handler(command, args):
     if is_authed(args['name']) == 1: # Owner
         if len(command) > 1:
             if command[1] == 'mute':
                 if api_key != None:
+                    log.info("Owner disabled mic")
                     robot_util.setMicEnabled(True, robot_id, api_key)
                 # Mic Mute
                 return
             elif command[1] == 'unmute':
                 if api_key != None:
+                    log.info("owner enabled mic")
                     robot_util.setMicEnabled(False, robot_id, api_key)
                 # Mic Unmute
                 return
 
 def tts_handler(command, args):
-    print("tts :", tts)
+    log.debug("tts :", tts)
     if len(command) > 1:
         if is_authed(args['name']) == 2: # Owner
             if command[1] == 'mute':
-                print("mute")
+                log.info("Owner muted TTS")
                 tts.mute_tts()
                 return
             elif command[1] == 'unmute':
+                log.info("Owner unmuted TTS")
                 tts.unmute_tts()
                 return
             elif command[1] == 'vol':
+                # TODO : Impliment this.
                 # TTS int volume command
                 return
 
@@ -239,7 +260,7 @@ def stationary_handler(command, args):
     global stationary
     if is_authed(args['name']) == 2: # Owner
         stationary = not stationary
-        print ("stationary is ", stationary)
+        log.info("stationary is %s", stationary)
 
 def global_chat_handler(command, args):
     if len(command) > 1:
@@ -297,7 +318,7 @@ def handler(args):
 
     try:	
         command = command.split(']')[1:][0].split(' ')[1:]
-        print(command)
+        log.debug("command : %s", command)
     except IndexError: # catch empty messages
         return
     
@@ -314,7 +335,7 @@ def move_auth(args):
     if stationary:
         direction = args['command']
         if direction == 'F' or direction == 'B':
-            print("No forward for you.....")
+            log.debug("No forward for you.....")
             return 
                
     if anon_control == False and anon:

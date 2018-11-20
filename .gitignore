@@ -21,6 +21,8 @@ gpio.conf
 .\#*
 
 *.bak
+*.log
+
 letsrobot.conf
 hardware/hardware_custom.py
 tts/tts_custom.py

@@ -1,10 +1,10 @@
-from __future__ import print_function
 import requests
 import time
 import traceback
 import ssl
 import sys
 import json
+import logging
 
 if (sys.version_info > (3, 0)):
     import urllib.request as urllib2
@@ -13,10 +13,12 @@ else:
     import urllib2
     from urllib2 import HTTPError
 
+log = logging.getLogger('robot_util')
+
 terminate=None
 
 def terminate_controller():
-    print('Attempting to terminate controller...')
+    log.info('Attempting to terminate controller...')
     if terminate != None:
         terminate.acquire()
 
@@ -24,10 +26,9 @@ def terminate_controller():
 # TODO : Think about rewriting this, and using request.
 
 def getWithRetry(url, secure=True):
-
     for retryNumber in range(2000):
         try:
-            print("GET", url)
+            log.debug("GET", url)
             if secure:
                 response = urllib2.urlopen(url).read()
             else:
@@ -37,8 +38,8 @@ def getWithRetry(url, secure=True):
                 response = urllib2.urlopen(url, context=ctx).read()
             break
         except:
-            print ("could not open url", url)
-            traceback.print_exc()
+            log.excpetion("could not open url", url)
+            #traceback.print_exc()
             time.sleep(2)
 
     return response.decode('utf-8')
@@ -59,11 +60,11 @@ def sendRobotSettings(data, robot_id, api_key):
         try:
             f = urllib2.urlopen(req)
         except HTTPError:
-            print(api_key)
-            print("Unable to update robot config on server! check API key")
+            #log.debug(api_key)
+            log.error("Unable to update robot config on server! check API key")
         response = f.read()
         f.close()
-        print(response)
+        log.debug("sendRobotSettings : %s", response)
 
 # This function allows you to set multiple values at once.
 def updateRobotSettings(robot_id, api_key, **kwargs ):

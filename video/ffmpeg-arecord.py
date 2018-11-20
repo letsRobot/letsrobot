@@ -4,9 +4,6 @@ import ffmpeg
 arecord_path = None
 arecord_format = None
 
-print (dir())
-print (dir("__name__"))
-
 # This is a pretty ugly way to overload the startAudioCapture(), but it's also
 # the only way that seems to work. Otherwise, when called internally to the 
 # ffmpeg module, the original function gets called.
@@ -25,8 +22,6 @@ def setupArecord(robot_config):
     arecord_format = robot_config.get('ffmpeg-arecord', 'arecord_format')
 
 def startAudioCapture():
-    print(dir())
-
     audioCommandLine = ('{arecord} -D hw:{audio_hw_num} -c {audio_channels}'
                        ' -f {arecord_format} -r {audio_sample_rate} |'
                        ' {ffmpeg} -i - -ar {audio_sample_rate} -f mpegts'
@@ -48,7 +43,7 @@ def startAudioCapture():
                             audio_port=ffmpeg.audioPort,
                             stream_key=ffmpeg.stream_key)
 
-    print (audioCommandLine)
+    log.debug("audioCommandLine : %s", audioCommandLine)
     ffmpeg.audio_process=ffmpeg.subprocess.Popen(audioCommandLine, shell=True)
     ffmpeg.atexit.register(ffmpeg.atExitAudioCapture)
     ffmpeg.audio_process.wait()

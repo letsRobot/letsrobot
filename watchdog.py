@@ -3,6 +3,9 @@
 #      
 
 from threading import Thread
+import logging
+
+log = logging.getLogger('watchdog')
 
 watches={}
 
@@ -12,7 +15,7 @@ def watch():
     
     for (name, process) in watches.items():
         if not process[0].is_alive():
-            print("Process "+name+" not running, restarting")
+            log.error("Process "+name+" not running, restarting")
             start(name, process[1], *process[2], **process[3])
          
 def start(name, startFunction, *args, **kwargs):

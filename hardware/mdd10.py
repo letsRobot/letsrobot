@@ -3,6 +3,9 @@
 
 import RPi.GPIO as GPIO
 import schedule
+import logging
+log = logging.getLogger('hardware/mdd10')
+
 
 maxSpeedEnabled = False
 AN1 - None
@@ -43,7 +46,7 @@ def setup(robot_config):
 
 def SpeedNormal():
     maxSpeedEnabled = False
-    print("normal speed")
+    log.debug("normal speed")
 
 #MDD10 speed and movement controls
 def move(args):
@@ -53,17 +56,17 @@ def move(args):
     if command == 'MAXSPEED':
         handleMaxSpeedCommand()
         maxSpeedEnabled = True
-        print("max speed")
+        log.debug("max speed")
         schedule.single_task(120, SpeedNormal)        
         return
         
     if maxSpeedEnabled:
-        print("AT MAX.....................")
-        print(maxSpeedEnabled)
+        log.debug("AT MAX.....................")
+        log.debug("maxSpeedEnabled : %s",maxSpeedEnabled)
         moveMDD10(command, 100)
     else:
-        print("NORMAL.................")
-        print(maxSpeedEnabled)
+        log.debug("NORMAL.................")
+        log.debug("maxSpeedEnabled : %s",maxSpeedEnabled)
         moveMDD10(command, int(float(drivingSpeedActuallyUsed) / 2.55))                
 
 

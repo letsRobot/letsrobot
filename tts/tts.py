@@ -2,13 +2,16 @@ import os
 import sys
 import re
 import audio_util
+import logging
+
+log = logging.getLogger('tts/tts')
+
 
 if (sys.version_info > (3, 0)):
     import importlib
 
 type = 'none'
 tts_module = None
-debug_messages = None
 mute = False
 mute_anon = None
 urlRegExp = "(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
@@ -18,12 +21,10 @@ banned=[]
 def setup(robot_config):
     global type
     global tts_module
-    global debug_messages
     global mute_anon
     global url_filter
     
     type = robot_config.get('tts', 'type')
-    debug_messages = robot_config.get('misc', 'debug_messages')
     mute_anon = not robot_config.getboolean('tts', 'anon_tts')
     url_filter = robot_config.getboolean('tts', 'filter_url_tts')
 
@@ -46,6 +47,7 @@ def setup(robot_config):
 
 
     #import the appropriate tts handler module.
+    log.debug("loading module tts/%s", type);    
     if robot_config.getboolean('misc', 'custom_tts'):
         if os.path.exists('tts/tts_custom.py'):
             if (sys.version_info > (3, 0)):
@@ -53,7 +55,7 @@ def setup(robot_config):
             else:
                 tts_module = __import__('tts.tts_custom', fromlist=['tts_custom'])
         else:
-            print("Unable to find tts/tts_custom.py")    
+            log.info("Unable to find tts/tts_custom.py")    
             if (sys.version_info > (3, 0)):
                 tts_module = importlib.import_module('tts.'+type)
             else:
@@ -89,36 +91,31 @@ def say(*args):
 def mute_tts():
     global mute
     mute = True
-    if debug_messages:
-        print ("TTS muted")    
+    log.info("TTS muted")    
 
 def unmute_tts():
     global mute
     mute = False
-    if debug_messages:
-        print ("TTS unmuted")    
+    log.info("TTS unmuted")    
     
 def mute_anon_tts():
     global mute_anon
     mute_anon = True
-    if debug_messages:
-        print ("Anonymous TTS muted")    
+    log.info("Anonymous TTS muted")    
     
 def unmute_anon_tts():
     global mute_anon
     mute_anon = False
-    if debug_messages:
-        print ("Anonymous TTS unmuted")
+    log.info("Anonymous TTS unmuted")
         
 def mute_user_tts(user):
     global banned
     banned.append(user)
-    print(user + " TTS muted")
+    log.info(user + " TTS muted")
     
 def unmute_user_tts(user):
     global banned
     if user in banned:
         banned.remove(user)
-        print(user + " TTS unmuted")
-            
-    
+        log.info(user + " TTS unmuted")
+

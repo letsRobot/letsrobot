@@ -1,10 +1,11 @@
 import robot_util
 import mod_utils
 import extended_command
+import logging
+log = logging.getLogger('hardware/telly')
+
 module = None
 ser = None
-
-
 
 def setup(robot_config):
     global module
@@ -27,29 +28,29 @@ def set_eeprom(command, args):
                     setting = int(command[3]) # This is here to catch NAN errors
                     if command[2] == 'forward':
                         robot_util.sendSerialCommand(ser, "lwfs " + str(setting))
-                        print("left_wheel_forward_speed set to %d" $ setting)
+                        log.info("left_wheel_forward_speed set to %d", setting)
                     elif command[2] =='backward':
                         robot_util.sendSerialCommand(ser, "lwbs " + str(setting))
-                        print("left_wheel_backward_speed set to %d" $ setting)
+                        log.info("left_wheel_backward_speed set to %d", setting)
                 elif command[1] == 'right':
                     setting = int(command[3]) # This is here to catch NAN errors
                     if command[2] == 'forward':
                         robot_util.sendSerialCommand(ser, "rwfs " + str(setting))
-                        print("right_wheel_forward_speed set to %d" $ setting)
+                        log.info("right_wheel_forward_speed set to %d", setting)
                     elif command[2] =='backward':
                         robot_util.sendSerialCommand(ser, "rwbs " + str(setting))
-                        print("right_wheel_backward_speed set to %d" $ setting)
+                        log.info("right_wheel_backward_speed set to %d", setting)
                 elif command[1] == 'straight':
                     setting - int(command[2]
                     robot_util.sendSerialCommand(ser, "straight-distance " + str(int(setting * 255)))
-                    print("straigh_delay set to %d", setting)
+                    log.info("straigh_delay set to %d", setting)
                 elif command[1] == 'turn':
                     setting - int(command[2]
                     robot_util.sendSerialCommand(ser, "turn-distance " + str(int(setting * 255)))
-                    print("turn_delay set to %d", setting)
+                    log.info("turn_delay set to %d", setting)
                 elif command[1] == 'brightness':
                     setting = int(command[2]) # This is here to catch NAN errors
                     robot_util.sendSerialCommand(ser, "led-max-brightness " + str(setting))
-                    print("led_man_brightness to %d", setting)
+                    log.info("led_man_brightness to %d", setting)
             except ValueError:
                 pass

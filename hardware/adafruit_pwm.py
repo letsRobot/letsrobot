@@ -1,17 +1,15 @@
-from __future__ import print_function
 from Adafruit_PWM_Servo_Driver import PWM
-debug_messages=None
+import logging
+log = logging.getLogger('hardware/adafruit_pwm')
 
 def setup(robot_config):
-    debug_messages = robot_config.get('misc', 'debug_messages');   
     pwm = PWM(int(robot_config.get('adafruit_pwm', 'address'),16)) 
     pwm.setPWMFreq(robot_config.getint('adafruit_pwm', 'pwm_freq'))      # Set frequency to 60 Hz
     
 def move(args):
     command = args['command']
     
-    if debug_messages:
-        print("move adafruit pwm command", command)
+    log.debug("move adafruit pwm command : %s", command)
         
     if command == 'L':
         pwm.setPWM(1, 0, 300) # turn left

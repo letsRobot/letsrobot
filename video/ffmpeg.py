@@ -11,6 +11,8 @@ import extended_command
 import atexit
 import os
 import sys
+import logging
+log = logging.getLogger('video/ffmpeg')
 
 robotID=None
 no_mic=True
@@ -112,7 +114,7 @@ def setup(robot_config):
 
     server_override = robot_config.getboolean('misc', 'server_override')
 
-    print ("getting websocket relay host")
+    log.info("getting websocket relay host")
     websocketRelayHost = networking.getWebsocketRelayHost()
 
     if not no_camera:
@@ -125,7 +127,7 @@ def setup(robot_config):
         
         videoHost = websocketRelayHost['host']
         videoPort = networking.videoPort
-        print ("Relay host for video: %s:%s" % (videoHost, videoPort))
+        log.debug("Relay host for video: %s:%s" % (videoHost, videoPort))
 
         video_device = robot_config.get('camera', 'camera_device')
         video_codec = robot_config.get('ffmpeg', 'video_codec')
@@ -154,7 +156,7 @@ def setup(robot_config):
  
         audioHost = websocketRelayHost['host']
         audioPort = networking.audioPort
-        print ("Relay host for audio: %s:%s" % (audioHost, audioPort))
+        log.debug("Relay host for audio: %s:%s" % (audioHost, audioPort))
 
         audio_codec = robot_config.get('ffmpeg', 'audio_codec')
         audio_bitrate = robot_config.get('ffmpeg', 'audio_bitrate')        
@@ -181,19 +183,19 @@ def refreshFromOnlineSettings():
     global x_res
     global y_res
     global mic_off
-    print ("refreshing from online settings")
+    log.info("refreshing from online settings")
     onlineSettings = networking.getOnlineRobotSettings(robotID)
-    print(onlineSettings)
+    log.debug("onlineSettings : %s", onlineSettings)
     
     x_res = onlineSettings['xres']
     y_res = onlineSettings['yres']
-    print("Setting resolution to %ix%i" %(x_res, y_res))
+    log.info("Setting resolution to %ix%i",x_res, y_res)
 
     if onlineSettings['mic_enabled']:
-        print("Mic Enabled")
+        log.info("Mic Enabled")
         mic_off = False
     else:
-        print("Mic Disabled")
+        log.info("Mic Disabled")
         mic_off = True
 
 def start():
@@ -208,7 +210,7 @@ def start():
             watchdog.start("FFmpegAudioProcess", startAudioCapture)
 
 def onRobotSettingsChanged(*args):
-    print ('set message recieved:', args)
+    log.info('set message recieved:', args)
     refreshFromOnlineSettings()        
 
     if not no_camera:
@@ -225,19 +227,19 @@ def onCommandToRobot(*args):
 
     if len(args) > 0 and 'robot_id' in args[0] and args[0]['robot_id'] == robotID:
         commandMessage = args[0]
-        print('command for this robot received:', commandMessage)
+        log.info('command for this robot received:', commandMessage)
         command = commandMessage['command']
 
         if command == 'VIDOFF':
-            print ('disabling camera capture process')
-            print ("args", args)
+            log.info('disabling camera capture process')
+            log.debug("args : %s", args)
             stopAudioCapture()
             stopVideoCapture()
 
         if command == 'VIDON':
             if not no_camera:
-                print ('enabling camera capture process')
-                print ("args", args)
+                log.info('enabling camera capture process')
+                log.debug("args : %s", args)
                 startVideoCapture()
                 if not no_mic:       
                     startAudioCapture()
@@ -246,17 +248,17 @@ def startVideoCapture():
     global video_process
     # set brightness
     if (brightness is not None):
-        print ("brightness", brightness)
+        log.info("setting brightness : %s", brightness)
         os.system("v4l2-ctl -c brightness={brightness}".format(brightness=robotSettings.brightness))
 
     # set contrast
     if (contrast is not None):
-        print ("contrast", contrast)
+        log.info("setting contrast : %s", contrast)
         os.system("v4l2-ctl -c contrast={contrast}".format(contrast=robotSettings.contrast))
 
     # set saturation
     if (saturation is not None):
-        print ("saturation", saturation)
+        log.info("setting saturation : %s", saturation)
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
 
     
@@ -280,7 +282,7 @@ def startVideoCapture():
                             yres=y_res, 
                             stream_key=stream_key)
 
-    print (videoCommandLine)
+    log.debug("videoCommandLine : %s", videoCommandLine)
     video_process=subprocess.Popen(shlex.split(videoCommandLine))
     atexit.register(atExitVideoCapture)
     try:
@@ -329,7 +331,7 @@ def startAudioCapture():
                             audio_port=audioPort,
                             stream_key=stream_key)
                             
-    print (audioCommandLine)
+    log.debug("audioCommandLine : %s", audioCommandLine)
     audio_process=subprocess.Popen(shlex.split(audioCommandLine))
     atexit.register(atExitAudioCapture)
     if audio_process != None:
@@ -396,7 +398,7 @@ def brightnessChatHandler(command, args):
             if new_brightness <= 255 and new_brightness >= 0:
                 brightness = new_brightness
                 os.system(v4l2_ctl_location + " --set-ctrl brightness=" + str(brightness))
-                print("brightness set to %.2f" % brightness)
+                log.info("brightness set to %.2f" % brightness)
 
 def contrastChatHandler(command, args):
     global contrast
@@ -409,7 +411,7 @@ def contrastChatHandler(command, args):
             if new_contrast <= 255 and new_contrast >= 0:
                 contrast = new_contrast
                 os.system(v4l2_ctl_location + " --set-ctrl contrast=" + str(contrast))
-                print("contrast set to %.2f" % contrast)
+                log.info("contrast set to %.2f" % contrast)
 
 def saturationChatHandler(command, args):
     if len(command) > 2:
@@ -421,7 +423,7 @@ def saturationChatHandler(command, args):
             if new_saturation <= 255 and new_saturation >= 0:
                 saturation = new_saturation
                 os.system(v4l2_ctl_location + " --set-ctrl saturation=" + str(saturation))
-                print("saturation set to %.2f" % saturation)
+                log.info("saturation set to %.2f" % saturation)
 
 def audioChatHandler(command, args):
     global audio_process

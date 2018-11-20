@@ -1,24 +1,22 @@
-from __future__ import print_function
 import os
 import tempfile
 import uuid
+import logging
+
+log = logging.getLogger('tts/festival')
 
 tempDir = None
-debug_messages = None
 hw_num = None
 
 def setup(robot_config):
-    global debug_messages
     global tempDir
     global hw_num
     
-    debug_messages = robot_config.get('misc', 'debug_messages')
     hw_num = robot_config.getint('tts', 'hw_num')
     
     #set the location to write the temp file to
     tempDir = tempfile.gettempdir()
-    if debug_messages:
-       print("TTS temporary directory:", tempDir)
+    log.info("TTS temporary directory : %s", tempDir)
 
 def say(*args):
     message = args[0]

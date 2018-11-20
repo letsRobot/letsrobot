@@ -5,6 +5,9 @@ from subprocess import Popen, PIPE
 import os
 import random
 import networking
+import logging
+
+log = logging.getLogger('tts/polly')
 
 client = None
 polly = None
@@ -65,9 +68,7 @@ def setup(robot_config):
                             region_name=region_name)
                             
     users[owner] = owner_voice
-#    users['jill'] = 'Amy'
-    users['jill'] = 'Mizuki'
-    users['Hep'] = 'Justin'
+    users['jill'] = 'Amy'
 
     if random_voice: # random voices enabled
         if robot_config.getboolean('tts', 'ext_chat'): #ext_chat enabled, add voice command
@@ -89,9 +90,9 @@ def say(*args):
                 VoiceId = robot_voice,
                 Text = message,
             )
-            print("Say : " + message)
+            log.info("Say : " + message)
         except ClientError:
-            print("TTS Error! Falling back on espeak.")
+            log.error("TTS Error! Falling back on espeak.")
             fallback_tts.say(message)
         
     else:
@@ -105,7 +106,7 @@ def say(*args):
                     users[user] = random.choice(voices)
                 voice = users[user]    
         
-            print(user + " voice " + voice + ": " + message)
+            log.info(user + " voice " + voice + ": " + message)
         else:
             voice = robot_voice
  
@@ -116,7 +117,7 @@ def say(*args):
                 Text = message,
             )
         except ClientError:
-            print("TTS Error! Falling back on espeak.")
+            log.error("TTS Error! Falling back on espeak.")
             fallback_tts.say(message, args[1])
 
     if "AudioStream" in response:

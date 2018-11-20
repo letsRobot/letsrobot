@@ -1,5 +1,8 @@
 #import the USB and Time librarys into Python
 import usb.core, usb.util, time, sys
+import logging
+log = logging.getLogger('hardware/owi_arm')
+
 
 # led pesistence variable
 led = 0
@@ -13,7 +16,7 @@ def setup(robot_config):
  
     #Check if the arm is detected and warn if not
     if RoboArm is None:
-        print("USB Arm not found")
+        log.critical("USB Arm not found")
         sys.exit()
      
 
@@ -27,7 +30,7 @@ def CtrlTransfer(a, b, c, d, e, f):
             break
         except:
             error += 1
-            print("USB timeout!")
+            log.error("USB timeout!")
             time.sleep(0.1)
             if error == 5:
                sys.exit()

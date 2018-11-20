@@ -1,9 +1,8 @@
-from __future__ import print_function
 import RPi.GPIO as GPIO
 import time
 import extended_command
-
-debug_messages=None
+import logging
+log = logging.getLogger('hardware/l298n')
 
 sleeptime=None 
 rotatetimes=None
@@ -18,18 +17,17 @@ def set_rotate_time(command, args):
     if extended_command.is_authed(args['name']) == 2: # Owner
         if len(command) > 1:
             rotatetimes=float(command[1])
-            print("rotate time multiplier set to : %d" % float(command[1]))
+            log.info("rotate time multiplier set to : %d", float(command[1]))
 
 def set_sleep_time(command, args):
     global sleeptime
     if extended_command.is_authed(args['name']) == 2: # Owner
         if len(command) > 1:
             sleeptime=float(command[1])
-            print("sleep time set to : %d" % float(command[2]))
+            log.info("sleep time set to : %d", float(command[2]))
 
 
 def setup(robot_config):
-    global debug_messages
     global StepPinForward
     global StepPinBackward
     global StepPinLeft
@@ -37,13 +35,10 @@ def setup(robot_config):
     global sleeptime
     global rotatetimes
     
-    debug_messages = robot_config.get('misc', 'debug_messages')
     sleeptime = robot_config.getfloat('l298n', 'sleeptime')
     rotatetimes = robot_config.getfloat('l298n', 'rotatetimes')
     
-    if debug_messages:
-        mode=GPIO.getmode()
-        print(" mode ="+str(mode))
+    log.debug("GPIO mode : %s", str(GPIO.getmode()))
 
     GPIO.setwarnings(False)
     GPIO.cleanup()

@@ -5,11 +5,14 @@
 
 import sys
 import time
+import logging
+log = logging.getLogger('hardware/maestro-servo')
+
 try:
     import hardware/maestro
 except ImportError:
-    print "You are missing the maestro.py file from the hardware subdirectory."
-    print "Please download it from here https://github.com/FRC4564/Maestro"
+    log.critical("You are missing the maestro.py file from the hardware subdirectory.")
+    log.critical("Please download it from here https://github.com/FRC4564/Maestro")
     sys.exit()
 
 servo = None

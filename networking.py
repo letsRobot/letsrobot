@@ -1,7 +1,4 @@
-from __future__ import print_function
-
 import requests
-
 import sys
 import robot_util
 import json
@@ -10,6 +7,7 @@ import platform
 import subprocess
 import tts.tts as tts
 import watchdog
+import logging
 
 from socketIO_client import SocketIO, LoggingNamespace
 
@@ -19,6 +17,8 @@ if (sys.version_info > (3, 0)):
 else:
 #    import thread
     import urllib2
+
+log = logging.getLogger('networking')
 
 controlHostPort = None
 chatHostPort = None
@@ -43,50 +43,57 @@ chatSocket = None
 messengerSocket = None
 no_chat_server = None
 secure_cert = None
-debug_messages = None
 
 onHandleChatMesasge = None
 
 def getControlHostPort():
     url = 'https://%s/get_control_host_port/%s' % (infoServer, robot_id)
     response = robot_util.getWithRetry(url, secure=secure_cert)
+    log.debug("getControlHostPort : %s", response)
     return json.loads(response)
 
 def getChatHostPort():
     url = 'https://%s/get_chat_host_port/%s' % (infoServer, robot_id)
     response = robot_util.getWithRetry(url, secure=secure_cert)
+    log.debug("getChatHostPort : %s", response)
     return json.loads(response)
     
 def getOwnerDetails(username):
     url = 'https://%s/api/v1/accounts/%s' % (apiServer, username)
 #    url = 'https://api.letsrobot.tv/api/v1/robocasters/%s' % (username)
     response = robot_util.getWithRetry(url, secure=secure_cert)
+    log.debug("getOwnerDetails : %s", response)
     return json.loads(response)
     
 def getVideoPort():
     url = 'https://%s/get_video_port/%s' % (infoServer, camera_id)
     response = robot_util.getWithRetry(url, secure=secure_cert)
+    log.debug("getVideoPort : %s", response)
     return json.loads(response)['mpeg_stream_port']
 
 def getAudioPort():
     url = 'https://%s/get_audio_port/%s' % (infoServer, camera_id)
     response = robot_util.getWithRetry(url, secure=secure_cert)
+    log.debug("getAudioPort : %s", response)
     return json.loads(response)['audio_stream_port']
 
 def getWebsocketRelayHost():
     url = 'https://%s/get_websocket_relay_host/%s' % (infoServer, camera_id)
     response = robot_util.getWithRetry(url, secure=secure_cert)
+    log.debug("getWebsocketRelayHost : %s", response)
     return json.loads(response)
     
 def getOnlineRobotSettings(robotID):
     url = 'https://%s/api/v1/robots/%s' % (apiServer, robotID)
     response = robot_util.getWithRetry(url, secure=secure_cert).decode('utf-8')
+    log.debug("getOnlineRobotSettings : %s", response)
     return json.loads(response)
 
 def getMessengerAuthToken():
     url = 'https://%s/api/v1/authenticate' % (apiServer)
     payload = {'username': messengerUsername, 'password': messengerPassword}
     authToken = robot_util.getAuthToken(url, payload, secure=secure_cert)
+    log.debug("getMessengerAuthToken : %s", response)
     return authToken
     
 def waitForAppServer():
@@ -94,16 +101,14 @@ def waitForAppServer():
         try:
             appServerSocketIO.wait(seconds=1)
         except AttributeError:
-            if debug_messages:
-                print("Warning: App Server Socket not connected.");
+            log.warning("Warning: App Server Socket not connected.");
 
 def waitForControlServer():
     while True:
         try:
             controlSocketIO.wait(seconds=1)        
         except AttributeError:
-            if debug_messages:
-                print("Warning: Control Server Socket not connected.");
+            log.warning("Warning: Control Server Socket not connected.");
 
 def waitForChatServer():
     global chatSocket
@@ -112,12 +117,11 @@ def waitForChatServer():
         try:
             chatSocket.wait(seconds=1)        
         except AttributeError:
-            if debug_messages:
-                print("Warning: Chat Server Socket not connected.");
+            log.warning("Warning: Chat Server Socket not connected.");
         except IndexError:
-                print("Error: Chat Server Socket has FAILED");
-                startListenForChatServer()
-                return
+            log.error("Error: Chat Server Socket has FAILED");
+            startListenForChatServer()
+            return
         
 def waitForMessengerServer():
     while True:
@@ -126,10 +130,9 @@ def waitForMessengerServer():
         try:
             messengerSocket.wait(seconds=1)        
         except AttributeError:
-            if debug_messages:
-                print("Warning: Messenger Chat Socket not connected.");a
-                startListenForMessengerServer()
-                return
+            log.warning("Warning: Messenger Chat Socket not connected.");a
+            startListenForMessengerServer()
+            return
         
 def startListenForAppServer():
     watchdog.start("AppServerListen", waitForAppServer)
@@ -142,12 +145,11 @@ def startListenForChatServer():
 
     chatSocket = SocketIO(chatHostPort['host'], chatHostPort['port'], LoggingNamespace, transports='websocket')
 
-    print("Connected to chat socket.io")
+    log.info("Connected to chat socket.io")
     chatSocket.on('chat_message_with_name', onHandleChatMessage)
     chatSocket.on('connect', onHandleChatConnect)
     chatSocket.on('reconnect', onHandleChatReconnect)
-    if debug_messages:
-        chatSocket.on('disconnect', onHandleChatDisconnect)
+    chatSocket.on('disconnect', onHandleChatDisconnect)
     watchdog.start("ChatServerListen", waitForChatServer)
     return chatSocket
 
@@ -157,98 +159,65 @@ def startListenForMessengerServer():
     cookie = getMessengerAuthToken()
 
     if not cookie.status_code == 200:
-        print('ERROR : Messenger username / password rejected by server')
+        log.error('ERROR : Messenger username / password rejected by server')
         sys.exit()
 
     messengerSocket = SocketIO('https://%s' % messengerHost, messengerPort, LoggingNamespace, cookies={'connect.sid': cookie.cookies['connect.sid']}, transports='websocket')
 
-    print("Connected to messenger chat socket.io")
+    log.info("Connected to messenger chat socket.io")
     messengerSocket.on('connect', onHandleMessengerConnect)
     messengerSocket.on('reconnect', onHandleMessengerReconnect)
-    if debug_messages:
-        messengerSocket.on('disconnect', onHandleMessengerDisconnect)
+    messengerSocket.on('disconnect', onHandleMessengerDisconnect)
 
     watchdog.start("MessengerServerListen", waitForMessengerServer)
     return messengerSocket
    
 def onHandleAppServerConnect(*args):
     identifyRobotID()    
-    if debug_messages:
-        print
-        print("app socket.io connect")
-        print
+    log.info("app socket.io connect")
 
 
 def onHandleAppServerReconnect(*args):
     identifyRobotID()
-    if debug_messages:
-        print
-        print("app server socket.io reconnect")
-        print
+    log.info("app server socket.io reconnect")
     
 def onHandleAppServerDisconnect(*args):    
-    print
-    print("app server socket.io disconnect")
-    print
+    log.info("app server socket.io disconnect")
  
 def onHandleChatConnect(*args):
     identifyRobotID()
-    if debug_messages:
-        print
-        print("chat socket.io connect")
-        print
+    log.info("chat socket.io connect")
 
 def onHandleChatReconnect(*args):
     identifyRobotID()
-    if debug_messages:
-        print
-        print("chat socket.io reconnect")
-        print
+    log.info("chat socket.io reconnect")
     
 def onHandleChatDisconnect(*args):
-    print
-    print("chat socket.io disconnect")
-    print
+    log.info("chat socket.io disconnect")
 
 def onHandleControlConnect(*args):
     identifyRobotID()    
-    if debug_messages:
-        print
-        print("control socket.io connect")
-        print
+    log.info("control socket.io connect")
 
 def onHandleControlReconnect(*args):
     identifyRobotID()
-    if debug_messages:
-        print
-        print("control socket.io reconnect")
-        print
+    log.info("control socket.io reconnect")
     
 def onHandleControlDisconnect(*args):
-    print
-    print("control socket.io disconnect")
-    print
+    log.info("control socket.io disconnect")
     newControlHostPort = getControlHostPort()
     if newControlHostPort['port'] != controlHostPort['port']:
-        print('control host port changed!')
+        log.warn('control host port changed!')
         robot_util.terminate_controller() 
  
 def onHandleMessengerConnect(*args):
-    if debug_messages:
-        print
-        print("messenger chat socket.io connect")
-        print
+    log.info("messenger chat socket.io connect")
 
 def onHandleMessengerReconnect(*args):
-    if debug_messages:
-        print
-        print("messenger chat socket.io reconnect")
-        print
+    log.info("messenger chat socket.io reconnect")
     
 def onHandleMessengerDisconnect(*args):
-    print
-    print("messenger chat socket.io disconnect")
-    print
+    log.info("messenger chat socket.io disconnect")
 
 
 def setupSocketIO(robot_config):
@@ -265,7 +234,6 @@ def setupSocketIO(robot_config):
 
     global no_chat_server
     global secure_cert
-    global debug_messages
 
     global messengerEnable
     global messengerHost
@@ -274,7 +242,6 @@ def setupSocketIO(robot_config):
     global messengerUsername
     global messengerPassword
 
-    debug_messages = robot_config.getboolean('misc', 'debug_messages') 
     robot_id = robot_config.get('robot', 'robot_id')
     camera_id = robot_config.getint('robot', 'camera_id')
     infoServer = robot_config.get('misc', 'info_server')
@@ -296,11 +263,10 @@ def setupSocketIO(robot_config):
 
     schedule.repeat_task(60, identifyRobot_task)
     
-    if debug_messages:   
-        print("using socket io to connect to control", controlHostPort)
-        print("using socket io to connect to chat", chatHostPort)
-        print("using video port %d" % videoPort)
-        print("using audio port %d" % audioPort)
+    log.info("using socket io to connect to control", controlHostPort)
+    log.info("using socket io to connect to chat", chatHostPort)
+    log.info("using video port %d" % videoPort)
+    log.info("using audio port %d" % audioPort)
 
     if robot_config.getboolean('misc', 'check_internet'):
         #schedule a task to check internet status
@@ -309,15 +275,13 @@ def setupSocketIO(robot_config):
 
 def setupControlSocket(on_handle_command):
     global controlSocketIO
-    if debug_messages:
-        print("Connecting socket.io to control host port", controlHostPort)
+    log.debug("Connecting socket.io to control host port", controlHostPort)
     controlSocketIO = SocketIO(controlHostPort['host'], int(controlHostPort['port']), LoggingNamespace, transports='websocket')
-    print("Connected to control socket.io")
+    log.info("Connected to control socket.io")
     startListenForControlServer()
     controlSocketIO.on('connect', onHandleControlConnect)
     controlSocketIO.on('reconnect', onHandleControlReconnect)    
-    if debug_messages:
-        controlSocketIO.on('disconnect', onHandleControlDisconnect)
+    controlSocketIO.on('disconnect', onHandleControlDisconnect)
     controlSocketIO.on('command_to_robot', on_handle_command)
     return controlSocketIO
 
@@ -325,38 +289,34 @@ def setupChatSocket(on_handle_chat_message):
     global onHandleChatMessage
 
     if not no_chat_server:
-        if debug_messages:
-            print('Connecting socket.io to chat host port', chatHostPort)
+        log.debug('Connecting socket.io to chat host port', chatHostPort)
         onHandleChatMessage = on_handle_chat_message
         startListenForChatServer()
         return chatSocket
     else:
-        print("chat server connection disabled")
+        log.info("chat server connection disabled")
 
 def setupAppSocket(on_handle_exclusive_control):
     global appServerSocketIO
-    if debug_messages:
-        print("Connecting to socket.io to app server")
+    log.debug("Connecting to socket.io to app server")
     appServerSocketIO = SocketIO('letsrobot.tv', 8022, LoggingNamespace, transports='websocket')
-    print("Connected to app server")
+    log.info("Connected to app server")
     startListenForAppServer()
     appServerSocketIO.on('exclusive_control', on_handle_exclusive_control)
     appServerSocketIO.on('connect', onHandleAppServerConnect)
     appServerSocketIO.on('reconnect', onHandleAppServerReconnect)
-    if debug_messages:
-        appServerSocketIO.on('disconnect', onHandleAppServerDisconnect)
+    appServerSocketIO.on('disconnect', onHandleAppServerDisconnect)
     return appServerSocketIO
 
 def setupMessengerSocket():
     global messengerSocket
     
     if not no_chat_server:
-        if debug_messages:
-            print('Connecting socket.io to messenger chat host port', "%s %s" % (messengerHost, messengerPort))
+        log.debug('Connecting socket.io to messenger chat host port', "%s %s" % (messengerHost, messengerPort))
         startListenForMessengerServer()
         return messengerSocket
     else:
-        print("messenger chat server connection disabled")
+        log.info("messenger chat server connection disabled")
 
 
 def sendChargeState(charging):
@@ -364,32 +324,28 @@ def sendChargeState(charging):
     try:
         appServerSocketIO.emit('charge_state', chargeState)
     except AttributeError:
-        if debug_messages:
-            print("Error: Can't update server on charge state, no app socket")
-    print("charge state:", chargeState)
+        log.error("Error: Can't update server on charge state, no app socket")
+    log.debug("charge state:", chargeState)
 
 def sendOnlineState(state):
     onlineState = {'send_video_process_exists': state, 'camera_id': camera_id}
     try:
         appServerSocketIO.emit('send_video_status', onlineState)
     except AttributeError:
-        if debug_messages:
-            print("Error: Can't update server on charge state, no app socket")
-    print("online state: %s" % onlineState)
+        log.error("Error: Can't update server on charge state, no app socket")
+    log.debug("online state: %s" % onlineState)
 
 def ipInfoUpdate():
     try:
         appServerSocketIO.emit('ip_information', 
             {'ip': subprocess.check_output(["hostname", "-I"]).decode('utf-8'), 'robot_id': robot_id})
     except AttributeError:
-        if debug_messages:
-            print("Error: Cant send ip address update, no app socket")
+        log.error("Error: Cant send ip address update, no app socket")
 
 def identifyRobotID():
     """tells the server which robot is using the connection"""
     controlSocketIO.emit('robot_id', robot_id)
-    if debug_messages:
-        print("Sending identify robot id message")
+    log.debug("Sending identify robot id message")
     if not no_chat_server and not chatSocket == None:
         chatSocket.emit('identify_robot_id', robot_id);
     if not appServerSocketIO == None:
@@ -417,14 +373,16 @@ def internetStatus_task():
     if internetStatus != lastInternetStatus:
         if internetStatus:
             tts.say("ok")
+            log.info("internet connected")
         else:
+            log.info("missing internet connection")
             tts.say("missing internet connection")
     lastInternetStatus = internetStatus
 
 def sendChatMessage(message):
     new_message = "[%s] %s" % (messengerName, message)
 
-    print ("%s %s %s" % (new_message, messengerName, robot_id)) 
+    log.debug ("%s %s %s" % (new_message, messengerName, robot_id)) 
     chat_message = { 'message': new_message,
                      'robot_id': robot_id,
                      'robot_name': messengerName,
