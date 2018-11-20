@@ -308,11 +308,13 @@ def restartVideoCapture():
 def startAudioCapture():
     global audio_process
 
-    audioCommandLine = ('{ffmpeg} -f {audio_input_format} -ar {audio_sample_rate} -ac {audio_channels}'
-                       ' {in_options} -i {audio_device} -f mpegts'
-                       ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
-                       ' -muxdelay 0.001 {out_options}'
-                       ' http://{audio_host}:{audio_port}/{stream_key}/640/480/')
+    audioCommandLine = '{ffmpeg} -f {audio_input_format}'
+    if audio_input_format != "avfoundation":
+        audioCommandLine += ' -ar {audio_sample_rate} -ac {audio_channels}'
+    audioCommandLine += (' {in_options} -i {audio_device} -f mpegts'
+                         ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
+                         ' -muxdelay 0.001 {out_options}'
+                         ' http://{audio_host}:{audio_port}/{stream_key}/640/480/')
 
     audioCommandLine = audioCommandLine.format(ffmpeg=ffmpeg_location,
                             audio_input_format=audio_input_format,

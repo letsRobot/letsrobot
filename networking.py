@@ -65,28 +65,28 @@ def getOwnerDetails(username):
     
 def getVideoPort():
     url = 'https://%s/get_video_port/%s' % (infoServer, camera_id)
-    response = robot_util.getWithRetry(url)
+    response = robot_util.getWithRetry(url, secure=secure_cert)
     return json.loads(response)['mpeg_stream_port']
 
 def getAudioPort():
     url = 'https://%s/get_audio_port/%s' % (infoServer, camera_id)
-    response = robot_util.getWithRetry(url)
+    response = robot_util.getWithRetry(url, secure=secure_cert)
     return json.loads(response)['audio_stream_port']
 
 def getWebsocketRelayHost():
     url = 'https://%s/get_websocket_relay_host/%s' % (infoServer, camera_id)
-    response = robot_util.getWithRetry(url)
+    response = robot_util.getWithRetry(url, secure=secure_cert)
     return json.loads(response)
     
 def getOnlineRobotSettings(robotID):
     url = 'https://%s/api/v1/robots/%s' % (apiServer, robotID)
-    response = robot_util.getWithRetry(url).decode('utf-8')
+    response = robot_util.getWithRetry(url, secure=secure_cert).decode('utf-8')
     return json.loads(response)
 
 def getMessengerAuthToken():
     url = 'https://%s/api/v1/authenticate' % (apiServer)
     payload = {'username': messengerUsername, 'password': messengerPassword}
-    authToken = robot_util.getAuthToken(url, payload)
+    authToken = robot_util.getAuthToken(url, payload, secure=secure_cert)
     return authToken
     
 def waitForAppServer():
