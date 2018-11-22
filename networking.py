@@ -47,7 +47,7 @@ secure_cert = None
 onHandleChatMesasge = None
 
 def getControlHostPort():
-    url = 'https://%s/get_control_host_port/%s' % (infoServer, robot_id)
+    url = 'https://%s/get_control_host_port/%s?version=2' % (infoServer, robot_id)
     response = robot_util.getWithRetry(url, secure=secure_cert)
     log.debug("getControlHostPort : %s", response)
     return json.loads(response)
