@@ -38,7 +38,7 @@ def getWithRetry(url, secure=True):
                 response = urllib2.urlopen(url, context=ctx).read()
             break
         except:
-            log.excpetion("could not open url", url)
+            log.exception("could not open url", url)
             #traceback.print_exc()
             time.sleep(2)
 
