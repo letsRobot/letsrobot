@@ -9,7 +9,7 @@ import logging
 log = logging.getLogger('hardware/maestro-servo')
 
 try:
-    import hardware/maestro
+    import hardware.maestro
 except ImportError:
     log.critical("You are missing the maestro.py file from the hardware subdirectory.")
     log.critical("Please download it from here https://github.com/FRC4564/Maestro")

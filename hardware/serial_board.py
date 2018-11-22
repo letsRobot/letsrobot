@@ -43,9 +43,9 @@ def setup(robot_config):
         log.critical("error: could not find any valid serial port")
         sys.exit()
    
-       log.info("Serial Connected")
-       log.debug("port:", ser.name)
-       log.debug("baud:", serialBaud)
+        log.info("Serial Connected")
+        log.debug("port:", ser.name)
+        log.debug("baud:", serialBaud)
 
     return(ser)
     

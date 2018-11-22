@@ -41,11 +41,11 @@ def set_eeprom(command, args):
                         robot_util.sendSerialCommand(ser, "rwbs " + str(setting))
                         log.info("right_wheel_backward_speed set to %d", setting)
                 elif command[1] == 'straight':
-                    setting - int(command[2]
+                    setting = int(command[2])
                     robot_util.sendSerialCommand(ser, "straight-distance " + str(int(setting * 255)))
                     log.info("straigh_delay set to %d", setting)
                 elif command[1] == 'turn':
-                    setting - int(command[2]
+                    setting = int(command[2])
                     robot_util.sendSerialCommand(ser, "turn-distance " + str(int(setting * 255)))
                     log.info("turn_delay set to %d", setting)
                 elif command[1] == 'brightness':
