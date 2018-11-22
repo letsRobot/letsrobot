@@ -33,25 +33,25 @@ def move(args):
     if direction == 'F':
         servo.setTarget(0, 12000)
         servo.setTarget(1, 12000)
-            time.sleep(straightDelay)
+        time.sleep(straightDelay)
         servo.setTarget(0, 6000)
         servo.setTarget(1, 6000)
     elif direction == 'B':
         servo.setTarget(0, 0)
         servo.setTarget(1, 0)
-            time.sleep(straightDelay)
+        time.sleep(straightDelay)
         servo.setTarget(0, 6000)
         servo.setTarget(1, 6000)
     elif direction == 'L':
         servo.setTarget(0, 0)
         servo.setTarget(1, 12000)
-            time.sleep(turnDelay)
+        time.sleep(turnDelay)
         servo.setTarget(0, 6000)
         servo.setTarget(1, 6000)
     elif direction == 'R':
         servo.setTarget(0, 12000)
         servo.setTarget(1, 0)
-            time.sleep(turnDelay)
+        time.sleep(turnDelay)
         servo.setTarget(0, 6000)
         servo.setTarget(1, 6000)
 
