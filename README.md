@@ -141,7 +141,7 @@ The RasPi will need the following things install so it can talk to your motors a
 
 1. Edit the letsrobot.conf file created in the previous section.
    ```
-   nano ~letsrobot.conf
+   nano letsrobot.conf
    ```
 2. Configure the [robot] section
    * owner should be the username you have registered the robot under on the LetsRobot site.
