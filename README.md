@@ -125,7 +125,11 @@ The RasPi will need the following things install so it can talk to your motors a
    ```
    sudo python -m pip install -r ~/letsrobot/requirements.txt
    ```
-
+   
+4. Open the new letsrobot directory
+   ```
+   cd letsrobot
+   ```
 
 5. Copy letsrobot.sample.conf to letsrobot.conf
 
@@ -137,7 +141,7 @@ The RasPi will need the following things install so it can talk to your motors a
 
 1. Edit the letsrobot.conf file created in the previous section.
    ```
-   nano ~letsrobot.conf
+   nano letsrobot.conf
    ```
 2. Configure the [robot] section
    * owner should be the username you have registered the robot under on the LetsRobot site.
@@ -189,7 +193,7 @@ The RasPi will need the following things install so it can talk to your motors a
 
 1. Copy the start_robot script to your home directory.
 
-   ```cp ~/letsrobot/scipts/start_robot ~```
+   ```cp ~/letsrobot/scripts/start_robot ~```
 
 2. Add the startup script to the crontab
    ```
