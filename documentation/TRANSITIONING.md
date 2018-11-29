@@ -1,7 +1,7 @@
 # Transitioning from RunMyRobot to LetsRobot
 
 ## Passing Arugments
-Previously, all settings for the bots were made as parameter arguments in `start_robot`. Now, almost all customization occurs in a new file called `letsrobot.conf`. A template can be found called `letsrobot.sample.conf`. Parameter arguments are still accepted, and will override the settings in `letsrobot.conf`, but are generally recommended for one-time changes.
+Previously, all settings for the bots were made as parameter arguments in `start_robot`. Now, almost all customization occurs in a new file called `letsrobot.conf`. A template can be found called `letsrobot.sample.conf`. **Some** parameter arguments are still accepted, and will override the settings in `letsrobot.conf`, but are generally recommended for one-time changes.
 
 ## `start_robot`
 The biggest change, is now only one file is called to get a robot online; `letsrobot.py` which handles what used to be handled by `controller.py` and `send_video.py`, with some exceptions mentioned later. You do not need to pass arguments via this file anymore.
