@@ -7,7 +7,6 @@ import logging
 
 log = logging.getLogger('extended_command')
 
-
 # TODO 
 # If I pull the send_video stuff into controller, the ability to restart the ffmpeg process would
 # be useful
@@ -63,6 +62,8 @@ api_key = None
 stationary = None
 banned=[]
 mods=[]
+whiteList=[]
+whiteListCommand=[]
 
 def setup(robot_config):
     global owner
@@ -130,6 +131,29 @@ def anon_handler(command, args):
                         log.info("Anon TTS disabled")
                         tts.mute_anon_tts()
     log.debug("anon_control : %s", str(anon_control))
+
+def whitelist_handler(command, args):
+    global whiteList
+    global whiteListCommand
+    
+    if len(command) > 2:
+        if is_authed(args['name']) == 2: # Owner
+            user = command[2]
+            if command[1] == 'add':
+                whiteList.append(user)
+                log.info("%s added to whitelist", args['name'])
+            elif command[1] == 'del':
+                whiteList.remove(user)
+                log.info("%s removed from whitelist", args['name'])
+            elif command[1] == 'command':
+                if len(command) > 3:
+                    new_command = command[3]
+                    if command[2] == 'add':
+                        whiteListCommand.append(new_command)
+                        log.info("%s added to command whitelist" % new_command)
+                    elif command[2] == 'del':
+                        whiteListCommand.remove(new_command)
+                        log.inf("%s removed from command whitelist" % new_command)
 
 def ban_handler(command, args):
     global banned
@@ -316,7 +340,8 @@ commands={    '.anon'       :    anon_handler,
               '.show_exclusive':     show_exclusive_handler,
               '.word_filter':    word_filter_handler,
               '.stationary' :    stationary_handler,
-              '.table'      :    stationary_handler
+              '.table'      :    stationary_handler,
+              '.whitelist'  :    whitelist_handler
 	        }
 
 def handler(args):
@@ -345,7 +370,12 @@ def move_auth(args):
         if direction == 'F' or direction == 'B':
             log.debug("No forward for you.....")
             return 
-               
+    if args['command'] in whiteListCommand:
+        if user not in whiteList:
+            log.debug("%s not authed for command %s" % (user, args['command']))
+            return    
+
+           
     if anon_control == False and anon:
         return
     elif dev_mode_mods:
