@@ -252,14 +252,21 @@ def tts_handler(command, args):
                 tts.unmute_tts()
                 return
             elif command[1] == 'vol':
-                # TODO : Impliment this.
-                # TTS int volume command
+                if len(command) > 2:
+                    log.info("Owner changed TTS Volume")
+                    tts.volume(command[2])
                 return
 
 def stationary_handler(command, args):
     global stationary
     if is_authed(args['name']) == 2: # Owner
-        stationary = not stationary
+        if len(command) > 1:
+            if command[1] == 'on':
+                stationary = True
+            elif command[1] == 'off':
+                stationary = False
+        else:
+            stationary = not stationary
         log.info("stationary is %s", stationary)
 
 def global_chat_handler(command, args):
@@ -297,18 +304,19 @@ def show_exclusive_handler(command, args):
 
 # This is a dictionary of commands and their handler functions
 commands={    '.anon'       :    anon_handler,
-	            '.ban'        :    ban_handler,
-	            '.unban'      :    unban_handler,
-	            '.timeout'    :    timeout_handler,
-	            '.untimout'   :    untimeout_handler,
+              '.ban'        :    ban_handler,
+              '.unban'      :    unban_handler,
+              '.timeout'    :    timeout_handler,
+              '.untimout'   :    untimeout_handler,
               '.devmode'    :    devmode_handler,
-	            '.mic'        :    mic_handler,
-	            '.tts'        :    tts_handler,
-	          '.global_chat':    global_chat_handler,
+              '.mic'        :    mic_handler,
+              '.tts'        :    tts_handler,
+              '.global_chat':    global_chat_handler,
               '.public'    :    public_mode_handler,
               '.show_exclusive':     show_exclusive_handler,
               '.word_filter':    word_filter_handler,
-              '.stationary' :    stationary_handler
+              '.stationary' :    stationary_handler,
+              '.table'      :    stationary_handler
 	        }
 
 def handler(args):

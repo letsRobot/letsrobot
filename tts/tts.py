@@ -16,6 +16,7 @@ mute = False
 mute_anon = None
 urlRegExp = "(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
 url_filter = None
+hw_num = None
 banned=[]
 
 def setup(robot_config):
@@ -23,6 +24,7 @@ def setup(robot_config):
     global tts_module
     global mute_anon
     global url_filter
+    global hw_num
     
     type = robot_config.get('tts', 'type')
     mute_anon = not robot_config.getboolean('tts', 'anon_tts')
@@ -34,6 +36,8 @@ def setup(robot_config):
         temp_hw_num = audio_util.getSpeakerByName(audio_device.encode('utf-8'))
         if temp_hw_num != None:
             robot_config.set('tts', 'hw_num', str(temp_hw_num))
+    
+    hw_num = robot_config.get('tts', 'hw_num')
     
     if type != 'none':
         # set volume level
@@ -118,4 +122,21 @@ def unmute_user_tts(user):
     if user in banned:
         banned.remove(user)
         log.info(user + " TTS unmuted")
+        
+def volume(vol):
+    try:
+        new_vol = int(vol)
+    except ValueError:
+        log.debug("Not a valid volume level %s" % vol)
+        return
+        
+    new_vol = new_vol % 101
+    
+    try:
+        tts_module.volume(vol)
+    except AttributeError:
+        log.info("Setting volume to %d" % new_vol)
+        os.system("amixer set PCM -- 100%d%%" % new_vol)
+        os.system("amixer -c %s cset numid=3 %d%%" % (hw_num, new_vol))
+    
 
