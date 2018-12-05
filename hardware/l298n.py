@@ -6,6 +6,7 @@ log = logging.getLogger('hardware/l298n')
 
 sleeptime=None 
 rotatetimes=None
+turn_sleeptimes=None
 
 StepPinForward=None
 StepPinBackward=None
@@ -26,6 +27,13 @@ def set_sleep_time(command, args):
             sleeptime=float(command[1])
             log.info("sleep time set to : %d", float(command[2]))
 
+def set_turn_sleep_time(command, args):
+    global turn_sleeptime
+    if extended_command.is_authed(args['name']) == 2: # Owner
+        if len(command) > 1:
+            turn_sleeptime=float(command[1])
+            log.info("turn sleep time set to : %d", float(command[2]))
+
 
 def setup(robot_config):
     global StepPinForward
@@ -33,9 +41,11 @@ def setup(robot_config):
     global StepPinLeft
     global StepPinRight
     global sleeptime
+    global turn_sleeptime
     global rotatetimes
     
     sleeptime = robot_config.getfloat('l298n', 'sleeptime')
+    turn_sleeptime = robot_config.getfloat('l298n', 'turn_sleeptime')
     rotatetimes = robot_config.getfloat('l298n', 'rotatetimes')
     
     log.debug("GPIO mode : %s", str(GPIO.getmode()))
@@ -46,6 +56,7 @@ def setup(robot_config):
     if robot_config.getboolean('tts', 'ext_chat'): #ext_chat enabled, add motor commands
         extended_command.add_command('.set_rotate_time', set_rotate_time)
         extended_command.add_command('.set_sleep_time', set_sleep_time)
+        extended_command.add_command('.set_turn_sleep_time', set_turn_sleep_time)
 
 # TODO passing these as tuples may be unnecessary, it may accept lists as well. 
     StepPinForward = tuple(map(int, robot_config.get('l298n', 'StepPinForward').split(',')))
@@ -61,20 +72,26 @@ def setup(robot_config):
 
 def move(args):
     direction = args['command']
+    if direction == 'FIRE':
+        os.sytem("aplay -D plughw:2 /home/pi/sounds/firehorn.wav")
+    if direction == 'BEED':
+        os.system("aplay -D plughw:2 /home/pi/sounds/beedoo_minions.wav")
+    if direction == 'FART':
+        os.system("aplay -D plughw:2 /home/pi/sounds/fart-1.wav")
     if direction == 'F':
         GPIO.output(StepPinForward, GPIO.HIGH)
-        time.sleep(sleeptime)
+        time.sleep(sleeptime * rotatetimes)
         GPIO.output(StepPinForward, GPIO.LOW)
     if direction == 'B':
         GPIO.output(StepPinBackward, GPIO.HIGH)
-        time.sleep(sleeptime)
+        time.sleep(sleeptime * rotatetimes)
         GPIO.output(StepPinBackward, GPIO.LOW)
     if direction == 'L':
         GPIO.output(StepPinLeft, GPIO.HIGH)
-        time.sleep(sleeptime * rotatetimes)
+        time.sleep(turn_sleeptime)
         GPIO.output(StepPinLeft, GPIO.LOW)
     if direction == 'R':
         GPIO.output(StepPinRight, GPIO.HIGH)
-        time.sleep(sleeptime * rotatetimes)
+        time.sleep(turn_sleeptime)
         GPIO.output(StepPinRight, GPIO.LOW)
        
