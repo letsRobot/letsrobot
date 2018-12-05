@@ -72,12 +72,6 @@ def setup(robot_config):
 
 def move(args):
     direction = args['command']
-    if direction == 'FIRE':
-        os.sytem("aplay -D plughw:2 /home/pi/sounds/firehorn.wav")
-    if direction == 'BEED':
-        os.system("aplay -D plughw:2 /home/pi/sounds/beedoo_minions.wav")
-    if direction == 'FART':
-        os.system("aplay -D plughw:2 /home/pi/sounds/fart-1.wav")
     if direction == 'F':
         GPIO.output(StepPinForward, GPIO.HIGH)
         time.sleep(sleeptime * rotatetimes)
