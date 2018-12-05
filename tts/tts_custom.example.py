@@ -26,9 +26,9 @@ def say(*args):
         user = args[1]['name']
         if user == 'jill':
             prefix = "harken.mp3"
-        elif user == 'theodore':
+        elif user == 'Geddy':
             prefix = "tremble.mp3"
-        elif user == 'rick':
+        elif user == 'unacceptableuse':
             prefix = "relax.mp3"
         elif user == 'roboempress':
             prefix = "run.mp3"
