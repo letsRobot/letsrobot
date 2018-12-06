@@ -264,7 +264,7 @@ def mic_handler(command, args):
                 return
 
 def tts_handler(command, args):
-    log.debug("tts :", tts)
+    log.debug("tts : %s", tts)
     if len(command) > 1:
         if is_authed(args['name']) == 2: # Owner
             if command[1] == 'mute':

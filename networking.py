@@ -130,7 +130,7 @@ def waitForMessengerServer():
         try:
             messengerSocket.wait(seconds=1)        
         except AttributeError:
-            log.warning("Warning: Messenger Chat Socket not connected.");a
+            log.warning("Warning: Messenger Chat Socket not connected.")
             startListenForMessengerServer()
             return
         
@@ -263,8 +263,8 @@ def setupSocketIO(robot_config):
 
     schedule.repeat_task(60, identifyRobot_task)
     
-    log.info("using socket io to connect to control", controlHostPort)
-    log.info("using socket io to connect to chat", chatHostPort)
+    log.info("using socket io to connect to control %s", controlHostPort)
+    log.info("using socket io to connect to chat %s", chatHostPort)
     log.info("using video port %d" % videoPort)
     log.info("using audio port %d" % audioPort)
 
@@ -325,7 +325,7 @@ def sendChargeState(charging):
         appServerSocketIO.emit('charge_state', chargeState)
     except AttributeError:
         log.error("Error: Can't update server on charge state, no app socket")
-    log.debug("charge state:", chargeState)
+    log.debug("charge state : %s", chargeState)
 
 def sendOnlineState(state):
     onlineState = {'send_video_process_exists': state, 'camera_id': camera_id}

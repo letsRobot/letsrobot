@@ -28,7 +28,7 @@ def terminate_controller():
 def getWithRetry(url, secure=True):
     for retryNumber in range(2000):
         try:
-            log.debug("GET", url)
+            log.debug("GET %s", url)
             if secure:
                 response = urllib2.urlopen(url).read()
             else:
@@ -38,7 +38,7 @@ def getWithRetry(url, secure=True):
                 response = urllib2.urlopen(url, context=ctx).read()
             break
         except:
-            log.exception("could not open url", url)
+            log.exception("could not open url %s", url)
             #traceback.print_exc()
             time.sleep(2)
 
