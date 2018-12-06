@@ -249,17 +249,17 @@ def startVideoCapture():
     # set brightness
     if (brightness is not None):
         log.info("setting brightness : %s", brightness)
-        os.system("v4l2-ctl -c brightness={brightness}".format(brightness=robotSettings.brightness))
+        os.system("v4l2-ctl -c brightness={brightness}".format(brightness=brightness))
 
     # set contrast
     if (contrast is not None):
         log.info("setting contrast : %s", contrast)
-        os.system("v4l2-ctl -c contrast={contrast}".format(contrast=robotSettings.contrast))
+        os.system("v4l2-ctl -c contrast={contrast}".format(contrast=contrast))
 
     # set saturation
     if (saturation is not None):
         log.info("setting saturation : %s", saturation)
-        os.system("v4l2-ctl -c saturation={saturation}".format(saturation=robotSettings.saturation))
+        os.system("v4l2-ctl -c saturation={saturation}".format(saturation=saturation))
 
     
     videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
