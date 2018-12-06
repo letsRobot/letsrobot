@@ -1,3 +1,7 @@
+# will require sudo apt-get install python-imaging
+# Note the rate at which hud frames are produced seems to need to be a lot 
+# higher than the rate ffmpeg is expecting them to prevent lag.
+
 #from video.ffmpeg import *
 import ffmpeg
 import logging
@@ -40,7 +44,7 @@ def startVideoCapture():
 
     videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
                         ' -r 25 {in_options} -i {video_device}'
-                        ' -f image2pipe -r 4 -vcodec png -i - {video_filter}'
+                        ' -f image2pipe -r 2 -vcodec png -i - {video_filter}'
                         ' -filter_complex "[1:v]colorkey=0x000000:0.1:0.0[ckout];[0:v][ckout]overlay[out]"'
                         ' -map "[out]" -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
                         ' -muxdelay 0.001 {out_options}'
@@ -71,11 +75,11 @@ def startVideoCapture():
             image.save(ffmpeg.video_process.stdin, 'PNG')
         except IOError:
             break
-        time.sleep(0.25) 
+        time.sleep(0.1) 
 
     try:
         ffmpeg.video_process.stdin.close()
-        atexit.unregister(ffmpeg.atExitVideoCapture) # Only python 3
+        ffmpeg.atexit.unregister(ffmpeg.atExitVideoCapture) # Only python 3
     except AttributeError:
         pass
 
