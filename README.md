@@ -4,7 +4,7 @@
 This repo is officially ready for public use, but we're still working out some kinks. If you find something's wrong, we would love to hear it! Message us on discord, and if it's a problem with our code, we'll make a bug report and fix it!
 
 <h3> We are officially testing the new robot side code </h3>
-We've re-written the entire robot side code to be more modular and easily extendable. It's still in the testing phase, but everything needed to run a robot is there. If you would like to help us test it out, we've put it on a new repo here: [https://github.com/letsRobot/letsrobot](https://github.com/letsRobot/letsrobot)
+We've re-written the entire robot side code to be more modular and easily extendable. It's still in the testing phase, but everything needed to run a robot is there.
 
 A few highlights: 
 * Everything is modular, with a .conf file instead of using text parameters 
