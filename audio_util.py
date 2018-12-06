@@ -2,7 +2,7 @@ import subprocess
 import re
 import logging
 
-log = logging.getLogger('audio_util')
+log = logging.getLogger('LR.audio_util')
 
 def getAudioDeviceByName(name, command):
     text = subprocess.check_output(command)

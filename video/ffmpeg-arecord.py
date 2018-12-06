@@ -2,7 +2,7 @@
 import ffmpeg
 import logging
 
-log = logging.getLogger('video/ffmpeg-arecord')
+log = logging.getLogger('LR.video.ffmpeg-arecord')
 
 
 arecord_path = None

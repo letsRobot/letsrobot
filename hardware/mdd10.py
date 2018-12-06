@@ -4,7 +4,7 @@
 import RPi.GPIO as GPIO
 import schedule
 import logging
-log = logging.getLogger('hardware/mdd10')
+log = logging.getLogger('LR.hardware.mdd10')
 
 
 maxSpeedEnabled = False

@@ -5,7 +5,7 @@ import schedule
 import robot_util
 import logging
 
-log = logging.getLogger('extended_command')
+log = logging.getLogger('LR.extended_command')
 
 # TODO 
 # If I pull the send_video stuff into controller, the ability to restart the ffmpeg process would

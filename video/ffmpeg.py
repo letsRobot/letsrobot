@@ -12,7 +12,7 @@ import atexit
 import os
 import sys
 import logging
-log = logging.getLogger('video/ffmpeg')
+log = logging.getLogger('LR.video.ffmpeg')
 
 robotID=None
 no_mic=True

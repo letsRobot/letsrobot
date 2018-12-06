@@ -3,7 +3,7 @@ import tempfile
 import uuid
 import logging
 
-log = logging.getLogger('tts/festival')
+log = logging.getLogger('LR.tts.festival')
 
 tempDir = None
 hw_num = None

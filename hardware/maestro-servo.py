@@ -6,7 +6,7 @@
 import sys
 import time
 import logging
-log = logging.getLogger('hardware/maestro-servo')
+log = logging.getLogger('LR.hardware.maestro-servo')
 
 try:
     import hardware.maestro

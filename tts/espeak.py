@@ -3,7 +3,7 @@ import tempfile
 import uuid
 import logging
 
-log = logging.getLogger('tts/espeak')
+log = logging.getLogger('LR.tts.espeak')
 
 tempDir = None
 male = None

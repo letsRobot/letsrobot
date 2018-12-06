@@ -1,5 +1,5 @@
 import logging
-log = logging.getLogger('hardware/mc33926')
+log = logging.getLogger('LR.hardware.mc33926')
 
 try:
     from dual_mc33926_rpi import motors, MAX_SPEED

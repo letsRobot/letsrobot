@@ -18,7 +18,7 @@ else:
 #    import thread
     import urllib2
 
-log = logging.getLogger('networking')
+log = logging.getLogger('LR.networking')
 
 controlHostPort = None
 chatHostPort = None

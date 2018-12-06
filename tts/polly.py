@@ -7,7 +7,7 @@ import random
 import networking
 import logging
 
-log = logging.getLogger('tts/polly')
+log = logging.getLogger('LR.tts.polly')
 
 client = None
 polly = None

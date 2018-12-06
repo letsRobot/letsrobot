@@ -1,7 +1,7 @@
 #import the USB and Time librarys into Python
 import usb.core, usb.util, time, sys
 import logging
-log = logging.getLogger('hardware/owi_arm')
+log = logging.getLogger('LR.hardware.owi_arm')
 
 
 # led pesistence variable

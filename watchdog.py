@@ -5,7 +5,7 @@
 from threading import Thread
 import logging
 
-log = logging.getLogger('watchdog')
+log = logging.getLogger('LR.watchdog')
 
 watches={}
 

@@ -1,7 +1,7 @@
 import serial
 import sys
 import logging
-log = logging.getLogger('hardware/serial_board')
+log = logging.getLogger('LR.hardware.serial_board')
 
 ser = None
 

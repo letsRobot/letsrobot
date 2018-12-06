@@ -9,7 +9,7 @@ import tts.tts as tts
 import json
 import time
 import logging
-log = logging.getLogger('hardware/motor_hat')
+log = logging.getLogger('LR.hardware.motor_hat')
 
 try:
     from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor

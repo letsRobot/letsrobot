@@ -13,7 +13,7 @@ else:
     import urllib2
     from urllib2 import HTTPError
 
-log = logging.getLogger('robot_util')
+log = logging.getLogger('LR.robot_util')
 
 terminate=None
 

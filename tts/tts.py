@@ -4,7 +4,7 @@ import re
 import audio_util
 import logging
 
-log = logging.getLogger('tts/tts')
+log = logging.getLogger('LR.tts')
 
 
 if (sys.version_info > (3, 0)):
