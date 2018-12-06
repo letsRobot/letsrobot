@@ -1,8 +1,20 @@
 # LetsRobot.tv
 
-# WARNING:
-This repository is probably **NOT** what you're looking for. This repository is still in development and not yet ready for mainstream use! If you stumbled across this repository trying to build or modify your robot, you're probably looking for [RunMyRobot.](https://github.com/runmyrobot/runmyrobot)
+# We're in Beta!
+This repo is officially ready for public use, but we're still working out some kinks. If you find something's wrong, we would love to hear it! Message us on discord, and if it's a problem with our code, we'll make a bug report and fix it!
 
+<h3> We are officially testing the new robot side code </h3>
+We've re-written the entire robot side code to be more modular and easily extendable. It's still in the testing phase, but everything needed to run a robot is there. If you would like to help us test it out, we've put it on a new repo here: [https://github.com/letsRobot/letsrobot](https://github.com/letsRobot/letsrobot)
+
+A few highlights: 
+* Everything is modular, with a .conf file instead of using text parameters 
+* Extending scripts is done in separate files
+* Default support for more robots
+* Includes most features avaible with current repo
+
+We are also developing a GUI to help make the setup process easier.
+Shout out to Nocturnal, Roy, and Skeeter for making a more awesome developer friendly tool! 
+We still need to test on more robots before we can make the official switch, and we still need to do more documentation. We highly encourage you to give this a shot and let us know if you run into any issues.
 
 ## Open Robot Control Code For Connecting to LetsRobot.tv 
 
