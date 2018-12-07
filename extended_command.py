@@ -84,6 +84,9 @@ def setup(robot_config):
     
     mods = networking.getOwnerDetails(owner)['moderators']
 #    mods = networking.getOwnerDetails(owner)['robocaster']['moderators']
+    if robot_config.has_option('misc', 'global_mods'):
+        if robot_config.getboolean('misc', 'global_mods'):
+           mods = mods + networking.getFrontPage()['admins']
     log.info("Moderators : %s", mods)
 
 # check if the user is the owner or moderator, 0 for not, 1 for moderator, 2 for owner

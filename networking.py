@@ -57,6 +57,13 @@ def getChatHostPort():
     response = robot_util.getWithRetry(url, secure=secure_cert)
     log.debug("getChatHostPort : %s", response)
     return json.loads(response)
+
+def getFrontPage():
+    url = 'https://%s/api/v1/robocasters/internal/frontpage' % apiServer
+    response = robot_util.getWithRetry(url, secure=secure_cert)
+    log.debug("getFrontPage : %s", response)
+    return json.loads(response)
+     
     
 def getOwnerDetails(username):
     url = 'https://%s/api/v1/accounts/%s' % (apiServer, username)
