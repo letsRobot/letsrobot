@@ -26,6 +26,11 @@ def setupHUD(robot_config):
     return
 
 def startVideoCapture():
+    global x_res
+    global y_res
+    x_res = ffmpeg.y_res
+    y_res = ffmpeg.x_res
+
     # set brightness
     if (ffmpeg.brightness is not None):
         log.info("setting brightness : %s", ffmpeg.brightness)
@@ -45,9 +50,8 @@ def startVideoCapture():
     videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
                         ' -r 25 {in_options} -i {video_device}'
                         ' -f image2pipe -r 2 -vcodec png -i - {video_filter}'
-                        ' -filter_complex "[1:v]colorkey=0x000000:0.1:0.0[ckout];[0:v][ckout]overlay[out]"'
-                        ' -map "[out]" -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
-                        ' -muxdelay 0.001 {out_options}'
+                        ' -filter_complex "overlay" -f mpegts -codec:v {video_codec}'
+                        ' -b:v {video_bitrate}k -bf 0 -muxdelay 0.001 {out_options}'
                         ' http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/')
 
     videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg.ffmpeg_location,
@@ -105,7 +109,7 @@ def getWifiStats():
         return "Not Found"
 
 def drawHUD():
-    image = Image.new("RGB", (640, 480), color = (0,0,0))
+    image = Image.new("RGBA", (x_res, y_res), color = (0,0,0,0))
     draw = ImageDraw.Draw(image)
     draw.text((20, 70), "Testing 123", fill=(255,255,255))
     draw.text((20, 100), "CPU Temp : %s" % measure_temp())
