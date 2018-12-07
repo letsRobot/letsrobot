@@ -210,7 +210,7 @@ def start():
             watchdog.start("FFmpegAudioProcess", startAudioCapture)
 
 def onRobotSettingsChanged(*args):
-    log.info('set message recieved:', args)
+    log.info('set message recieved: %s', args)
     refreshFromOnlineSettings()        
 
     if not no_camera:

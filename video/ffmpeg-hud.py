@@ -77,14 +77,17 @@ def startVideoCapture():
         image = drawHUD()
         try:
             image.save(ffmpeg.video_process.stdin, 'PNG')
-        except IOError:
+        except (IOError, ValueError):
+            log.debug("exception writing image to pipe")
             break
         time.sleep(0.1) 
 
     try:
+        ffmpeg.atExitVideoCapture()
         ffmpeg.video_process.stdin.close()
         ffmpeg.atexit.unregister(ffmpeg.atExitVideoCapture) # Only python 3
     except AttributeError:
+        log.debug("exception closing ffmpeg thread and pipe")
         pass
 
 def measure_temp():
