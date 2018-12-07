@@ -62,6 +62,7 @@ def sendRobotSettings(data, robot_id, api_key):
         except HTTPError:
             #log.debug(api_key)
             log.error("Unable to update robot config on server! check API key")
+            return False
         response = f.read()
         f.close()
         log.debug("sendRobotSettings : %s", response)
