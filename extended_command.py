@@ -60,6 +60,9 @@ owner = None
 robot_id = None
 api_key = None
 stationary = None
+exclusive = False
+exclusive_mods = False 
+exclusive_user = ''
 banned=[]
 mods=[]
 whiteList=[]
@@ -154,6 +157,36 @@ def whitelist_handler(command, args):
                     elif command[2] == 'del':
                         whiteListCommand.remove(new_command)
                         log.inf("%s removed from command whitelist" % new_command)
+
+def exclusive_handler(command, args):
+    global exclusive
+    global exclusive_user
+    global exclusive_mods
+
+    log.debug("exclusive_handler : %s %s", command, args)
+
+    if len(command) > 2:
+        if is_authed(args['name']) == 2: # Owner
+            user = command[2]
+            if command[1] == 'user':
+                exclusive_user = user
+                exclusive = True
+                log.info("%s given exclusive control", user)
+                return
+            elif command[1] == 'off':
+                exclusive = False
+                log.info("Exclusive control disabled")
+                return
+            elif command[1] == 'mods':
+                if user == 'on':
+                   exclusive_mods = True
+                   log.info("Enabling mod control during exclusive")
+                   return
+                elif user == 'off':
+                   exclusive_mods = False
+                   log.info("Disabling mod control during exclusive")
+                   return
+
 
 def ban_handler(command, args):
     global banned
@@ -341,7 +374,8 @@ commands={    '.anon'       :    anon_handler,
               '.word_filter':    word_filter_handler,
               '.stationary' :    stationary_handler,
               '.table'      :    stationary_handler,
-              '.whitelist'  :    whitelist_handler
+              '.whitelist'  :    whitelist_handler,
+              '.exclusive'  :    exclusive_handler
 	        }
 
 def handler(args):
@@ -365,17 +399,32 @@ def move_auth(args):
     user = args['user']
     anon = args['anonymous']
     
+    # Check if stationary mode is enabled
     if stationary:
         direction = args['command']
         if direction == 'F' or direction == 'B':
             log.debug("No forward for you.....")
             return 
+
+    # Check if command is in the whitelist required commands
     if args['command'] in whiteListCommand:
         if user not in whiteList:
             log.debug("%s not authed for command %s" % (user, args['command']))
             return    
 
-           
+    # check if exclusive control is enabled
+    if exclusive:
+        if exclusive_mods:
+            if user not in mods:
+                if (user != exclusive_user) and (user != owner): 
+                    log.debug("%s not authed for exclusive control", user)
+                    return
+        elif user not in mods:
+            if (user != exclusive_user) and (user != owner): 
+                log.debug("%s not authed for exclusive control", user)
+                return
+
+               
     if anon_control == False and anon:
         return
     elif dev_mode_mods:
