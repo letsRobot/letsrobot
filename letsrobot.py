@@ -68,8 +68,7 @@ log.critical('LetsRobot Controller Starting up')
 
 # Log all unhandled exceptions.
 def exceptionLogger(exctype, value, tb):
-    log.critical("Unhandled exception of type : {}".format(exctype))
-    log.critical("Traceback : {}".format(traceback.format_tb(tb)))
+    log.critical("Unhandled exception of type : {}".format(exctype),exc_info=(exctype, value, tb))
 sys.excepthook = exceptionLogger
 
 # This is required to allow us to get True / False boolean values from the
