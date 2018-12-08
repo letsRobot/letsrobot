@@ -1,6 +1,10 @@
-# will require sudo apt-get install python-imaging
+# will require 'sudo apt-get install python-imaging' and 'pip install psutil'
 # Note the rate at which hud frames are produced seems to need to be a lot 
 # higher than the rate ffmpeg is expecting them to prevent lag.
+#
+# Note : Currently there is no way to customize this, so copy it to a different
+# file and edit that file, if yo wish to make modifications. So as not to break
+# git pull.
 
 #from video.ffmpeg import *
 import video.ffmpeg as ffmpeg
@@ -10,6 +14,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import extended_command
 import psutil
+import datetime
 
 log = logging.getLogger('LR.video.ffmpeg-hud')
 
@@ -58,7 +63,8 @@ def startVideoCapture():
 
     videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
                         ' -r 25 {in_options} -i {video_device}'
-                        ' -f image2pipe -r 2 -vcodec png -i - {video_filter}'
+                        ' -f image2pipe -r 2 -vcodec png -thread_queue_size 1'
+                        ' -i - {video_filter}'
                         ' -filter_complex "overlay" -f mpegts -codec:v {video_codec}'
                         ' -b:v {video_bitrate}k -bf 0 -muxdelay 0.001 {out_options}'
                         ' http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/')
@@ -96,7 +102,7 @@ def startVideoCapture():
         except (IOError, ValueError):
             log.debug("exception writing image to pipe")
             break
-        time.sleep(0.1) 
+        time.sleep(0.05) 
 
     try:
         ffmpeg.atExitVideoCapture()
@@ -161,9 +167,11 @@ def drawBaseHUD():
     logo = Image.open('video/LRWebLogox256.png')
     logo.thumbnail((logo_pos, logo_pos))
     image.paste(logo, (x_res - logo_pos - 6, 9), logo)
+    image_draw.rectangle(((3, y_res-25), (x_res-3, y_res-5)), (0,64,0,128), (0,255,0))
     drawrect(image_draw, [(2,2),(x_res-4,y_res-4)], outline=(0,255,0), width=3)
     image_draw.line(((3,y_res-25),(x_res-3, y_res-25)), fill=(0,255,0), width=3)
     image_draw.line(((logo_pos, y_res-4),(logo_pos, y_res-25)), fill=(0,255,0), width=3)
+    image_draw.line(((logo_pos*3, y_res-4),(logo_pos*3, y_res-25)), fill=(0,255,0), width=3)
     image_draw.line(((logo_pos*5, y_res-4),(logo_pos*5, y_res-25)), fill=(0,255,0), width=3)
 
     return image
@@ -175,10 +183,14 @@ def drawHUD(HUD):
 
     text_spacing = x_res / 6
     cpu_usage = psutil.cpu_percent(percpu=True)
+    time = datetime.datetime.now()
+    time = time.strftime("Time : %a %y/%m/%d %H:%M:%S")
 
-    draw.text((10, y_res-20), "CPU Temp : %s" % measure_temp())
-    draw.text((text_spacing+5, y_res-20), "CPU Usage : %s%% %s%% %s%% %s%%" % tuple(cpu_usage))
-    draw.text((5*text_spacing+5, y_res-20), "WiFi : %s" % getWifiStats())
+    draw.text((10, y_res-20), "Temp : %s" % measure_temp())
+    draw.text((text_spacing+5, y_res-20), "Usage : %s%% %s%% %s%% %s%%" % tuple(cpu_usage))
+    draw.text(((3*text_spacing)+5, y_res-20), time)
+    draw.text(((5*text_spacing)+5, y_res-20), "WiFi : %s" % getWifiStats())
+
     return(image) 
 
 def start():
