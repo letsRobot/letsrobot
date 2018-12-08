@@ -422,10 +422,9 @@ def move_auth(args):
                 if (user != exclusive_user) and (user != owner): 
                     log.debug("%s not authed for exclusive control", user)
                     return
-        elif user not in mods:
-            if (user != exclusive_user) and (user != owner): 
-                log.debug("%s not authed for exclusive control", user)
-                return
+        if (user != exclusive_user) and (user != owner): 
+            log.debug("%s not authed for exclusive control", user)
+            return
 
                
     if anon_control == False and anon:
