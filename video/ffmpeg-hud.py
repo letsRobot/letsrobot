@@ -3,7 +3,7 @@
 # higher than the rate ffmpeg is expecting them to prevent lag.
 
 #from video.ffmpeg import *
-import ffmpeg
+import video.ffmpeg as ffmpeg
 import logging
 import time
 import os

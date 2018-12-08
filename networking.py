@@ -92,7 +92,7 @@ def getWebsocketRelayHost():
     
 def getOnlineRobotSettings(robotID):
     url = 'https://%s/api/v1/robots/%s' % (apiServer, robotID)
-    response = robot_util.getWithRetry(url, secure=secure_cert).decode('utf-8')
+    response = robot_util.getWithRetry(url, secure=secure_cert)
     log.debug("getOnlineRobotSettings : %s", response)
     return json.loads(response)
 

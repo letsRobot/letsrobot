@@ -1,5 +1,5 @@
 #from video.ffmpeg import *
-import ffmpeg
+import video.ffmpeg as ffmpeg
 import logging
 
 log = logging.getLogger('LR.video.ffmpeg-arecord')
