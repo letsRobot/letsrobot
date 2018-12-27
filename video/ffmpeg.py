@@ -246,6 +246,7 @@ def onCommandToRobot(*args):
 
 def startVideoCapture():
     global video_process
+
     # set brightness
     if (brightness is not None):
         log.info("setting brightness : %s", brightness)
@@ -260,13 +261,19 @@ def startVideoCapture():
     if (saturation is not None):
         log.info("setting saturation : %s", saturation)
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=saturation))
-
-    
-    videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
-                        ' -r 25 {in_options} -i {video_device} {video_filter}'
-                        ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
-                        ' -muxdelay 0.001 {out_options}'
-                        ' http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/')
+        
+    if (video_input_format == "mjpeg"):
+        videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25'
+                            ' -r 25 {in_options} -i {video_device} {video_filter}'
+                            ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
+                            ' -muxdelay 0.001 {out_options}'
+                            ' http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/')
+    else:
+        videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -s {xres}x{yres}'
+                            ' -r 25 {in_options} -i {video_device} {video_filter}'
+                            ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
+                            ' -muxdelay 0.001 {out_options}'
+                            ' http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/')
                         
     videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
                             input_format=video_input_format,
