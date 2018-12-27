@@ -20,6 +20,7 @@ steeringBias=None
 motorPins=None
 pwm_freq=None
 pwm_range=None
+pwm_speed=None
 
 # Function for setting turn delay
 def set_turn_delay(command, args):
@@ -39,6 +40,15 @@ def set_drive_delay(command, args):
             robot_config.set('zerobot', 'driveDelay', float(command[1]))
             log.info("Drive delay set to : %d", float(command[2]))
 
+# Function for setting drive speed
+def set_drive_speed(command, args):
+    global pwm_speed
+    if extended_command.is_authed(args['name']) == 2: # Owner
+        if len(command) > 1:
+            pwm_speed=int(command[1])
+            robot_config.set('zerobot', 'pwm_speed', int(command[1]))
+            log.info("Drive speed set to : %d", int(command[2]))
+
 # Function for setting steering bias
 def set_bias(command, args):
     global steeringBias
@@ -56,17 +66,20 @@ def setup(robot_config):
     global steeringBias
     global pwm_freq
     global pwm_range
+    global pwm_speed
     
     driveDelay = float(robot_config.getfloat('zerobot', 'driveDelay'))
     turnDelay = float(robot_config.getfloat('zerobot', 'turnDelay'))
     steeringBias = int(robot_config.getfloat('zerobot', 'steeringBias'))
     pwm_freq = int(robot_config.getfloat('zerobot', 'pwm_freq'))
     pwm_range = int(robot_config.getfloat('zerobot', 'pwm_range'))
+    pwm_speed = int(robot_config.getfloat('zerobot', 'pwm_speed'))
 
     # Activate chat commands for motor settings
     if robot_config.getboolean('tts', 'ext_chat'): #ext_chat enabled, add motor commands
         extended_command.add_command('.set_turn_delay', set_turn_delay)
         extended_command.add_command('.set_drive_delay', set_drive_delay)
+        extended_command.add_command('.set_drive_speed', set_drive_speed)
         extended_command.add_command('.set_bias', set_bias)
 
     # Init the pins into the array and configure them
@@ -93,26 +106,26 @@ def setup(robot_config):
 def move(args):
     direction = args['command']
     if direction == 'F':
-        pi.set_PWM_dutycycle(motorPins[0], 180-steeringBias)
-        pi.set_PWM_dutycycle(motorPins[2], 180+steeringBias)
+        pi.set_PWM_dutycycle(motorPins[0], pwm_speed-steeringBias)
+        pi.set_PWM_dutycycle(motorPins[2], pwm_speed+steeringBias)
         time.sleep(driveDelay)
         for i in range(0,4):
             pi.write(motorPins[i], 0)
     if direction == 'B':
-        pi.set_PWM_dutycycle(motorPins[1], 180-steeringBias)
-        pi.set_PWM_dutycycle(motorPins[3], 180+steeringBias)
+        pi.set_PWM_dutycycle(motorPins[1], pwm_speed-steeringBias)
+        pi.set_PWM_dutycycle(motorPins[3], pwm_speed+steeringBias)
         time.sleep(driveDelay)
         for i in range(0,4):
             pi.write(motorPins[i], 0)
     if direction == 'L':
-        pi.set_PWM_dutycycle(motorPins[0], 180-steeringBias)
-        pi.set_PWM_dutycycle(motorPins[3], 180+steeringBias)
+        pi.set_PWM_dutycycle(motorPins[0], pwm_speed-steeringBias)
+        pi.set_PWM_dutycycle(motorPins[3], pwm_speed+steeringBias)
         time.sleep(turnDelay)
         for i in range(0,4):
             pi.write(motorPins[i], 0)
     if direction == 'R':
-        pi.set_PWM_dutycycle(motorPins[1], 180-steeringBias)
-        pi.set_PWM_dutycycle(motorPins[2], 180+steeringBias)
+        pi.set_PWM_dutycycle(motorPins[1], pwm_speed-steeringBias)
+        pi.set_PWM_dutycycle(motorPins[2], pwm_speed+steeringBias)
         time.sleep(turnDelay)
         for i in range(0,4):
             pi.write(motorPins[i], 0)
