@@ -319,7 +319,7 @@ def setupMessengerSocket():
     global messengerSocket
     
     if not no_chat_server:
-        log.debug('Connecting socket.io to messenger chat host port, %s %s', messengerHost, messengerPort)
+        log.debug('Connecting socket.io to messenger chat host port : %s %s', messengerHost, messengerPort)
         startListenForMessengerServer()
         return messengerSocket
     else:
