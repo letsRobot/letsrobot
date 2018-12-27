@@ -99,8 +99,8 @@ def getOnlineRobotSettings(robotID):
 def getMessengerAuthToken():
     url = 'https://%s/api/v1/authenticate' % (apiServer)
     payload = {'username': messengerUsername, 'password': messengerPassword}
-    authToken = robot_util.getAuthToken(url, payload, secure=secure_cert)
-    log.debug("getMessengerAuthToken : %s", response)
+    authToken = robot_util.getAuthToken(url, payload)
+    log.debug("getMessengerAuthToken : %s", authToken)
     return authToken
     
 def waitForAppServer():
@@ -319,7 +319,7 @@ def setupMessengerSocket():
     global messengerSocket
     
     if not no_chat_server:
-        log.debug('Connecting socket.io to messenger chat host port', "%s %s" % (messengerHost, messengerPort))
+        log.debug('Connecting socket.io to messenger chat host port, %s %s', messengerHost, messengerPort)
         startListenForMessengerServer()
         return messengerSocket
     else:
