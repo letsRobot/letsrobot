@@ -99,7 +99,7 @@ def getOnlineRobotSettings(robotID):
 def getMessengerAuthToken():
     url = 'https://%s/api/v1/authenticate' % (apiServer)
     payload = {'username': messengerUsername, 'password': messengerPassword}
-    authToken = robot_util.getAuthToken(url, payload, secure=secure_cert)
+    authToken = robot_util.getAuthToken(url, payload)
     log.debug("getMessengerAuthToken : %s", response)
     return authToken
     
