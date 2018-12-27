@@ -1,11 +1,14 @@
-import serial
-import sys
 import logging
-log = logging.getLogger('LR.hardware.serial_board')
+log = logging.getLogger('LR.hardware.mqtt')
+
+try:
+    import paho.mqtt.client as mqttc
+except ImportError:
+    log.critical("You need to install the paho mqtt client")
 
 ser = None
 
-def sendSerialCommand(ser, command):
+def sendMQTTCommand(ser, command):
 
     log.info("serial send: ", str(command.lower()))
     ser.write(command.lower().encode('utf8') + b"\r\n")     # write a string
@@ -51,4 +54,4 @@ def setup(robot_config):
     
 def move(args):
     command = args['command']
-    sendSerialCommand(ser, command)
+    sendMQTTCommand(command)
