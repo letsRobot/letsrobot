@@ -22,6 +22,7 @@ def sendmqttCommand(command):
         log.error("failed to connect to MQTT Broker")
     
     rc = mqttClient.publish(mqttTopic,command)
+    mqttClient.disconnect()
 
 def on_publish(client,userdata,rc):
     log.debug("command published")
