@@ -8,6 +8,7 @@
 
 #import pigpio
 #pi=pigpio.pi()
+import os
 import time
 import extended_command
 import logging
@@ -15,11 +16,13 @@ log = logging.getLogger('LR.hardware.zerobot')
 import thread
 import BlynkLib
 blynk = BlynkLib.Blynk('86ed838111d84fb4aa4b2b51a4019cd9', '127.0.0.1', 8888)
+thread.start_new_thread(blynk.run, ())
+
 from configparser import ConfigParser
 robot_config = ConfigParser()
 robot_config.readfp(open('letsrobot.conf'))
 
-driveDelay=None 
+driveDelay=None
 turnDelay=None
 steeringBias=None
 
@@ -28,12 +31,21 @@ pwm_freq=None
 pwm_range=None
 pwm_speed=None
 
+def config_save(section, param, value):
+    robot_config.set(section, param, str(value))
+    #log.info('In %s, saving %s into %s.', os.getcwd(), str(value), param)
+    with open('letsrobot.conf', 'w') as configfile:
+        robot_config.write(configfile)
+        configfile.close()
+
 # Function for setting turn delay
 def set_turn_delay(command, args):
     global turnDelay
     if extended_command.is_authed(args['name']) == 2: # Owner
         if len(command) > 1:
             turnDelay=float(command[1])
+            blynk.virtual_write(1, turnDelay)
+            config_save('zerobot', 'turnDelay', turnDelay)
             log.info("Rotate delay set to : %d", float(command[1]))
 
 # Function for setting drive delay
@@ -42,6 +54,8 @@ def set_drive_delay(command, args):
     if extended_command.is_authed(args['name']) == 2: # Owner
         if len(command) > 1:
             driveDelay=float(command[1])
+            blynk.virtual_write(2, driveDelay)
+            config_save('zerobot', 'driveDelay', driveDelay)
             log.info("Drive delay set to : %d", float(command[1]))
 
 # Function for setting drive speed
@@ -50,6 +64,8 @@ def set_drive_speed(command, args):
     if extended_command.is_authed(args['name']) == 2: # Owner
         if len(command) > 1:
             pwm_speed=int(command[1])
+            blynk.virtual_write(3, pwm_speed)
+            config_save('zerobot', 'pwm_speed', pwm_speed)
             log.info("Drive speed set to : %d", int(command[1]))
 
 # Function for setting steering bias
@@ -58,6 +74,9 @@ def set_bias(command, args):
     if extended_command.is_authed(args['name']) == 2: # Owner
         if len(command) > 1:
             steeringBias=int(command[1])
+            blynk.virtual_write(4, steeringBias)
+            steeringBias=int(command[1])
+            config_save('zerobot', 'steeringBias', steeringBias)
             log.info("Steering bias set to : %d", int(command[1]))
 
 def setup(robot_config):
@@ -75,6 +94,11 @@ def setup(robot_config):
     pwm_freq = int(robot_config.getfloat('zerobot', 'pwm_freq'))
     pwm_range = int(robot_config.getfloat('zerobot', 'pwm_range'))
     pwm_speed = int(robot_config.getfloat('zerobot', 'pwm_speed'))
+
+    blynk.virtual_write(1, turnDelay)
+    blynk.virtual_write(2, driveDelay)
+    blynk.virtual_write(3, pwm_speed)
+    blynk.virtual_write(4, steeringBias)
 
     # Activate chat commands for motor settings
     if robot_config.getboolean('tts', 'ext_chat'): #ext_chat enabled, add motor commands
@@ -105,23 +129,23 @@ def setup(robot_config):
 
 @blynk.VIRTUAL_WRITE(1)
 def v1_write_handler(value):
-    turnDelay = float(value)
-    log.info("Rotate delay set to : %f", turnDelay)
+    turnDelay=float(value)
+    config_save('zerobot', 'turnDelay', turnDelay)
 
 @blynk.VIRTUAL_WRITE(2)
 def v2_write_handler(value):
-    driveDelay = float(value)
-    log.info("Drive delay set to : %f", driveDelay)
+    driveDelay=float(value)
+    config_save('zerobot', 'driveDelay', driveDelay)
 
 @blynk.VIRTUAL_WRITE(3)
 def v3_write_handler(value):
-    driveSpeed = int(value)
-    log.info("Driving speed set to : %d", driveSpeed)
+    pwm_speed=int(value)
+    config_save('zerobot', 'pwm_speed', pwm_speed)
 
 @blynk.VIRTUAL_WRITE(4)
 def v4_write_handler(value):
-    steeringBias = int(value)
-    log.info("Steering Bias set to : %d", steeringBias)
+    steeringBias=int(value)
+    config_save('zerobot', 'steeringBias', steeringBias)
 
 def move(args):
     direction = args['command']
@@ -151,5 +175,4 @@ def move(args):
 #        for i in range(0,4):
 #            pi.write(motorPins[i], 0)
 
-thread.start_new_thread(blynk.run, ())
 
