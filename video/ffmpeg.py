@@ -262,7 +262,7 @@ def startVideoCapture():
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=saturation))
 
     
-    videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
+    videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 {video_size}'
                         ' -r 25 {in_options} -i {video_device} {video_filter}'
                         ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
                         ' -muxdelay 0.001 {out_options}'
@@ -270,6 +270,7 @@ def startVideoCapture():
                         
     videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
                             input_format=video_input_format,
+                            video_size=('-video_size {xres}x{yres}'.format(xres=xres,yres=yres) if input_format != "mjpeg" else "")
                             in_options=video_input_options,
                             video_device=video_device, 
                             video_filter=video_filter,
