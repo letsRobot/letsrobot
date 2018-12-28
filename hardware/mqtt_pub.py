@@ -1,5 +1,5 @@
 import logging
-log = logging.getLogger('LR.hardware.mqtt')
+log = logging.getLogger('LR.hardware.mqtt_pub')
 
 try:
     import paho.mqtt.client as mqttc
