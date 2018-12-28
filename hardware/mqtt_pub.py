@@ -7,14 +7,14 @@ except ImportError:
     log.critical("paho mqtt did not load. You need to install the paho mqtt client")
 
 #define variables here
-mqtthost=none
-mqttPort=none
-mqttTopic=none
-mqttClient=none
+mqtthost=None
+mqttPort=None
+mqttTopic=None
+mqttClient=None
 
 def sendmqttCommand(command):
     global mqttClient
-    log.info("mqtt pub send: ", str(command.lower()))
+    log.info("mqtt pub send: %s ", command)
     
     try:
         mqttClient.connect(mqtthost, mqttPort)
@@ -36,9 +36,9 @@ def setup(robot_config):
     global mqttTopic
     global mqttClient
 
-    mqtthost = robot_config.get('mqtt', 'host')
-    mqttPort = robot_config.getint('mqtt', 'port')
-    mqttTopic = robot_config.get('mqtt', 'topic')
+    mqtthost = robot_config.get('mqtt_pub', 'host')
+    mqttPort = robot_config.getint('mqtt_pub', 'port')
+    mqttTopic = robot_config.get('mqtt_pub', 'topic')
     mqttClient = mqttc.Client("robot")      #TODO client can b the robot ID
     
     mqttClient.on_publish = on_publish
