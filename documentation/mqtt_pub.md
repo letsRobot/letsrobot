@@ -1,6 +1,7 @@
 # MQTT Publish controller
 [MQTT](http://mqtt.org/) is a Machine-to-Machine communication protocol supporting a lightweight publish/subscribe message transport. It is commonly used in IoT and home automation applications. This LetsRobt Hardware controller will allow commands recieved from the LetsRobot site to be published to a MQTT Broker. Various remote robots, devices, and software can subscribe to the MQTT Broker to recieve messages. This configuration will allow the command processing to be decoupled from the LetsRobot Client software both in software processing and, if you choose, the network/system location.
-![MQTT Publish Topography](https://raw.githubusercontent.com/Papershaper/letsrobot/documentation/mqtt_pub_topography.png)
+
+![MQTT Publish Topography](https://raw.githubusercontent.com/Papershaper/letsrobot/master/documentation/mqtt_pub_topography.png)
       
 ## Potential Uses
 Using the MQTT Pub hardward with LetsRobot, you can broadcast the command messages from the site to many different devices in your robot environment. It would also be possible to publish messages to devices that already have a MQTT interface.
@@ -10,9 +11,9 @@ A common example would be to seperate the video/audio streaming services from th
 ## mqtt_pub description
 The mqtt_pub.py script is a implementation of the LetsRobot Client Hardware Controller. The script uses the Eclipse foundation Paho Python library.
 
-It contains methods for ```setup()``` and move(). On setup() the script will load all configurations. It will create a mqtt client and attach handlers for connection, disconnection, and message publishing. 
+It contains methods for ```setup()``` and ```move()```. On ```setup()``` the script will load all configurations. It will create a mqtt client and attach handlers for connection, disconnection, and message publishing. 
 
-When move() is called, the script will attempt a connection to the configured MQTT Broker, publish the 'command' arguments, and disconnect.
+When ```move()``` is called, the script will attempt a connection to the configured MQTT Broker, publish the 'command' arguments, and disconnect.
 
 The mqtt_pub script does not contain the MQTT Broker, or Subscription methods.
 
