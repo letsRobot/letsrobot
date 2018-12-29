@@ -3,6 +3,7 @@ import sys
 import re
 import audio_util
 import logging
+import platform
 
 log = logging.getLogger('LR.tts')
 
@@ -32,10 +33,13 @@ def setup(robot_config):
 
     # get playback device hardware num from name.
     audio_device = robot_config.get('tts', 'audio_device')
-    if audio_device != '':
-        temp_hw_num = audio_util.getSpeakerByName(audio_device.encode('utf-8'))
-        if temp_hw_num != None:
-            robot_config.set('tts', 'hw_num', str(temp_hw_num))
+
+    # convert the device to hw num if not on windows
+    if platform.system() != "Windows":
+        if audio_device != '':
+            temp_hw_num = audio_util.getSpeakerByName(audio_device.encode('utf-8'))
+            if temp_hw_num != None:
+                robot_config.set('tts', 'hw_num', str(temp_hw_num))
     
     hw_num = robot_config.get('tts', 'hw_num')
     

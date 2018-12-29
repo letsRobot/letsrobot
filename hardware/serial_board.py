@@ -7,7 +7,7 @@ ser = None
 
 def sendSerialCommand(ser, command):
 
-    log.info("serial send: ", str(command.lower()))
+    log.info("serial send: %s", str(command.lower()))
     ser.write(command.lower().encode('utf8') + b"\r\n")     # write a string
     ser.flush()
 
@@ -21,7 +21,7 @@ def setup(robot_config):
     try:
         ser = serial.Serial(serialDevice, serialBaud, timeout=0, write_timeout=0)  # open serial
     except:
-        log.error("error: could not open serial port")
+        log.error("error: could not open serial port %s", serial_device)
         try:
             ser = serial.Serial('/dev/ttyACM0', serialBaud, timeout=0, write_timeout=0)  # open serial
         except:

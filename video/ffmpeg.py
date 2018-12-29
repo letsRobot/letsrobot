@@ -149,10 +149,6 @@ def setup(robot_config):
     if not no_mic:
         audio_hw_num = robot_config.get('camera', 'audio_hw_num')
         audio_device = robot_config.get('camera', 'audio_device')
-        if audio_device != '':
-            temp_hw_num = audio_util.getMicByName(audio_device.encode('utf-8'))
-            if temp_hw_num != None:
-                audio_hw_num = temp_hw_num       
  
         audioHost = websocketRelayHost['host']
         audioPort = networking.audioPort
@@ -168,6 +164,13 @@ def setup(robot_config):
 
         if robot_config.getboolean('tts', 'ext_chat'):
             extended_command.add_command('.audio', audioChatHandler)
+
+        # resolve device name to hw num, unless under windows
+        if audio_input_format != "dshow":
+            if audio_device != '':
+                temp_hw_num = audio_util.getMicByName(audio_device.encode('utf-8'))
+                if temp_hw_num != None:
+                    audio_hw_num = temp_hw_num       
 
         # format the device for hw number if using alsa
         if audio_input_format == 'alsa':
