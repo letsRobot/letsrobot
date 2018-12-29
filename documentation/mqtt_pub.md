@@ -10,7 +10,7 @@ A common example would be to seperate the video/audio streaming services from th
 ## mqtt_pub description
 The mqtt_pub.py script is a implementation of the LetsRobot Client Hardware Controller. The script uses the Eclipse foundation Paho Python library.
 
-It contains methods for setup() and move(). On setup() the script will load all configurations. It will create a mqtt client and attach handlers for connection, disconnection, and message publishing. 
+It contains methods for ```setup()``` and move(). On setup() the script will load all configurations. It will create a mqtt client and attach handlers for connection, disconnection, and message publishing. 
 
 When move() is called, the script will attempt a connection to the configured MQTT Broker, publish the 'command' arguments, and disconnect.
 
@@ -27,7 +27,9 @@ Finally, the robot that will use the MQTT message stream will need to have softw
 to use the mqtt_pub controller software it must be configured to operate in the letsrobot.conf file.
 
 At the top section of the file, set the hardward controller type to "mqtt_pub"
-'''type=mqtt_pub'''
+```python
+type=mqtt_pub
+```
 
 Find the "[mqtt_pub]" section to configure the Broker and Topic information.
 the following changes are needed:
@@ -35,7 +37,7 @@ the following changes are needed:
 * port - Typically this is 1883, check your broker for the exact port
 * topic - this is the information group that the Broker/Subscribers listen to. as default this is set to "LR/command"
 
-'''
+```python
 [mqtt_pub]
 # If you are using MQTT you need to supply the host IP address, port, and Topic
 # host should be the IP address where the MQTT broker is running
@@ -44,4 +46,4 @@ the following changes are needed:
 host = 192.168.178.88   
 port = 1883
 topic = LR/command
-'''
+```
