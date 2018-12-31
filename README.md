@@ -280,6 +280,7 @@ The following hardware is supported.
 * MotoZero 4 Motor Controller
 * OWI 535 Robotic Arm (USB controller)
 * Serial Based controllers (Parallaxy or Arduinos)
+* MQTT Publish commands to a local MQTT Broker
 
 Missing something?, you can add it, open source! Instructions for adding new hardware can be found [here.](EXTENDING_CONTROLLER.md)
 
