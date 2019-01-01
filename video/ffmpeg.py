@@ -270,7 +270,7 @@ def startVideoCapture():
                         
     videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
                             input_format=video_input_format,
-                            video_size=('-video_size {xres}x{yres}'.format(xres=xres,yres=yres) if input_format != "mjpeg" else "")
+                            video_size=('-video_size {xres}x{yres}'.format(xres=xres,yres=yres) if input_format != "mjpeg" else ""),
                             in_options=video_input_options,
                             video_device=video_device, 
                             video_filter=video_filter,
