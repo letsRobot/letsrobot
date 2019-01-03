@@ -168,27 +168,28 @@ def exclusive_handler(command, args):
 
     log.debug("exclusive_handler : %s %s", command, args)
 
-    if len(command) > 2:
+    if len(command) >= 2:
         if is_authed(args['name']) == 2: # Owner
-            user = command[2]
-            if command[1] == 'user':
-                exclusive_user = user
-                exclusive = True
-                log.info("%s given exclusive control", user)
-                return
-            elif command[1] == 'off':
+            if command[1] == 'off':
                 exclusive = False
                 log.info("Exclusive control disabled")
                 return
-            elif command[1] == 'mods':
-                if user == 'on':
-                   exclusive_mods = True
-                   log.info("Enabling mod control during exclusive")
-                   return
-                elif user == 'off':
-                   exclusive_mods = False
-                   log.info("Disabling mod control during exclusive")
-                   return
+            elif len(command) >= 3:
+                user = command[2]
+                if command[1] == 'user':
+                    exclusive_user = user
+                    exclusive = True
+                    log.info("%s given exclusive control", user)
+                    return
+                elif command[1] == 'mods':
+                    if user == 'on':
+                       exclusive_mods = True
+                       log.info("Enabling mod control during exclusive")
+                       return
+                    elif user == 'off':
+                       exclusive_mods = False
+                       log.info("Disabling mod control during exclusive")
+                       return
 
 
 def ban_handler(command, args):
@@ -401,7 +402,7 @@ def handler(args):
 def move_auth(args):
     user = args['user']
     anon = args['anonymous']
-    
+   
     # Check if stationary mode is enabled
     if stationary:
         direction = args['command']
@@ -416,16 +417,17 @@ def move_auth(args):
             return    
 
     # check if exclusive control is enabled
-    if exclusive:
+    if exclusive and (user != owner):
         if exclusive_mods:
             if user not in mods:
-                if (user != exclusive_user) and (user != owner): 
+                if user != exclusive_user: 
                     log.debug("%s not authed for exclusive control", user)
                     return
-        if (user != exclusive_user) and (user != owner): 
+        if user != exclusive_user: 
             log.debug("%s not authed for exclusive control", user)
             return
-
+    elif exclusive:
+        log.debug("%s %s is authed", user, args['command'])
                
     if anon_control == False and anon:
         return
