@@ -174,22 +174,20 @@ def exclusive_handler(command, args):
                 exclusive = False
                 log.info("Exclusive control disabled")
                 return
-            elif len(command) >= 3:
-                user = command[2]
-                if command[1] == 'user':
-                    exclusive_user = user
-                    exclusive = True
-                    log.info("%s given exclusive control", user)
-                    return
-                elif command[1] == 'mods':
-                    if user == 'on':
-                       exclusive_mods = True
-                       log.info("Enabling mod control during exclusive")
-                       return
-                    elif user == 'off':
-                       exclusive_mods = False
-                       log.info("Disabling mod control during exclusive")
-                       return
+            elif len(command) < 3:
+                exclusive_user = command[1]
+                exclusive = True
+                log.info("%s given exclusive control", command[1])
+                return
+            elif (len(command) >= 2) and (command[1] == 'mods'):
+                if command[2] == 'on':
+                   exclusive_mods = True
+                   log.info("Enabling mod control during exclusive")
+                   return
+                elif command[2] == 'off':
+                   exclusive_mods = False
+                   log.info("Disabling mod control during exclusive")
+                   return
 
 
 def ban_handler(command, args):
