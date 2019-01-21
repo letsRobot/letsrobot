@@ -225,12 +225,13 @@ def handle_stopfix(args):
 
     if move_handler == None:
        return
-    delay = 1
+    delay = 0.5
 
     time.sleep(delay)
 
     t = time.time()
-    if t - last_time >= delay:
+    if t - last_time >= delay * 0.9:
+        print('STOPPING!')
         acopy = args.copy()
         acopy.update({'command': 'stop' })
         move_handler(acopy)
