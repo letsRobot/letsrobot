@@ -14,6 +14,7 @@ import sys
 import watchdog
 import logging
 import logging.handlers
+import time
 
 if (sys.version_info > (3, 0)):
     import importlib
@@ -218,10 +219,26 @@ def changeVolumeNormal():
 def handleLoudCommand(seconds):
     os.system("amixer -c 2 cset numid=3 %d%%" % 100)
     schedule.single_task(seconds, changeVolumeNormal)
-    
+
+def handle_stopfix(args):
+    global handlingCommand, last_time
+
+    if move_handler == None:
+       return
+    delay = 1
+
+    time.sleep(delay)
+
+    t = time.time()
+    if t - last_time >= delay:
+        acopy = args.copy()
+        acopy.update({'command': 'stop' })
+        move_handler(acopy)
+
 def handle_command(args):
-        global handlingCommand
+        global handlingCommand, last_time
         handlingCommand = True
+        last_time = time.time()
 
         # catch move commands that happen before the controller has fully
         # loaded and set a move handler.
@@ -258,6 +275,7 @@ def on_handle_command(*args):
        return
    else:
        thread.start_new_thread(handle_command, args)
+       thread.start_new_thread(handle_stopfix, args)
 
 def on_handle_exclusive_control(*args):
    thread.start_new_thread(handle_exclusive_control, args)
