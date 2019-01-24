@@ -46,6 +46,8 @@ secure_cert = None
 
 onHandleChatMesasge = None
 
+bootMessage = None
+
 def getControlHostPort():
     url = 'https://%s/get_control_host_port/%s?version=2' % (infoServer, robot_id)
     response = robot_util.getWithRetry(url, secure=secure_cert)
@@ -248,6 +250,7 @@ def setupSocketIO(robot_config):
     global messengerName
     global messengerUsername
     global messengerPassword
+    global bootMessage
 
     robot_id = robot_config.get('robot', 'robot_id')
     camera_id = robot_config.getint('robot', 'camera_id')
@@ -262,6 +265,8 @@ def setupSocketIO(robot_config):
     messengerUsername = robot_config.get('messenger', 'username')
     messengerPassword = robot_config.get('messenger', 'password')
     messengerName = robot_config.get('messenger', 'robot_name')
+
+    bootMessage = robot_config.get('tts', 'boot_message')
 
     controlHostPort = getControlHostPort()
     chatHostPort = getChatHostPort()
@@ -375,11 +380,12 @@ def isInternetConnected():
 
 lastInternetStatus = False
 def internetStatus_task():
+    global bootMessage
     global lastInternetStatus
     internetStatus = isInternetConnected()
     if internetStatus != lastInternetStatus:
         if internetStatus:
-            tts.say("ok")
+            tts.say(bootMessage)
             log.info("internet connected")
         else:
             log.info("missing internet connection")
