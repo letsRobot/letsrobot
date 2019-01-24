@@ -32,7 +32,7 @@ def say(*args):
     f.close()
 
     if male:
-        os.system('cat ' + tempFilePath + ' | espeak -v en-us+m%d -s 170--stdout | aplay -D plughw:%d,0' %(voice_number, hw_num) )
+        os.system('cat ' + tempFilePath + ' | espeak -v en-us+m%d -s 170 --stdout | aplay -D plughw:%d,0' %(voice_number, hw_num) )
     else:
         os.system('cat ' + tempFilePath + ' | espeak -v en-us+f%d -s 170 --stdout | aplay -D plughw:%d,0' % (voice_number, hw_num) )
     os.remove(tempFilePath)    
