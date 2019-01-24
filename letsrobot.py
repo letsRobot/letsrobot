@@ -310,7 +310,7 @@ if robot_config.getboolean('messenger', 'enable'):
 # If custom hardware extensions have been enabled, load them if they exist. Otherwise load the default
 # controller for the specified hardware type.
 log.info("Loading hardware module")
-log.debug("Loading module hardware/%s", commandArgs.type);
+log.debug("Loading module hardware/%s", commandArgs.type)
 if commandArgs.custom_hardware:
     if os.path.exists('hardware/hardware_custom.py'):
         if (sys.version_info > (3, 0)):
