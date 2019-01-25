@@ -385,7 +385,7 @@ def internetStatus_task():
     internetStatus = isInternetConnected()
     if internetStatus != lastInternetStatus:
         if internetStatus:
-            tts.say(bootMessage)
+            tts.say("ok")
             log.info("internet connected")
         else:
             log.info("missing internet connection")
