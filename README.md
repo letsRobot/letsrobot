@@ -338,6 +338,21 @@ Install [DRV8835 Motor Driver library](https://github.com/pololu/drv8835-motor-d
 ## Pololu MC33926 Motor Driver
 Install [MC33926 Motor Driver library](https://github.com/pololu/dual-mc33926-motor-driver-rpi)
 
+# A note about the Raspi Cam Module
+Sometimes enabling the Raspberry Pi Camera module in `raspi-config` doesn't completely load the kernel drivers for it. If you don't see `/dev/video0` on your system, or `letsrobot.py` complains about not finding it, then do the following:
+
+1. Enable the kernel module for your current session: 
+```
+sudo modprobe bcm2835-v4l2
+```
+
+2. Tell the operating system to load the kernel module at boot going forward:
+```
+sudo cat 'bcm2835-v4l2' >> /etc/modules
+```
+
+Now you should see `video0` if you do `ls /dev/ | grep video`
+
 # High Level Overview
 
 ![robot client topology](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/RobotClientTopology.png)
