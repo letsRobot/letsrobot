@@ -27,7 +27,7 @@ def say(*args):
     message.replace("\\", r"\\")
     message.replace("'", r"\'")
     message.replace('"', r'\"')
-    log.info( 'lang=%s message=%s', pico_voice, message );
+    log.info( 'lang=%s message=%s', pico_voice, message )
     os.system( 'pico2wave --lang=' + pico_voice + ' --wave=' + tempWaveFilePath + ' \"' + message + '\"' )
     os.system( 'aplay ' + tempWaveFilePath + ' -D plughw:%d,0' % hw_num )
     os.remove(tempWaveFilePath)
