@@ -32,10 +32,10 @@ def setup(robot_config):
         ssml_gender=texttospeech.enums.SsmlVoiceGender.NEUTRAL)
 
     audio_config = texttospeech.types.AudioConfig(
-        audio_encoding=texttospeech.enums.AudioEncoding.MP3
+        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
 
-    hwNum = robot_config.get('tts', 'hw_num')
+    hwNum = robot_config.getint('tts', 'hw_num')
 
 
 def say(*args):
@@ -50,6 +50,6 @@ def say(*args):
 
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
-    with open('output.mp3', 'wb') as out:
+    with open('output.wav', 'wb') as out:
         out.write(response.audio_content)
-        os.system('/usr/bin/mpg123-alsa -a hw:' + hwNum + ',0 output.mp3')
+        os.system('aplay output.wav -D plughw:%d,0' % hwNum)
