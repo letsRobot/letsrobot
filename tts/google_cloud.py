@@ -12,6 +12,7 @@ client = None
 voice = None
 hwNum = None
 audio_config = None
+keyFile = None
 
 client = None
 
@@ -22,24 +23,25 @@ def setup(robot_config):
     global voice
     global hwNum
     global audio_config
+    global keyFile
 
     client = texttospeech.TextToSpeechClient()
-
-    if os.getenv("GOOGLE_APPLICATION_CREDENTIALS") == None:
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pi/key.json"
-        log.info("setting tts env variable")
+    
 
     voice = texttospeech.types.VoiceSelectionParams(
-        language_code='en-US',
-        ssml_gender=texttospeech.enums.SsmlVoiceGender.NEUTRAL)
+        voice=robot_config.get('google_cloud', 'voice'))
 
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
 
+    keyFile = robot_config.get('google_cloud', 'key_file')
     hwNum = robot_config.getint('tts', 'hw_num')
 
     tempDir = tempfile.gettempdir()
+
+    os.system('export GOOGLE_APPLICATION_CREDENTIALS=%s' % keyFile)
+    log.info("setting tts env variable")
 
 
 def say(*args):
