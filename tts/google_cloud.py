@@ -7,6 +7,7 @@ from google.cloud import texttospeech
 
 log = logging.getLogger('LR.tts.google_cloud')
 
+tempDir = None
 client = None
 voice = None
 hwNum = None
@@ -16,6 +17,7 @@ client = None
 
 
 def setup(robot_config):
+    global tempDir
     global client
     global voice
     global hwNum
@@ -37,6 +39,8 @@ def setup(robot_config):
 
     hwNum = robot_config.getint('tts', 'hw_num')
 
+    tempDir = tempfile.gettempdir()
+
 
 def say(*args):
     global client
@@ -50,6 +54,8 @@ def say(*args):
 
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
-    with open('output.wav', 'wb') as out:
+    tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
+
+    with open(tempFilePath, 'wb') as out:
         out.write(response.audio_content)
         os.system('aplay output.wav -D plughw:%d,0' % hwNum)
