@@ -58,4 +58,4 @@ def say(*args):
 
     with open(tempFilePath, 'wb') as out:
         out.write(response.audio_content)
-        os.system('aplay output.wav -D plughw:%d,0' % hwNum)
+        os.system('aplay ' + out + ' -D plughw:%d,0' % hwNum)
