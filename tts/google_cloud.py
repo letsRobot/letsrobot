@@ -29,7 +29,7 @@ def setup(robot_config):
     
 
     voice = texttospeech.types.VoiceSelectionParams(
-        voice=robot_config.get('google_cloud', 'voice'))
+        name=robot_config.get('google_cloud', 'voice'))
 
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
