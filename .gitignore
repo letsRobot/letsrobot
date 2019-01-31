@@ -36,3 +36,5 @@ chat_custom.py
 tts/secret.py
 
 hardware/maestro.py
+
+output.mp3
