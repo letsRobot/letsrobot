@@ -26,17 +26,20 @@ def setup(robot_config):
     global keyFile
 
     client = texttospeech.TextToSpeechClient()
-    
+
+    voice = robot_config.get('google_cloud', 'voice')
+    keyFile = robot_config.get('google_cloud', 'key_file')
+    hwNum = robot_config.getint('tts', 'hw_num')    
 
     voice = texttospeech.types.VoiceSelectionParams(
-        name=robot_config.get('google_cloud', 'voice'))
+        name=voice
+    )
 
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
 
-    keyFile = robot_config.get('google_cloud', 'key_file')
-    hwNum = robot_config.getint('tts', 'hw_num')
+    
 
     tempDir = tempfile.gettempdir()
 
