@@ -13,6 +13,7 @@ voice = None
 hwNum = None
 audio_config = None
 keyFile = None
+languageCode = None
 
 client = None
 
@@ -24,28 +25,28 @@ def setup(robot_config):
     global hwNum
     global audio_config
     global keyFile
+    global languageCode
 
     client = texttospeech.TextToSpeechClient()
 
     voice = robot_config.get('google_cloud', 'voice')
     keyFile = robot_config.get('google_cloud', 'key_file')
     hwNum = robot_config.getint('tts', 'hw_num')    
+    languageCode = robot_config.get('google_cloud', 'language_code')
 
     voice = texttospeech.types.VoiceSelectionParams(
-        name=voice
+        name=voice,
+        language_code=languageCode
     )
 
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
 
-    
+    if not 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = keyFile  
 
     tempDir = tempfile.gettempdir()
-
-    os.system('export GOOGLE_APPLICATION_CREDENTIALS=%s' % keyFile)
-    log.info("setting tts env variable")
-
 
 def say(*args):
     global client
