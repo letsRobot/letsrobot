@@ -34,6 +34,10 @@ def setup(robot_config):
     hwNum = robot_config.getint('tts', 'hw_num')    
     languageCode = robot_config.get('google_cloud', 'language_code')
 
+    storage_client = storage.Client.from_service_account_json(keyFile)
+
+    client = texttospeech.TextToSpeechClient(storage_client)
+    
     voice = texttospeech.types.VoiceSelectionParams(
         name=voice,
         language_code=languageCode
@@ -43,9 +47,6 @@ def setup(robot_config):
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
     
-    storage_client = storage.Client.from_service_account_json(keyFile)
-
-    client = texttospeech.TextToSpeechClient(storage_client)
     tempDir = tempfile.gettempdir()
 
 def say(*args):
