@@ -3,7 +3,7 @@ import tempfile
 import uuid
 import logging
 
-from google.cloud import texttospeech
+from google.cloud import texttospeech, storage
 
 log = logging.getLogger('LR.tts.google_cloud')
 
@@ -27,7 +27,7 @@ def setup(robot_config):
     global keyFile
     global languageCode
 
-    client = texttospeech.TextToSpeechClient()
+    
 
     voice = robot_config.get('google_cloud', 'voice')
     keyFile = robot_config.get('google_cloud', 'key_file')
@@ -42,10 +42,10 @@ def setup(robot_config):
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
+    
+    storage_client = storage.Client.from_service_account_json(keyFile)
 
-    if not 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = keyFile  
-
+    client = texttospeech.TextToSpeechClient(storage_client)
     tempDir = tempfile.gettempdir()
 
 def say(*args):
