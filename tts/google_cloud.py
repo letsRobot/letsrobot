@@ -12,30 +12,27 @@ client = None
 voice = None
 hwNum = None
 audio_config = None
-keyFile = None
+#keyFile = None
 languageCode = None
 
 client = None
-
 
 def setup(robot_config):
     global tempDir
     global client
     global voice
-#   global hwNum
+    global hwNum
     global audio_config
-    global keyFile
+#    global keyFile
     global languageCode
 
-    
-
     voice = robot_config.get('google_cloud', 'voice')
-#   keyFile = robot_config.get('google_cloud', 'key_file')
-    hwNum = robot_config.getint('tts', 'hw_num')    
+#    keyFile = robot_config.get('google_cloud', 'key_file')
+    hwNum = robot_config.getint('tts', 'hw_num')
     languageCode = robot_config.get('google_cloud', 'language_code')
 
     client = texttospeech.TextToSpeechClient()
-    
+
     voice = texttospeech.types.VoiceSelectionParams(
         name=voice,
         language_code=languageCode
@@ -44,7 +41,7 @@ def setup(robot_config):
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
-    
+
     tempDir = tempfile.gettempdir()
 
 def say(*args):
