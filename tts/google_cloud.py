@@ -3,7 +3,7 @@ import tempfile
 import uuid
 import logging
 
-from google.cloud import texttospeech, storage
+from google.cloud import texttospeech
 
 log = logging.getLogger('LR.tts.google_cloud')
 
