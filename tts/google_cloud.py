@@ -34,7 +34,9 @@ def setup(robot_config):
     hwNum = robot_config.getint('tts', 'hw_num')    
     languageCode = robot_config.get('google_cloud', 'language_code')
 
-    client = texttospeech.TextToSpeechClient()
+    client = texttospeech.TextToSpeechClient(
+        credentials=keyFile
+    )
     
     voice = texttospeech.types.VoiceSelectionParams(
         name=voice,
