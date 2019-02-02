@@ -34,7 +34,3 @@ hardware/hardware_custom.py
 tts/tts_custom.py
 chat_custom.py
 tts/secret.py
-
-hardware/maestro.py
-
-output.mp3
