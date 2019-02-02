@@ -3,7 +3,7 @@ import tempfile
 import uuid
 import logging
 
-from google.cloud import texttospeech, storage
+from google.cloud import texttospeech_v1beta1, storage
 
 log = logging.getLogger('LR.tts.google_cloud')
 
@@ -34,17 +34,17 @@ def setup(robot_config):
     hwNum = robot_config.getint('tts', 'hw_num')    
     languageCode = robot_config.get('google_cloud', 'language_code')
 
-    client = texttospeech.TextToSpeechClient(
+    client = texttospeech_v1beta1.TextToSpeechClient(
         credentials=keyFile
     )
     
-    voice = texttospeech.types.VoiceSelectionParams(
+    voice = texttospeech_v1beta1.types.VoiceSelectionParams(
         name=voice,
         language_code=languageCode
     )
 
-    audio_config = texttospeech.types.AudioConfig(
-        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
+    audio_config = texttospeech_v1beta1.types.AudioConfig(
+        audio_encoding=texttospeech_v1beta1.enums.AudioEncoding.LINEAR16
     )
     
     tempDir = tempfile.gettempdir()
@@ -57,7 +57,7 @@ def say(*args):
 
     message = args[0]
 
-    synthesis_input = texttospeech.types.SynthesisInput(text=message)
+    synthesis_input = texttospeech_v1beta1.types.SynthesisInput(text=message)
 
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
