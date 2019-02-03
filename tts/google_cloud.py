@@ -4,7 +4,7 @@ import uuid
 import logging
 
 from google.oauth2 import service_account
-from google.cloud import texttospeech, storage
+from google.cloud import texttospeech
 
 log = logging.getLogger('LR.tts.google_cloud')
 
