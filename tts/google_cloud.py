@@ -1,3 +1,5 @@
+# pylint: disable=no-member
+
 import os
 import tempfile
 import uuid
@@ -37,12 +39,12 @@ def setup(robot_config):
             keyFile)
     )
 
-    voice = texttospeech.types.VoiceSelectionParams(                            # pylint: disable=no-member
+    voice = texttospeech.types.VoiceSelectionParams(                            
         name=voice,
         language_code=languageCode
     )
 
-    audio_config = texttospeech.types.AudioConfig(                              # pylint: disable=no-member
+    audio_config = texttospeech.types.AudioConfig(                              
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
     )
 
@@ -56,7 +58,7 @@ def say(*args):
 
     message = args[0]
 
-    synthesis_input = texttospeech.types.SynthesisInput(text=message)           # pylint: disable=no-member
+    synthesis_input = texttospeech.types.SynthesisInput(text=message)           
 
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
