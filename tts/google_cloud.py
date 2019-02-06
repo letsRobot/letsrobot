@@ -17,6 +17,8 @@ hwNum = None
 audio_config = None
 keyFile = None
 languageCode = None
+voicePitch = 0.0
+voiceSpeakingRate = 1.0
 
 client = None
 
@@ -28,11 +30,15 @@ def setup(robot_config):
     global audio_config
     global keyFile
     global languageCode
+    global voicePitch
+    global voiceSpeakingRate
 
     voice = robot_config.get('google_cloud', 'voice')
     keyFile = robot_config.get('google_cloud', 'key_file')
     hwNum = robot_config.getint('tts', 'hw_num')
     languageCode = robot_config.get('google_cloud', 'language_code')
+    voicePitch = robot_config.getfloat('google_cloud', 'voice_pitch')
+    voiceSpeakingRate = robot_config.getfloat('google_cloud', 'voice_speaking_rate')
 
     client = texttospeech.TextToSpeechClient(
         credentials=service_account.Credentials.from_service_account_file(
@@ -45,7 +51,9 @@ def setup(robot_config):
     )
 
     audio_config = texttospeech.types.AudioConfig(                              
-        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16
+        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
+        pitch=voicePitch,
+        speaking_rate=voiceSpeakingRate
     )
 
     tempDir = tempfile.gettempdir()
