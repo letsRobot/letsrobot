@@ -33,7 +33,7 @@ def setup(robot_config):
     global voicePitch
     global voiceSpeakingRate
 
-    ssmlEnabled = robot_config.getBoolean('google_cloud', 'ssml_enabled')
+    ssmlEnabled = robot_config.getboolean('google_cloud', 'ssml_enabled')
     voice = robot_config.get('google_cloud', 'voice')
     keyFile = robot_config.get('google_cloud', 'key_file')
     hwNum = robot_config.getint('tts', 'hw_num')
