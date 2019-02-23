@@ -71,7 +71,7 @@ def say(*args):
     message = args[0]
     message = message.strip()
 
-    if message.startswith("<ssml>") and ssmlEnabled:
+    if message.startswith("<speak>") and ssmlEnabled:
         try:
             log.debug("Trying SSML Synthesis")
             synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
