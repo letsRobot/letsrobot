@@ -360,7 +360,8 @@ def ipInfoUpdate():
 
 def identifyRobotID():
     """tells the server which robot is using the connection"""
-    controlSocketIO.emit('robot_id', robot_id)
+    if not controlSocketIO == None:
+        controlSocketIO.emit('robot_id', robot_id)
     log.debug("Sending identify robot id message")
     if not no_chat_server and not chatSocket == None:
         chatSocket.emit('identify_robot_id', robot_id)
