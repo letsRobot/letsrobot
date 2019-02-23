@@ -49,7 +49,14 @@ The brain of your robot is the Raspberry Pi, it connects everything to LetsRobot
    Password: raspberry
    ```
 
-4. ### Set Up your Raspberry Pi using raspi-config
+4. ### Update before you do anything else
+   Before changing anything, you should update so your raspberry pi has the latest software.
+   ```
+   sudo apt update
+   sudo apt upgrade -y
+   ```
+
+5. ### Set Up your Raspberry Pi using raspi-config
 
    1. Enter raspi-config by entering the following at the command prompt:
 

@@ -8,6 +8,7 @@ import subprocess
 import tts.tts as tts
 import watchdog
 import logging
+import random
 
 from socketIO_client import SocketIO, LoggingNamespace
 
@@ -266,7 +267,10 @@ def setupSocketIO(robot_config):
     messengerPassword = robot_config.get('messenger', 'password')
     messengerName = robot_config.get('messenger', 'robot_name')
 
-    bootMessage = robot_config.get('tts', 'boot_message')
+    bootMessages = robot_config.get('tts', 'boot_message')
+    bootMessageList = bootMessages.split(',')
+    bootMessage = random.choice(bootMessageList)
+
 
     controlHostPort = getControlHostPort()
     chatHostPort = getChatHostPort()
@@ -356,8 +360,7 @@ def ipInfoUpdate():
 
 def identifyRobotID():
     """tells the server which robot is using the connection"""
-    if not controlSocketIO == None:
-        controlSocketIO.emit('robot_id', robot_id)
+    controlSocketIO.emit('robot_id', robot_id)
     log.debug("Sending identify robot id message")
     if not no_chat_server and not chatSocket == None:
         chatSocket.emit('identify_robot_id', robot_id)
