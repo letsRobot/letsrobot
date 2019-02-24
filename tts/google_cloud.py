@@ -70,18 +70,14 @@ def say(*args):
 
     message = args[0]
     message = message.strip()
-
-    if message.startswith("<speak>") and ssmlEnabled:
-        try:
-            log.debug("Trying SSML Synthesis")
-            synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
-            log.debug("SSML synthesis successful")
-        except:
-            log.error("SSML synthesis failed!")
-            pass
-    else:
-        synthesis_input = texttospeech.types.SynthesisInput(text=message)
-
+    message = "<speak>" + message + "</speak>"
+    try:
+        log.debug("Trying SSML Synthesis")
+        synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
+        log.debug("SSML synthesis successful")
+    except:
+        log.error("SSML synthesis failed!")
+        pass
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
     tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
