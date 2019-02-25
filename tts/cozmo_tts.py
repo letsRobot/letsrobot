@@ -14,6 +14,7 @@ infoServer = None
 annotated = False
 flipped = 0
 colour = False
+stream_key = ""
 
 def set_colour(command, args):
     global colour 
@@ -38,9 +39,11 @@ def setup(robot_config):
     global video_port
     global annotated
     global colour
+    global stream_key
     
     camera_id = robot_config.get('robot', 'camera_id')
     infoServer = robot_config.get('misc', 'info_server')
+    stream_key = robot_config.get('robot', 'stream_key')
     video_port = getVideoPort()
     cozmo.setup_basic_logging()
     cozmo.robot.Robot.drive_off_charger_on_connect = False
@@ -115,7 +118,7 @@ def run(coz_conn):
         
         if platform.startswith('linux') or platform == "darwin":
             #MacOS/Linux
-            p = Popen(['/usr/local/bin/ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/hello/320/240/"], stdin=PIPE)
+            p = Popen(['/usr/local/bin/ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/"+stream_key+"/320/240/"], stdin=PIPE)
         elif platform.startswith('win'):
             #Windows
             import os
@@ -124,7 +127,7 @@ def run(coz_conn):
                thread.interrupt_main()
                thread.exit()
 
-            p = Popen(['c:/ffmpeg/bin/ffmpeg.exe', '-nostats', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25','-b:v', '400k', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/hello/320/240/"], stdin=PIPE)
+            p = Popen(['c:/ffmpeg/bin/ffmpeg.exe', '-nostats', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25','-b:v', '400k', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/"+stream_key+"/320/240/"], stdin=PIPE)
         
         try:
             while True:
