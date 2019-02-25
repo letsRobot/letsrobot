@@ -15,6 +15,7 @@ annotated = False
 flipped = 0
 colour = False
 stream_key = ""
+ffmpeg_location = None
 
 def set_colour(command, args):
     global colour 
@@ -40,10 +41,12 @@ def setup(robot_config):
     global annotated
     global colour
     global stream_key
+    global ffmpeg_location
     
     camera_id = robot_config.get('robot', 'camera_id')
     infoServer = robot_config.get('misc', 'info_server')
     stream_key = robot_config.get('robot', 'stream_key')
+    ffmpeg_location = robot_config.get('ffmpeg', 'ffmpeg_location')
     video_port = getVideoPort()
     cozmo.setup_basic_logging()
     cozmo.robot.Robot.drive_off_charger_on_connect = False
@@ -75,7 +78,7 @@ def setup(robot_config):
     
     if send_online_status:
         print("Enabling online status")
-        schedule.repeat_task(10, updateServer);
+        schedule.repeat_task(10, updateServer)
 
 def getVideoPort():
     import robot_util
@@ -92,13 +95,14 @@ def updateServer():
                                'ffmpeg_process_exists': True,
                                'camera_id':camera_id})
     except AttributeError:
-        print("Error: No appServerSocketIO");
+        print("Error: No appServerSocketIO")
 
 def getCozmo():
     return coz
 
 def run(coz_conn):
     global coz
+    global ffmpeg_location
     coz = coz_conn.wait_for_robot()
     coz.enable_stop_on_cliff(True)
 
@@ -118,16 +122,16 @@ def run(coz_conn):
         
         if platform.startswith('linux') or platform == "darwin":
             #MacOS/Linux
-            p = Popen(['/usr/local/bin/ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/"+stream_key+"/320/240/"], stdin=PIPE)
+            p = Popen([ffmpeg_location, '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/"+stream_key+"/320/240/"], stdin=PIPE)
         elif platform.startswith('win'):
             #Windows
             import os
-            if not os.path.isfile('c:/ffmpeg/bin/ffmpeg.exe'):
-               print("Error: cannot find c:\\ffmpeg\\bin\\ffmpeg.exe check ffmpeg is installed. Terminating controller")
+            if not os.path.isfile(ffmpeg_location):
+               print("Error: cannot find " + str(ffmpeg_location) + " check ffmpeg is installed. Terminating controller")
                thread.interrupt_main()
                thread.exit()
 
-            p = Popen(['c:/ffmpeg/bin/ffmpeg.exe', '-nostats', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25','-b:v', '400k', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/"+stream_key+"/320/240/"], stdin=PIPE)
+            p = Popen([ffmpeg_location, '-nostats', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25','-b:v', '400k', "-f","mpegts","http://letsrobot.tv:"+str(video_port)+"/"+stream_key+"/320/240/"], stdin=PIPE)
         
         try:
             while True:
