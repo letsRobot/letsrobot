@@ -9,8 +9,6 @@ from google.oauth2 import service_account
 from google.cloud import texttospeech
 
 log = logging.getLogger('LR.tts.google_cloud')
-
-ssmlEnabled = None
 tempDir = None
 client = None
 voice = None
@@ -22,7 +20,6 @@ voicePitch = 0.0
 voiceSpeakingRate = 1.0
 
 def setup(robot_config):
-    global ssmlEnabled
     global tempDir
     global client
     global voice
