@@ -42,7 +42,7 @@ do_camera_id() {
 }
 
 do_robot_type() {
-    ROBOT_TYPE=$(whiptail --radiolist "Choose a robot type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
+    ROBOT_TYPE=$(whiptail --radiolist "Choose a robot type" 20 60 13 \
         "serial_board" "Serial" OFF \
         "motor_hat" "Adafruit Motor Hat" OFF \
         "gopigo2" "GoPiGo2" OFF \
