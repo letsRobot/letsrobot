@@ -21,21 +21,21 @@ calc_wt_size() {
 }
 
 do_robot_owner() {
-    ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "YourLetsRobotUserName" 20 60 1 3>&1 1>&2 2>&3)
+    ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
     fi
 }
 
 do_robot_id() {
-    ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "YourRobotID" 20 60 1 3>&1 1>&2 2>&3)
+    ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^robot_id[[:space:]]*=.*/robot_id=$ROBOT_ID/}" $CONF_FILE
     fi
 }
 
 do_camera_id() {
-    CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "YourCameraID" 20 60 1 3>&1 1>&2 2>&3)
+    CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^camera_id[[:space:]]*=.*/camera_id=$CAMERA_ID/}" $CONF_FILE
     fi
@@ -52,6 +52,7 @@ do_robot_type() {
         "pololu" "Pololu" OFF \
         "adafruit_pwm" "Adafruit PWM" OFF \
         "owi_arm" "OWI Arm" OFF \
+        "diddyborg" "Diddyborg" OFF \
         "none" "None" ON \
         3>&1 1>&2 2>&3)
     RET=$?
