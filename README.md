@@ -136,6 +136,23 @@ wget -O - https://raw.githubusercontent.com/letsRobot/letsrobot/master/scripts/i
 2. If you are ready to install, press `enter` on your keyboard.
 ![install-1](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-1.png)
 
+3. Enter the username you signed up for LetsRobot with.
+![Install-2](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-2.png)
+
+4. Enter your robot ID.
+![Install-3](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-3.png)
+
+5. Enter your camera ID.
+![Install-4](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-4.png)
+
+6. Select your robot type. You need to select your choice with `space` before pressing enter.
+![Install-5](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-5.png)
+
+7. Enter your stream key. If you did not set one, your stream key is `hello`.
+![Install-6](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-6.png)
+
+8. Installation is complete. It is safe to reboot your robot or you can run it manually by running `python letsrobot.py` in the `letsrobot` directory.
+![Install-7](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-7.png)
 
 ## Installing LetsRobot control scripts on a Raspberry Pi
 
