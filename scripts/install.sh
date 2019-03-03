@@ -1,89 +1,104 @@
 #!/bin/bash
+# Let's Robot installer script
+# See LICENSE for copyright and license details
+# When editing this file, it is advisable to enable word wrap, and set your line
+# endings from CRLF to LF.
+# Version 2.0
 
-# Clear screen
-printf "\ec"
-echo -en "\ec"
+calc_wt_size() {
+    WT_HEIGHT=17
+    WT_WIDTH=$(tput cols)
 
-echo
+    if [ -z "$WT_WIDTH" ] || [ "$WT_WIDTH" -lt 60 ]; then
+        WT_WIDTH=78
+    fi
 
-echo -e "\e[31m**************************************************"
-echo -e "\e[31m* \e[39mYou are now about to install everything needed \e[31m*"
-echo -e "\e[31m* \e[39mto get your robot connected to letsrobot.tv    \e[31m*"
-echo -e "\e[31m* \e[39mBefore we can start, you need to get a robot,  \e[31m*"
-echo -e "\e[31m* \e[39mand camera ID. You can get that by pressing    \e[31m*"
-echo -e "\e[31m* \e[39mthe \"connect your robot\" button.             \e[31m*"
-echo -e "\e[31m**************************************************"
+    if [ "$WT_WIDTH" -gt 178 ]; then
+        WT_WIDTH=118
+    fi
 
-echo
+    WT_MENU_HEIGHT=$(($WT_HEIGHT-7))
+}
 
-#echo -e "\e[33mPlease enter your Robot ID:\e[39m "
-#read input_robot
+do_robot_owner() {
+    ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "YourLetsRobotUserName" 20 60 1 3>&1 1>&2 2>&3)
+    if [ $? -eq 0 ]; then
+        sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
+    fi
+}
 
-#re='^[0-9]+$'
-#if ! [[ $input_robot =~ $re ]] ; then
-#   echo "Error: Robot ID is not a number" >&2; exit 1
-#fi
+do_robot_id() {
+    ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "YourRobotID" 20 60 1 3>&1 1>&2 2>&3)
+    if [ $? -eq 0 ]; then
+        sed -i "/^\[robot]/,/^\[/{s/^robot_id[[:space:]]*=.*/robot_id=$ROBOT_ID/}" $CONF_FILE
+    fi
+}
 
-echo
+do_camera_id() {
+    CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "YourCameraID" 20 60 1 3>&1 1>&2 2>&3)
+    if [ $? -eq 0 ]; then
+        sed -i "/^\[robot]/,/^\[/{s/^camera_id[[:space:]]*=.*/camera_id=$CAMERA_ID/}" $CONF_FILE
+    fi
+}
 
-#echo -e "\e[33mPlease enter your Camera ID:\e[39m "
-#read input_camera
-#
-#echo
-#echo
-#
-#if ! [[ $input_camera =~ $re ]] ; then
-#   echo "Error: Camera ID is not a number" >&2; exit 1
-#fi
+do_robot_type() {
+    ROBOT_TYPE=$(whiptail --radiolist "Choose a robot type" $WT_HEIGHT $WT_WIDTH $WT_MENU_HEIGHT \
+        "serial_board" "Serial" OFF \
+        "motor_hat" "Adafruit Motor Hat" OFF \
+        "gopigo2" "GoPiGo2" OFF \
+        "gopigo3" "GoPiGo3" OFF \
+        "l298n" "L298N" OFF \
+        "motozero" "Motozero" OFF \
+        "pololu" "Pololu" OFF \
+        "adafruit_pwm" "Adafruit PWM" OFF \
+        "owi_arm" "OWI Arm" OFF \
+        "none" "None" ON \
+        3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[robot]/,/^\[/{s/^type[[:space:]]*=.*/type=$ROBOT_TYPE/}" $CONF_FILE
+    fi
+}
 
-#echo -e "\e[33mThank you, sit back and relax, we'll see you on letsrobot.tv\e[39m"
+do_stream_key() {
+    STREAM_KEY=$(whiptail --passwordbox "Please enter your stream key" 20 60 "hello" 20 60 1 3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+        return 0
+    elif [ $RET -eq 0 ]; then
+        sed -i "/^\[robot]/,/^\[/{s/^stream_key[[:space:]]*=.*/stream_key=$STREAM_KEY/}" $CONF_FILE
+    fi
+}
 
-# If start_robot exists, append letsrobot stuff to it otherwise overwrite the whole thing.
-if [ -e /home/$USER/start_robot ] 
-then
-    cat >> /home/$USER/start_robot <<EOF
+REPO_DIR="/home/$USER/letsrobot"
+CONF_FILE="$REPO_DIR/letsrobot.conf"
+whiptail --yesno "You are about to install everything needed to get your robot connected to letsrobot.tv. Before we can start, you need to get a robot ID and camera ID. You can get that by pressing the \"Connect your Robot\" button on the site.
+
+Ready to start?" 20 60 1
+if [ $? -eq 1 ]; then   # user pressed no
     
-    cd /home/pi/letsrobot
-    nohup scripts/repeat_start python letsrobot.py &> /dev/null &
-EOF
-else
-    cat > /home/$USER/start_robot <<EOF
-    #!/bin/bash
-    # suggested use for this:
-    # (1) Put in the id's for your robot, YOURROBOTID and YOURCAMERAID
-    # (2) use sudo to create a crontab entry: @reboot /bin/bash /home/pi/start_robot
-
-    cd /home/pi/letsrobot
-    nohup scripts/repeat_start python letsrobot.py &> /dev/null &
-EOF
+    exit 0
 fi
 
-echo -e "\e[33mInstalling required software...\e[39m"
+sudo apt-get update
+sudo apt-get upgrade --assume-yes
+sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git --assume-yes
 
-# Make sure the system is up to date
-sudo apt-get -y update
+git clone https://github.com/letsrobot/letsrobot.git $REPO_DIR
+python -m pip install -r $REPO_DIR/requirements.txt
+cp $REPO_DIR/letsrobot.sample.conf $CONF_FILE
 
-# This stuff takes forever, therefore not a default, but enable it if you want
-#sudo apt-get -y upgrade
-#sudo apt-get -y dist-upgrade
+do_robot_owner
+do_robot_id
+do_camera_id
+do_robot_type
+do_stream_key
 
-# Install required libraries and tools
-sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip libttspico-utils git
-
-# Download letsrobot scripts
-git clone https://github.com/letsrobot/letsrobot.git /home/$USER/letsrobot
-
-# Install python requirements
-sudo python -m pip install -r /home/$USER/letsrobot/requirements.txt
-
-# Copy letsrobot.sample.conf to letsrobot.conf
-cp /home/$USER/letsrobot/letsrobot.sample.conf /home/$USER/letsrobot/letsrobot.conf
-
-echo -e "\e[33mIt is now time to configure the controller. Please go to https://github.com/letsRobot/letsrobot#configure-the-controller for more information.\[e39m"
-sleep 3s
-
-nano /home/$USER/letsrobot/letsrobot.conf
+cp $REPO_DIR/scripts/start_robot /home/$USER/start_robot
+chmod +x /home/$USER/start_robot
 
 (crontab -l 2>/dev/null; echo "@reboot /home/$USER/start_robot") | crontab -
 
-echo -e "\e[33mInstall is now complete. Please reboot your robot. See you on letsrobot.tv!\e[39m"
+whiptail --msgbox "Installation is now complete. Please reboot your robot. See you on LetsRobot.tv!"  20 60 1
