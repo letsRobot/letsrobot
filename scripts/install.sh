@@ -3,22 +3,7 @@
 # See LICENSE for copyright and license details
 # When editing this file, it is advisable to enable word wrap, and set your line
 # endings from CRLF to LF.
-# Version 2.0
-
-calc_wt_size() {
-    WT_HEIGHT=17
-    WT_WIDTH=$(tput cols)
-
-    if [ -z "$WT_WIDTH" ] || [ "$WT_WIDTH" -lt 60 ]; then
-        WT_WIDTH=78
-    fi
-
-    if [ "$WT_WIDTH" -gt 178 ]; then
-        WT_WIDTH=118
-    fi
-
-    WT_MENU_HEIGHT=$(($WT_HEIGHT-7))
-}
+# Version 2.0.5
 
 do_robot_owner() {
     ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
