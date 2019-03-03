@@ -125,6 +125,18 @@ The brain of your robot is the Raspberry Pi, it connects everything to LetsRobot
    ![letsrobot robot settings](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-robot-settings.png)
    
 
+## Using the Optional Guided Install Script
+
+We made an installer to get you up and running as quickly as we can! All you need to do is follow the on-screen prompts.
+
+1. Copy and paste this command into a terminal.
+```
+wget -O - https://raw.githubusercontent.com/letsRobot/letsrobot/master/scripts/install.sh | bash -
+```
+2. If you are ready to install, press `enter` on your keyboard.
+![install-1](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-1.png)
+
+
 ## Installing LetsRobot control scripts on a Raspberry Pi
 
 The RasPi will need the following things install so it can talk to your motors and talk to the internet. Make sure you don’t get any errors in the console when doing the step below. If you have an issue, you can run this line again, and that will usually fix it!
