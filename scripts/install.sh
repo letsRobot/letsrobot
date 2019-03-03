@@ -64,7 +64,7 @@ do_robot_type() {
 }
 
 do_stream_key() {
-    STREAM_KEY=$(whiptail --passwordbox "Please enter your stream key" 20 60 "hello" 20 60 1 3>&1 1>&2 2>&3)
+    STREAM_KEY=$(whiptail --passwordbox "Please enter your stream key" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
