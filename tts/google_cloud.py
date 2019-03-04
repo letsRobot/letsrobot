@@ -18,6 +18,7 @@ keyFile = None
 languageCode = None
 voicePitch = 0.0
 voiceSpeakingRate = 1.0
+ssmlEnabled = None
 
 def setup(robot_config):
     global tempDir
@@ -29,6 +30,7 @@ def setup(robot_config):
     global languageCode
     global voicePitch
     global voiceSpeakingRate
+    global ssmlEnabled
 
     ssmlEnabled = robot_config.getboolean('google_cloud', 'ssml_enabled')
     voice = robot_config.get('google_cloud', 'voice')
@@ -57,7 +59,6 @@ def setup(robot_config):
 
     tempDir = tempfile.gettempdir()
 
-
 def say(*args):
     global client
     global voice
@@ -67,14 +68,18 @@ def say(*args):
 
     message = args[0]
     message = message.strip()
-    message = "<speak>" + message + "</speak>"
-    try:
-        log.debug("Trying SSML Synthesis")
-        synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
-        log.debug("SSML synthesis successful")
-    except:
-        log.error("SSML synthesis failed!")
-        pass
+    if ssmlEnabled:
+        message = "<speak>" + message + "</speak>"
+        try:
+            log.debug("Trying SSML Synthesis")
+            synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
+            log.debug("SSML synthesis successful")
+        except:
+            log.error("SSML synthesis failed!")
+            pass
+    else:
+        synthesis_input = texttospeech.types.SynthesisInput(text=message)
+
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
     tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
