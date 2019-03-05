@@ -4,9 +4,7 @@ import os
 import tempfile
 import uuid
 import logging
-
-from google.oauth2 import service_account
-from google.cloud import texttospeech
+import sys
 
 log = logging.getLogger('LR.tts.google_cloud')
 tempDir = None
@@ -19,6 +17,14 @@ languageCode = None
 voicePitch = 0.0
 voiceSpeakingRate = 1.0
 ssmlEnabled = None
+
+try:
+    from google.oauth2 import service_account
+    from google.cloud import texttospeech
+except:
+    log.critical("Google cloud libraries cloud not be loaded. Are they installed?")
+    log.critical("Run python -m pip install google-cloud-texttospeech")
+    sys.exit(1)
 
 def setup(robot_config):
     global tempDir
