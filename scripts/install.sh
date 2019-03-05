@@ -70,7 +70,7 @@ fi
 
 sudo apt-get update
 sudo apt-get upgrade --assume-yes
-sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git --assume-yes
+sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git screen --assume-yes
 
 git clone https://github.com/letsrobot/letsrobot.git $REPO_DIR
 python -m pip install -r $REPO_DIR/requirements.txt
