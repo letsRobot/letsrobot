@@ -15,7 +15,7 @@ type = 'none'
 tts_module = None
 mute = False
 mute_anon = None
-urlRegExp = "(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+urlRegExp = "(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"   #pylint: disable=W1401
 url_filter = None
 hw_num = None
 banned=[]
@@ -32,16 +32,28 @@ def setup(robot_config):
     url_filter = robot_config.getboolean('tts', 'filter_url_tts')
 
     # get playback device hardware num from name.
-    audio_device = robot_config.get('tts', 'audio_device')
+    try: 
+        audio_device = robot_config.get('tts', 'speaker_device')
+    except:
+        log.warn("letsrobot.conf is out of date. Consider updating.")
+        audio_device = robot_config.get('tts', 'audio_device')
 
     # convert the device to hw num if not on windows
     if platform.system() != "Windows":
         if audio_device != '':
             temp_hw_num = audio_util.getSpeakerByName(audio_device.encode('utf-8'))
             if temp_hw_num != None:
-                robot_config.set('tts', 'hw_num', str(temp_hw_num))
+                try:
+                    robot_config.set('tts', 'speaker_num', str(temp_hw_num))
+                except:
+                    log.warn("letsrobot.conf is out of date. Consider updating.")
+                    robot_config.set('tts', 'hw_num', str(temp_hw_num))
     
-    hw_num = robot_config.get('tts', 'hw_num')
+    try:
+        hw_num = robot_config.get('tts', 'speaker_num')
+    except:
+        log.warn("letsrobot.conf is out of date. Consider updating.")
+        hw_num = robot_config.get('tts', 'hw_num')
     
     if type != 'none':
         # set volume level
@@ -51,11 +63,15 @@ def setup(robot_config):
             #os.system("amixer set PCM -- -100")
 
         # tested for USB audio device
-        os.system("amixer -c %d cset numid=3 %d%%" % ( robot_config.getint('tts', 'hw_num'), robot_config.getint('tts', 'tts_volume')))
+        try:
+            os.system("amixer -c %d cset numid=3 %d%%" % (robot_config.getint('tts', 'speaker_num'), robot_config.getint('tts', 'tts_volume')))
+        except:
+            log.warn("letsrobot.conf is out of date. Consider updating.")
+            os.system("amixer -c %d cset numid=3 %d%%" % ( robot_config.getint('tts', 'hw_num'), robot_config.getint('tts', 'tts_volume')))
 
 
     #import the appropriate tts handler module.
-    log.debug("loading module tts/%s", type);    
+    log.debug("loading module tts/%s", type)
     if robot_config.getboolean('misc', 'custom_tts'):
         if os.path.exists('tts/tts_custom.py'):
             if (sys.version_info > (3, 0)):

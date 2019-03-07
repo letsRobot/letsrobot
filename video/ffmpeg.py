@@ -147,8 +147,13 @@ def setup(robot_config):
             extended_command.add_command('.saturation', saturationChatHandler)
         
     if not no_mic:
-        audio_hw_num = robot_config.get('camera', 'audio_hw_num')
-        audio_device = robot_config.get('camera', 'audio_device')
+        try:
+            audio_hw_num = robot_config.get('camera', 'mic_hw_num')
+            audio_device = robot_config.get('camera', 'mic_device')
+        except:
+            log.warn("letsrobot.conf is out of date. Consider updating.")
+            audio_hw_num = robot_config.get('camera', 'audio_hw_num')
+            audio_device = robot_config.get('camera', 'audio_device')
  
         audioHost = websocketRelayHost['host']
         audioPort = networking.audioPort
