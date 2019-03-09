@@ -44,8 +44,8 @@ def setup(robot_config):
         sys.exit()
    
         log.info("Serial Connected")
-        log.debug("port:", ser.name)
-        log.debug("baud:", serialBaud)
+        log.debug("port: {}".format(ser.name))
+        log.debug("baud: {}".format(serialBaud))
 
     return(ser)
     
