@@ -51,8 +51,12 @@ def setup(robot_config):
     owner = robot_config.get('robot', 'owner')
     owner_voice = robot_config.get('polly', 'owner_voice')
     robot_voice = robot_config.get('polly', 'robot_voice')
-    hw_num = robot_config.getint('tts', 'hw_num')
     random_voice = robot_config.getboolean('polly', 'random_voices')
+
+    try:
+        hw_num = robot_config.getint('tts', 'speaker_num')
+    except:
+        hw_num = robot_config.getint('tts', 'hw_num')
 
     access_key=robot_config.get('polly', 'access_key')
     secrets_key=robot_config.get('polly', 'secrets_key')
