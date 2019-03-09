@@ -14,14 +14,14 @@ def sendSerialCommand(ser, command):
 def setup(robot_config):
     global ser
 
-    serial_device = robot_config.get('serial', 'serial_device')
+    serialDevice = robot_config.get('serial', 'serial_device')
     serialBaud = robot_config.getint('serial', 'baud_rate')
 
     # initialize serial connection
     try:
         ser = serial.Serial(serialDevice, serialBaud, timeout=0, write_timeout=0)  # open serial
     except:
-        log.error("error: could not open serial port %s", serial_device)
+        log.error("error: could not open serial port {}".format(serialDevice))
         try:
             ser = serial.Serial('/dev/ttyACM0', serialBaud, timeout=0, write_timeout=0)  # open serial
         except:
