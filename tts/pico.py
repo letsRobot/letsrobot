@@ -15,7 +15,10 @@ def setup(robot_config):
     global hw_num
 
     pico_voice = robot_config.get('pico', 'voice')
-    hw_num = robot_config.getint('tts', 'hw_num')
+    try:
+        hw_num = robot_config.getint('tts', 'speaker_num')
+    except:
+        hw_num = robot_config.getint('tts', 'hw_num')
 
     #set the location to write the temp file to
     tempDir = tempfile.gettempdir()

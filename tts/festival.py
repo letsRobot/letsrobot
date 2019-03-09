@@ -12,7 +12,10 @@ def setup(robot_config):
     global tempDir
     global hw_num
     
-    hw_num = robot_config.getint('tts', 'hw_num')
+    try:
+        hw_num = robot_config.getint('tts', 'speaker_num')
+    except:
+        hw_num = robot_config.getint('tts', 'hw_num')
     
     #set the location to write the temp file to
     tempDir = tempfile.gettempdir()
