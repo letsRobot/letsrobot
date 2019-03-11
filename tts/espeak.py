@@ -15,20 +15,15 @@ def setup(robot_config):
     global male
     global voice_number
     global hw_num
-    global devNum
 
     male = robot_config.getboolean('espeak', 'male')
     voice_number = robot_config.getint('espeak', 'voice_number')
     
-    try:
+    if robot_config.has_option('tts', 'speaker_num'):
         hw_num = robot_config.getint('tts', 'speaker_num')
-    except:
+    else:
         hw_num = robot_config.getint('tts', 'hw_num')
 
-    if robot_config.has_option('tts', 'device_number'):
-        devNum = robot_config.getint('tts', 'device_number')
-    else:
-        devNum = 0
 
     #set the location to write the temp file to
     tempDir = tempfile.gettempdir()
@@ -42,7 +37,7 @@ def say(*args):
     f.close()
 
     if male:
-        os.system('cat ' + tempFilePath + ' | espeak -v en-us+m{} -s 170 --stdout | aplay -D plughw:{},{}'.format(voice_number, hw_num, devNum) )
+        os.system('cat ' + tempFilePath + ' | espeak -v en-us+m{} -s 170 --stdout | aplay -D plughw:{}'.format(voice_number, hw_num) )
     else:
-        os.system('cat ' + tempFilePath + ' | espeak -v en-us+f{} -s 170 --stdout | aplay -D plughw:{},{}'.format(voice_number, hw_num, devNum) )
+        os.system('cat ' + tempFilePath + ' | espeak -v en-us+f{} -s 170 --stdout | aplay -D plughw:{}'.format(voice_number, hw_num) )
     os.remove(tempFilePath)    

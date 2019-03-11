@@ -11,7 +11,6 @@ tempDir = None
 client = None
 voice = None
 hwNum = None
-devNum = None
 audio_config = None
 keyFile = None
 languageCode = None
@@ -38,7 +37,6 @@ def setup(robot_config):
     global voicePitch
     global voiceSpeakingRate
     global ssmlEnabled
-    global devNum
 
     ssmlEnabled = robot_config.getboolean('google_cloud', 'ssml_enabled')
     voice = robot_config.get('google_cloud', 'voice')
@@ -48,15 +46,10 @@ def setup(robot_config):
     voiceSpeakingRate = robot_config.getfloat(
         'google_cloud', 'voice_speaking_rate')
 
-    try:
-        hwNum = robot_config.getint('tts', 'speaker_num')
-    except:
-        hwNum = robot_config.getint('tts', 'hw_num')
-
-    if robot_config.has_option('tts', 'device_number'):
-        devNum = robot_config.getint('tts', 'device_number')
+    if robot_config.has_option('tts', 'speaker_num'):
+        hwNum = robot_config.get('tts', 'speaker_num')
     else:
-        devNum = 0
+        hwNum = robot_config.get('tts', 'hw_num')
 
     client = texttospeech.TextToSpeechClient(
         credentials=service_account.Credentials.from_service_account_file(
@@ -82,7 +75,6 @@ def say(*args):
     global hwNum
     global audio_config
     global ssmlEnabled
-    global devNum
 
     message = args[0]
     message = message.strip()
@@ -104,4 +96,4 @@ def say(*args):
 
     with open(tempFilePath, 'wb') as out:
         out.write(response.audio_content)
-        os.system('aplay ' + tempFilePath + ' -D plughw:{},{}'.format(hwNum, devNum))
+        os.system('aplay ' + tempFilePath + ' -D plughw:{}'.format(hwNum))

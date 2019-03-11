@@ -12,9 +12,9 @@ def setup(robot_config):
     global tempDir
     global hw_num
     
-    try:
+    if robot_config.has_option('tts', 'speaker_num'):
         hw_num = robot_config.getint('tts', 'speaker_num')
-    except:
+    else:
         hw_num = robot_config.getint('tts', 'hw_num')
     
     #set the location to write the temp file to
@@ -30,7 +30,7 @@ def say(*args):
     f.close()
 
     os.system('text2wave -o ' + tempFilePath +'.wav ' + tempFilePath)
-    os.system('aplay -D plughw:%d,0 ' % hw_num + tempFilePath + '.wav')
+    os.system('aplay -D plughw:{} '.format(hw_num) + tempFilePath + '.wav')
     os.remove(tempFilePath + '.wav')
     os.remove(tempFilePath)
     

@@ -32,9 +32,9 @@ def setup(robot_config):
     url_filter = robot_config.getboolean('tts', 'filter_url_tts')
 
     # get playback device hardware num from name.
-    try: 
+    if robot_config.has_option('tts', 'speaker_device'): 
         audio_device = robot_config.get('tts', 'speaker_device')
-    except:
+    else:
         log.warn("letsrobot.conf is out of date. Consider updating.")
         audio_device = robot_config.get('tts', 'audio_device')
 
@@ -43,15 +43,15 @@ def setup(robot_config):
         if audio_device != '':
             temp_hw_num = audio_util.getSpeakerByName(audio_device.encode('utf-8'))
             if temp_hw_num != None:
-                try:
+                if robot_config.has_option('tts', 'speaker_num'):
                     robot_config.set('tts', 'speaker_num', str(temp_hw_num))
-                except:
+                else:
                     log.warn("letsrobot.conf is out of date. Consider updating.")
                     robot_config.set('tts', 'hw_num', str(temp_hw_num))
     
-    try:
+    if robot_config.has_option('tts', 'speaker_num'):
         hw_num = robot_config.get('tts', 'speaker_num')
-    except:
+    else:
         log.warn("letsrobot.conf is out of date. Consider updating.")
         hw_num = robot_config.get('tts', 'hw_num')
     
@@ -64,10 +64,10 @@ def setup(robot_config):
 
         # tested for USB audio device
         try:
-            os.system("amixer -c %d cset numid=3 %d%%" % (robot_config.getint('tts', 'speaker_num'), robot_config.getint('tts', 'tts_volume')))
+            os.system("amixer -c %d cset numid=3 %d%%" % (robot_config.get('tts', 'speaker_num'), robot_config.getint('tts', 'tts_volume')))
         except:
             log.warn("letsrobot.conf is out of date. Consider updating.")
-            os.system("amixer -c %d cset numid=3 %d%%" % ( robot_config.getint('tts', 'hw_num'), robot_config.getint('tts', 'tts_volume')))
+            os.system("amixer -c %d cset numid=3 %d%%" % ( robot_config.get('tts', 'hw_num'), robot_config.getint('tts', 'tts_volume')))
 
 
     #import the appropriate tts handler module.

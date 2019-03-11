@@ -53,10 +53,10 @@ def setup(robot_config):
     robot_voice = robot_config.get('polly', 'robot_voice')
     random_voice = robot_config.getboolean('polly', 'random_voices')
 
-    try:
-        hw_num = robot_config.getint('tts', 'speaker_num')
-    except:
-        hw_num = robot_config.getint('tts', 'hw_num')
+    if robot_config.has_option('tts', 'speaker_num'):
+        hw_num = robot_config.get('tts', 'speaker_num')
+    else:
+        hw_num = robot_config.get('tts', 'hw_num')
 
     access_key=robot_config.get('polly', 'access_key')
     secrets_key=robot_config.get('polly', 'secrets_key')
@@ -130,7 +130,7 @@ def say(*args):
 #     out.close()
 #     player = Popen(['/usr/bin/mpg123-alsa', '-a', 'hw:1,1', '-q', '/tmp/polly.mp3'], stdin=PIPE, bufsize=1)
 #     os.remove('/tmp/polly.mp3')
-        play = Popen(['/usr/bin/mpg123-alsa', '-a', 'hw:%d,0' % hw_num, '-q', '-'], stdin=PIPE, bufsize=1)
+        play = Popen(['/usr/bin/mpg123-alsa', '-a', 'hw:{}'.format(hw_num), '-q', '-'], stdin=PIPE, bufsize=1)
         play.communicate(response['AudioStream'].read())
             
 
