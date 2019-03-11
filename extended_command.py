@@ -73,6 +73,7 @@ def setup(robot_config):
     global robot_id
     global api_key
     global buttons_json
+    global mods
     
     owner = robot_config.get('robot', 'owner')
     robot_id = robot_config.get('robot', 'robot_id')
