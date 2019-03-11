@@ -20,9 +20,9 @@ def setup(robot_config):
     voice_number = robot_config.getint('espeak', 'voice_number')
     
     if robot_config.has_option('tts', 'speaker_num'):
-        hw_num = robot_config.getint('tts', 'speaker_num')
+        hw_num = robot_config.get('tts', 'speaker_num')
     else:
-        hw_num = robot_config.getint('tts', 'hw_num')
+        hw_num = robot_config.get('tts', 'hw_num')
 
 
     #set the location to write the temp file to
