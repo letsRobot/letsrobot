@@ -92,7 +92,6 @@ def setup(robot_config):
 
 # check if the user is the owner or moderator, 0 for not, 1 for moderator, 2 for owner
 def is_authed(user):
-    global mods
     if user == owner:
         return(2)
     elif user in mods:
