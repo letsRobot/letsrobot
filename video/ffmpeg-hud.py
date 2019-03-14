@@ -3,7 +3,7 @@
 # higher than the rate ffmpeg is expecting them to prevent lag.
 #
 # Note : Currently there is no way to customize this, so copy it to a different
-# file and edit that file, if yo wish to make modifications. So as not to break
+# file and edit that file, if you wish to make modifications. So as not to break
 # git pull.
 
 #from video.ffmpeg import *
