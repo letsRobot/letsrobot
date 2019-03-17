@@ -196,10 +196,15 @@ def refreshFromOnlineSettings():
     log.info("refreshing from online settings")
     onlineSettings = networking.getOnlineRobotSettings(robotID)
     log.debug("onlineSettings : %s", onlineSettings)
-    
-    x_res = onlineSettings['xres']
-    y_res = onlineSettings['yres']
-    log.info("Setting resolution to %ix%i",x_res, y_res)
+   
+    if 'xres' in onlineSettings.keys(): 
+        x_res = onlineSettings['xres']
+        y_res = onlineSettings['yres']
+        log.info("Setting resolution to %ix%i",x_res, y_res)
+    else:
+        x_res = 640
+        y_res = 480
+        log.info("Site missing resolution, defaulting to 640x480")
 
     if onlineSettings['mic_enabled']:
         log.info("Mic Enabled")
