@@ -109,8 +109,8 @@ def setup(robot_config):
 
     stream_key = robot_config.get('robot', 'stream_key')
 
-    x_res = robot_config.get('camera', 'x_res')
-    y_res = robot_config.get('camera', 'y_res')
+    x_res = robot_config.getint('camera', 'x_res')
+    y_res = robot_config.getint('camera', 'y_res')
 
     server_override = robot_config.getboolean('misc', 'server_override')
 
