@@ -15,6 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 import extended_command
 import psutil
 import datetime
+import networking
 
 log = logging.getLogger('LR.video.ffmpeg-hud')
 
@@ -44,6 +45,18 @@ def startVideoCapture():
     global hud_correct
     x_res = ffmpeg.x_res
     y_res = ffmpeg.y_res
+
+    ffmpeg.video_start_count += 1
+    log.debug("Video start count : %s", ffmpeg.video_start_count)
+
+    if ffmpeg.video_start_count % 10 == 0:
+        log.info("getting websocket relay host")
+        websocketRelayHost = networking.getWebsocketRelayHost()
+        log.debug("websocketRelayHost : %s", websocketRelayHost)
+        ffmpeg.videoHost = websocketRelayHost['host']
+        log.info("getting video port")
+        ffmpeg.videoPort = networking.getVideoPort()
+        log.debug("Relay host for video: %s:%s" % (ffmpeg.videoHost, ffmpeg.videoPort))
 
     # set brightness
     if (ffmpeg.brightness is not None):
@@ -84,7 +97,12 @@ def startVideoCapture():
                             stream_key=ffmpeg.stream_key)
 
     log.debug("videoCommandLine : %s", videoCommandLine)
-    ffmpeg.video_process=ffmpeg.subprocess.Popen(ffmpeg.shlex.split(videoCommandLine), stdin=ffmpeg.subprocess.PIPE)
+    try:
+        ffmpeg.video_process=ffmpeg.subprocess.Popen(ffmpeg.shlex.split(videoCommandLine), stdin=ffmpeg.subprocess.PIPE)
+    except OSError: # Can't find / execute ffmpeg
+        log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
+        robot_util.terminate()
+    
     ffmpeg.atexit.register(ffmpeg.atExitVideoCapture)
     #ffmpeg.video_process.wait()
     HUD = drawBaseHUD()

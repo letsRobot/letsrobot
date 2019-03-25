@@ -12,6 +12,7 @@ import atexit
 import os
 import sys
 import logging
+import robot_util
 log = logging.getLogger('LR.video.ffmpeg')
 
 robotID=None
@@ -46,6 +47,7 @@ audio_input_options = None
 audio_output_options = None
 video_input_options = None
 video_output_options = None
+video_start_count = 0
 
 video_process = None
 audio_process = None
@@ -261,6 +263,25 @@ def onCommandToRobot(*args):
 
 def startVideoCapture():
     global video_process
+    global video_start_count
+    global videoPort
+    global videoHost
+
+    video_start_count += 1
+    log.debug("Video start count : %s", video_start_count)
+
+    if video_start_count % 10 == 0:
+        log.info("getting websocket relay host")
+        websocketRelayHost = networking.getWebsocketRelayHost()
+        log.debug("websocketRelayHost : %s", websocketRelayHost)
+        videoHost = websocketRelayHost['host']
+        log.info("getting video port")
+        videoPort = networking.getVideoPort()
+        log.debug("Relay host for video: %s:%s" % (videoHost, videoPort))
+        audioPort = networking.getAudioPort()
+        log.debug("Audio relay port : %s" % (audioPort))
+ 
+
     # set brightness
     if (brightness is not None):
         log.info("setting brightness : %s", brightness)
@@ -298,13 +319,19 @@ def startVideoCapture():
                             stream_key=stream_key)
 
     log.debug("videoCommandLine : %s", videoCommandLine)
-    video_process=subprocess.Popen(shlex.split(videoCommandLine))
-    atexit.register(atExitVideoCapture)
     try:
-        atexit.unregister(atExitVideoCapture) # Only python 3
-    except AttributeError:
-        pass
-    video_process.wait()
+        video_process=subprocess.Popen(shlex.split(videoCommandLine))
+    except OSError: # Can't find / execute ffmpeg
+        log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
+        robot_util.terminate()
+
+    if video_process != None:
+        try:
+            atexit.unregister(atExitVideoCapture) # Only python 3
+        except AttributeError:
+            pass
+        atexit.register(atExitVideoCapture)
+        video_process.wait()
 
 def atExitVideoCapture():
     try:
@@ -347,14 +374,19 @@ def startAudioCapture():
                             stream_key=stream_key)
                             
     log.debug("audioCommandLine : %s", audioCommandLine)
-    audio_process=subprocess.Popen(shlex.split(audioCommandLine))
-    atexit.register(atExitAudioCapture)
+    try:
+        audio_process=subprocess.Popen(shlex.split(audioCommandLine))
+    except OSError: # Can't find / execute ffmpeg
+        log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
+        robot_util.terminate()
+
     if audio_process != None:
        try:
            atexit.unregister(atExitVideoCapture) # Only python 3
        except AttributeError:
            pass
-    audio_process.wait()
+       atexit.register(atExitAudioCapture)
+       audio_process.wait()
     
 def atExitAudioCapture():
     try:
