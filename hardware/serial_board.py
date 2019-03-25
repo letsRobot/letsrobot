@@ -1,51 +1,99 @@
 import serial
+import serial.tools.list_ports as ports
 import sys
 import logging
+import robot_util
 log = logging.getLogger('LR.hardware.serial_board')
 
 ser = None
+serialDevice = None
+serialBaud = None
+restarts = 0
 
 def sendSerialCommand(ser, command):
+    global restarts
 
-    log.info("serial send: %s", str(command.lower()))
-    ser.write(command.lower().encode('utf8') + b"\r\n")     # write a string
-    ser.flush()
+    try:
+        log.info("serial send: %s", str(command.lower()))
+        ser.write(command.lower().encode('utf8') + b"\r\n")     # write a string
+        ser.flush()
+        restarts = 0
+    except:
+        log.debug("Attempting to restart serial")
+        try:
+            ser.close()
+        except:
+            pass
+        connectSerial(serialDevice, serialBaud)
+
+
+def searchSerial(name):
+    for port in ports.comports():
+        if name in port.description or \
+           name in port.hwid or \
+           name in port.manufacturer:
+            return port.device
+    return None
+
+def fallbackSerial():
+    for port in ports.comports():
+        if not port.device == "/dev/ttyAMA0":
+            yield port.device
+        else:
+            log.debug("Serial Fallback ignoring onboard bluetooth serial")
+    log.debug("No more possible serial ports")
 
 def setup(robot_config):
-    global ser
+    global serialDevice
+    global serialBaud
 
     serialDevice = robot_config.get('serial', 'serial_device')
     serialBaud = robot_config.getint('serial', 'baud_rate')
 
+    if robot_config.has_option('serial', 'serial_name'):
+        deviceName = robot_config.get('serial', 'serial_name')
+        device = searchSerial(deviceName)
+        if device != None:           
+            serialDevice = device
+            log.info("Serial port named {} found at {}".format(deviceName, device))
+        else:
+            log.info("Serial port named {} NOT FOUND".format(deviceName))       
+
+    connectSerial(serialDevice, serialBaud)
+    
+    if ser is None:
+        log.critical("error: could not connect to any valid serial port")
+        robot_util.terminate_controller()
+
+def connectSerial(serialDevice, serialBaud):
+    global ser
+    global restarts
+    restarts = restarts + 1
+
+    ser = None
+    
     # initialize serial connection
     try:
         ser = serial.Serial(serialDevice, serialBaud, timeout=0, write_timeout=0)  # open serial
     except:
-        log.error("error: could not open serial port {}".format(serialDevice))
-        try:
-            ser = serial.Serial('/dev/ttyACM0', serialBaud, timeout=0, write_timeout=0)  # open serial
-        except:
-            log.error("error: could not open serial port /dev/ttyACM0")
+        log.error("Could not open serial port {}".format(serialDevice))
+        ports = fallbackSerial()
+        for port in ports:     
             try:
-                ser = serial.Serial('/dev/ttyUSB0', serialBaud, timeout=0, write_timeout=0)  # open serial
+                ser = serial.Serial(port, serialBaud, timeout=0, write_timeout=0)  # open serial
+                break
             except:
-                log.error("error: could not open serial port /dev/ttyUSB0")
-                try:
-                    ser = serial.Serial('/dev/ttyUSB1', serialBaud, timeout=0, write_timeout=0)  # open serial
-                except:
-                    log.error("error: could not open serial port /dev/ttyUSB1")
-                    try:
-                        ser = serial.Serial('/dev/ttyUSB2', serialBaud, timeout=0, write_timeout=0)  # open serial
-                    except:
-                        log.error("error: could not open serial port /dev/ttyUSB2")
+                log.error("Could not open serial port {}".format(port))
 
     if ser is None:
-        log.critical("error: could not find any valid serial port")
-        sys.exit()
-   
+        log.critical("Error: could not find any valid serial port")
+        if restarts >= 20:
+            log.critical("Error: too many attemtps to reconnect serial")
+            robot_util.terminate_controller()
+    else:              
         log.info("Serial Connected")
         log.debug("port: {}".format(ser.name))
-        log.debug("baud: {}".format(serialBaud))
+        log.debug("baud: {}".format(ser.baudrate))
 
     return(ser)
     
