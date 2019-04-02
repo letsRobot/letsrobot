@@ -266,6 +266,7 @@ def move( args ):
     global right
     global straightDelay
     global turnDelay
+    global drivingSpeed
     
     now = datetime.datetime.now()
     now_time = now.time()
