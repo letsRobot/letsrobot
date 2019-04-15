@@ -129,6 +129,7 @@ def say(*args):
     message = args[0]
     response = None
     synthesis_input = None
+    synthesis_voice = None
 
     if (len(args) == 1):
         try:
