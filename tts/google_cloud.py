@@ -130,39 +130,44 @@ def say(*args):
     response = None
     synthesis_input = None
     synthesis_voice = None
+    log.debug(args)
+    
 
-    user = args[1]['name']
+        
+    try:
+        user = args[1]['name']
+        if randomVoices:
+            if (args[1]['anonymous']):
+                synthesis_voice = texttospeech.types.VoiceSelectionParams(
+                    name="en-US-Standard-A",
+                    language_code="en-US"
+                )
+            else:
+                if user not in users:
+                    users[user] = random.choice(voiceList)
+                    name = users[user]
+                    language_code = name[0:4]
+                synthesis_voice = texttospeech.types.VoiceSelectionParams(
+                    name=name,
+                    language_code=name[0:4]
+                )
+                log.info("{} voice {}: {}".format(user, users[user], message))
+        else:
 
-    if randomVoices:
-        if (args[1]['anonymous']):
             synthesis_voice = texttospeech.types.VoiceSelectionParams(
                 name="en-US-Standard-A",
                 language_code="en-US"
             )
-        else:
-            if user not in users:
-                users[user] = random.choice(voiceList)
-                name = users[user]
-                language_code = name[0:4]
-            synthesis_voice = texttospeech.types.VoiceSelectionParams(
-                name=name,
-                language_code=name[0:4]
-            )
-            log.info("{} voice {}: {}".format(user, users[user], message))
-    else:
 
-        synthesis_voice = texttospeech.types.VoiceSelectionParams(
-            name="en-US-Standard-A",
-            language_code="en-US"
-        )
+        synthesis_input = texttospeech.type.SynthesisInput(text=message)
 
-    synthesis_input = texttospeech.type.SynthesisInput(text=message)
+        response = client.synthesize_speech(
+            synthesis_input, synthesis_voice, audio_config)
 
-    response = client.synthesize_speech(
-        synthesis_input, synthesis_voice, audio_config)
+        tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
 
-    tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
-
-    with open(tempFilePath, 'wb') as out:
-        out.write(response.audio_content)
-        os.system('aplay ' + tempFilePath + ' -D plughw:{}'.format(hwNum))
+        with open(tempFilePath, 'wb') as out:
+            out.write(response.audio_content)
+            os.system('aplay ' + tempFilePath + ' -D plughw:{}'.format(hwNum))
+    except:
+        pass
