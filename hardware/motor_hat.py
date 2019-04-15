@@ -251,21 +251,6 @@ def setup(robot_config):
 def move( args ):
     command = args['command']
     
-    global mh
-    global motorA
-    global motorB
-    global turningSpeedActuallyUsed
-    global dayTimeDrivingSpeedActuallyUsed
-    global nightTimeDrivingSpeedActuallyUsed
-    global secondsToCharge
-    global secondsToDischarge
-    global chargeIONumber
-    global forward
-    global backward
-    global left
-    global right
-    global straightDelay
-    global turnDelay
     global drivingSpeed
     
     now = datetime.datetime.now()
