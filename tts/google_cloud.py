@@ -116,7 +116,7 @@ def say(*args):
         voiceEncoding = voiceName[0:4]
         voice = texttospeech.types.VoiceSelectionParams(
             name=voiceName,
-            languageCode=voiceEncoding
+            language_code=voiceEncoding
         )
 
     message = args[0]
