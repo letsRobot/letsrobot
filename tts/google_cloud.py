@@ -146,16 +146,18 @@ def say(*args):
                 )
             else:
                 if user not in users:
-                    user[user] = random.choice(voiceList)
+                    users[user] = random.choice(voiceList)
+                    name = users[user]
+                    language_code = name[0:4]
                 voice = texttospeech.types.VoiceSelectionParams(
-                    name=users[user],
-                    language_code=users[user][0:4]
+                    name=name,
+                    language_code=language_code
                 )
                 log.info("{} voice {}: {}".format(user, users[user], message))
         else:
             voice = texttospeech.types.VoiceSelectionParams(
-                name=voice,
-                language_code=voice[0:4]
+                name=name,
+                language_code=language_code
             )
 
         synthesis_input = texttospeech.type.SynthesisInput(text=message)
