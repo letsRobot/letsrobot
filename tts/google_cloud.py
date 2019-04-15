@@ -88,16 +88,7 @@ def setup(robot_config):
     global voicePitch
     global voiceSpeakingRate
 
-    audio_config = texttospeech.types.AudioConfig(
-        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
-        pitch=voicePitch,
-        speaking_rate=voiceSpeakingRate
-    )
-
-    client = texttospeech.TextToSpeechClient(
-        credentials=service_account.Credentials.from_service_account_file(
-            keyFile)
-    )
+    
 
     fallback_tts = mod_utils.import_module('tts', 'espeak')
     fallback_tts.setup(robot_config)
@@ -118,6 +109,17 @@ def setup(robot_config):
     voicePitch = robot_config.getfloat('google_cloud', 'voice_pitch')
     voiceSpeakingRate = robot_config.getfloat(
         'google_cloud', 'voice_speaking_rate')
+
+    audio_config = texttospeech.types.AudioConfig(
+        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
+        pitch=voicePitch,
+        speaking_rate=voiceSpeakingRate
+    )
+
+    client = texttospeech.TextToSpeechClient(
+        credentials=service_account.Credentials.from_service_account_file(
+            keyFile)
+    )
 
     if not randomVoices:
         voice = texttospeech.types.VoiceSelectionParams(
