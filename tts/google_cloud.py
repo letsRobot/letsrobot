@@ -123,7 +123,7 @@ def setup(robot_config):
 
     if not randomVoices:
         voice = texttospeech.types.VoiceSelectionParams(
-            name=voice,
+            name=robot_voice,
             language_code=languageCode
         )
     else:
