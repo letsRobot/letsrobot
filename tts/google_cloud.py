@@ -158,7 +158,7 @@ def say(*args):
                 language_code="en-US"
             )
 
-        synthesis_input = texttospeech.type.SynthesisInput(text=message)
+        synthesis_input = texttospeech.types.SynthesisInput(text=message)
 
         response = client.synthesize_speech(
             synthesis_input, synthesis_voice, audio_config)
