@@ -7,6 +7,9 @@ import logging
 import sys
 import random
 
+import networking
+import mod_utils
+
 log = logging.getLogger('LR.tts.google_cloud')
 tempDir = None
 client = None
@@ -19,17 +22,19 @@ voicePitch = 0.0
 voiceSpeakingRate = 1.0
 ssmlEnabled = None
 randomVoices = None
-useWavenet = None
+users = {}
+messenger = None
 
 try:
     from google.oauth2 import service_account
     from google.cloud import texttospeech
 except:
-    log.critical("Google cloud libraries cloud not be loaded. Are they installed?")
+    log.critical(
+        "Google cloud libraries cloud not be loaded. Are they installed?")
     log.critical("Run python -m pip install google-cloud-texttospeech")
     sys.exit(1)
 
-waveNetList = [
+voiceList = [
     'ar-XA-Wavenet-A', 'ar-XA-Wavenet-B', 'ar-XA-Wavenet-C', 'da-DK-Wavenet-A',
     'de-DE-Wavenet-A', 'de-DE-Wavenet-B', 'de-DE-Wavenet-C', 'de-DE-Wavenet-D',
     'en-AU-Wavenet-A', 'en-AU-Wavenet-B', 'en-AU-Wavenet-C', 'en-AU-Wavenet-D',
@@ -51,11 +56,21 @@ waveNetList = [
     'vi-VN-Wavenet-A', 'vi-VN-Wavenet-B', 'vi-VN-Wavenet-C', 'vi-VN-Wavenet-D',
 ]
 
-standardList = [
-    'en-US-Standard-B', 'en-US-Standard-C', 'en-US-Standard-D', 'en-US-Standard-E',
-    'en-GB-Standard-A', 'en-GB-Standard-B', 'en-GB-Standard-C', 'en-GB-Standard-D',
-    'en-AU-Standard-A', 'en-AU-Standard-B', 'en-AU-Standard-C', 'en-AU-Standard-D'
-]
+
+def new_voice(command, args):
+    global users
+
+    if not args['anonymous']:
+        user = args['name']
+        if len(command) > 1:
+            if command[1] in voiceList:
+                users[user] = command[1]
+            else:
+                users[user] = random.choice(voiceList)
+        if messenger:
+            networking.sendChatMessage(
+                ".{} your voice is now {}".format(user, users[user]))
+
 
 def setup(robot_config):
     global tempDir
@@ -69,7 +84,7 @@ def setup(robot_config):
     global voiceSpeakingRate
     global ssmlEnabled
     global randomVoices
-    global useWavenet
+    global messenger
 
     ssmlEnabled = robot_config.getboolean('google_cloud', 'ssml_enabled')
     voice = robot_config.get('google_cloud', 'voice')
@@ -78,16 +93,12 @@ def setup(robot_config):
     voicePitch = robot_config.getfloat('google_cloud', 'voice_pitch')
     voiceSpeakingRate = robot_config.getfloat(
         'google_cloud', 'voice_speaking_rate')
+    messenger = robot_config.getboolean('messenger', 'enable')
 
     if robot_config.has_option('google_cloud', 'random_voices'):
         randomVoices = robot_config.getboolean('google_cloud', 'random_voices')
     else:
         randomVoices = False
-
-    if robot_config.has_option('google_cloud', 'use_WaveNet'):
-        useWavenet = robot_config.getboolean('google_cloud', 'use_WaveNet')
-    else:
-        useWavenet = False
 
     if robot_config.has_option('tts', 'speaker_num'):
         hwNum = robot_config.get('tts', 'speaker_num')
@@ -99,11 +110,9 @@ def setup(robot_config):
             keyFile)
     )
 
-    if not randomVoices:
-        voice = texttospeech.types.VoiceSelectionParams(
-            name=voice,
-            language_code=languageCode
-        )
+    if randomVoices:
+        import extended_command
+        extended_command.add_command('.new_voice', new_voice)
 
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
@@ -113,43 +122,46 @@ def setup(robot_config):
 
     tempDir = tempfile.gettempdir()
 
+
 def say(*args):
-    global client
     global voice
-    global hwNum
-    global audio_config
-    global ssmlEnabled
-    global randomVoices
-    global waveNetList
-    global standardList
-
-    if randomVoices:
-        if useWavenet:
-            voiceList = waveNetList
-        else:
-            voiceList = standardList
-        voiceName = random.choice(voiceList)
-        voiceEncoding = voiceName[0:4]
-        voice = texttospeech.types.VoiceSelectionParams(
-            name=voiceName,
-            language_code=voiceEncoding
-        )
-
+    
     message = args[0]
-    message = message.strip()
-    if ssmlEnabled:
-        message = "<speak>" + message + "</speak>"
-        try:
-            log.debug("Trying SSML Synthesis")
-            synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
-            log.debug("SSML synthesis successful")
-        except:
-            log.error("SSML synthesis failed!")
-            pass
-    else:
-        synthesis_input = texttospeech.types.SynthesisInput(text=message)
+    response = None
 
-    response = client.synthesize_speech(synthesis_input, voice, audio_config)
+    if (len(args) == 1):
+        try:
+            synthesis_input = texttospeech.type.SynthesisInput(text=message)
+            response = client.synthesize_speech(
+                synthesis_input, voice, audio_config)
+        except:
+            log.error("Synthesis failed!")
+    else:
+        user = args[1]['name']
+
+        if randomVoices:
+            if (args[1]['anonymous']):
+                voice = texttospeech.types.VoiceSelectionParams(
+                    name="en-US-Standard-A",
+                    language_code="en-US"
+                )
+            else:
+                if user not in users:
+                    user[user] = random.choice(voiceList)
+                voice = texttospeech.types.VoiceSelectionParams(
+                    name=users[user],
+                    language_code=users[user][0:4]
+                )
+                log.info("{} voice {}: {}".format(user, users[user], message))
+        else:
+            voice = texttospeech.types.VoiceSelectionParams(
+                name=voice,
+                language_code=voice[0:4]
+            )
+
+        synthesis_input = texttospeech.type.SynthesisInput(text=message)
+        response = client.synthesize_speech(
+            synthesis_input, voice, audio_config)
 
     tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
 
