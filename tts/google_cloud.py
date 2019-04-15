@@ -125,15 +125,13 @@ def setup(robot_config):
 
 def say(*args):
     global voice
-    
+
     message = args[0]
     response = None
 
     if (len(args) == 1):
         try:
             synthesis_input = texttospeech.type.SynthesisInput(text=message)
-            response = client.synthesize_speech(
-                synthesis_input, voice, audio_config)
         except:
             log.error("Synthesis failed!")
     else:
@@ -160,8 +158,8 @@ def say(*args):
             )
 
         synthesis_input = texttospeech.type.SynthesisInput(text=message)
-        response = client.synthesize_speech(
-            synthesis_input, voice, audio_config)
+    
+    response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
     tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
 
