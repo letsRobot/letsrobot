@@ -155,8 +155,8 @@ def say(*args):
         else:
 
             synthesis_voice = texttospeech.types.VoiceSelectionParams(
-                name="en-US-Standard-A",
-                language_code="en-US"
+                name=voice,
+                language_code=languageCode
             )
 
         synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
