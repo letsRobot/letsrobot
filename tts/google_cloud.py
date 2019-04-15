@@ -152,7 +152,7 @@ def say(*args):
                     language_code = name[0:4]
                 synthesis_voice = texttospeech.types.VoiceSelectionParams(
                     name=name,
-                    language_code=language_code
+                    language_code=name[0:4]
                 )
                 log.info("{} voice {}: {}".format(user, users[user], message))
         else:
