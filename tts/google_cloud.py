@@ -30,9 +30,25 @@ except:
     sys.exit(1)
 
 waveNetList = [
-    'en-US-Wavenet-A', 'en-US-Wavenet-B', 'en-US-Wavenet-C', 'en-US-Wavenet-D', 'en-US-Wavenet-E', 'en-US-Wavenet-F',
+    'ar-XA-Wavenet-A', 'ar-XA-Wavenet-B', 'ar-XA-Wavenet-C', 'da-DK-Wavenet-A',
+    'de-DE-Wavenet-A', 'de-DE-Wavenet-B', 'de-DE-Wavenet-C', 'de-DE-Wavenet-D',
+    'en-AU-Wavenet-A', 'en-AU-Wavenet-B', 'en-AU-Wavenet-C', 'en-AU-Wavenet-D',
     'en-GB-Wavenet-A', 'en-GB-Wavenet-B', 'en-GB-Wavenet-C', 'en-GB-Wavenet-D',
-    'en-AU-Wavenet-A', 'en-AU-Wavenet-B', 'en-AU-Wavenet-C', 'en-AU-Wavenet-D'
+    'en-IN-Wavenet-A', 'en-IN-Wavenet-B', 'en-IN-Wavenet-C', 'en-US-Wavenet-A',
+    'en-US-Wavenet-B', 'en-US-Wavenet-C', 'en-US-Wavenet-D', 'en-US-Wavenet-E',
+    'en-US-Wavenet-F', 'fr-CA-Wavenet-A', 'fr-CA-Wavenet-B', 'fr-CA-Wavenet-C',
+    'fr-CA-Wavenet-D', 'fr-FR-Wavenet-A', 'fr-FR-Wavenet-B', 'fr-FR-Wavenet-C',
+    'fr-FR-Wavenet-D', 'hu-HU-Wavenet-A', 'it-IT-Wavenet-A', 'ja-JP-Wavenet-A',
+    'ko-KR-Wavenet-A', 'ko-KR-Wavenet-B', 'ko-KR-Wavenet-C', 'ko-KR-Wavenet-D',
+    'nb-NO-Wavenet-A', 'nb-NO-Wavenet-B', 'nb-NO-Wavenet-C', 'nb-NO-Wavenet-D',
+    'nb-NO-Wavenet-E', 'nl-NL-Wavenet-A', 'nl-NL-Wavenet-B', 'nl-NL-Wavenet-C',
+    'nl-NL-Wavenet-D', 'nl-NL-Wavenet-E', 'pl-PL-Wavenet-A', 'pl-PL-Wavenet-B',
+    'pl-PL-Wavenet-C', 'pl-PL-Wavenet-D', 'pl-PL-Wavenet-E', 'pt-BR-Wavenet-A',
+    'pt-PT-Wavenet-A', 'pt-PT-Wavenet-B', 'pt-PT-Wavenet-C', 'pt-PT-Wavenet-D',
+    'ru-RU-Wavenet-A', 'ru-RU-Wavenet-B', 'ru-RU-Wavenet-C', 'ru-RU-Wavenet-D',
+    'sk-SK-Wavenet-A', 'sv-SE-Wavenet-A', 'tr-TR-Wavenet-A', 'tr-TR-Wavenet-B',
+    'tr-TR-Wavenet-C', 'tr-TR-Wavenet-D', 'tr-TR-Wavenet-E', 'uk-UA-Wavenet-A',
+    'vi-VN-Wavenet-A', 'vi-VN-Wavenet-B', 'vi-VN-Wavenet-C', 'vi-VN-Wavenet-D',
 ]
 
 standardList = [
