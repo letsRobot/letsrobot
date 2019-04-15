@@ -146,7 +146,6 @@ def say(*args):
                 if user not in users:
                     users[user] = random.choice(voiceList)
                     name = users[user]
-                    language_code = name[0:4]
                 synthesis_voice = texttospeech.types.VoiceSelectionParams(
                     name=name,
                     language_code=name[0:4]
@@ -169,5 +168,6 @@ def say(*args):
         with open(tempFilePath, 'wb') as out:
             out.write(response.audio_content)
             os.system('aplay ' + tempFilePath + ' -D plughw:{}'.format(hwNum))
-    except:
+    except Exception as e:
+        log.exception(e)
         pass
