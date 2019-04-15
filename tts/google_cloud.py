@@ -140,7 +140,7 @@ def say(*args):
 
         if randomVoices:
             if (args[1]['anonymous']):
-                voice = texttospeech.types.VoiceSelectionParams(
+                synthesis_voice = texttospeech.types.VoiceSelectionParams(
                     name="en-US-Standard-A",
                     language_code="en-US"
                 )
@@ -149,20 +149,20 @@ def say(*args):
                     users[user] = random.choice(voiceList)
                     name = users[user]
                     language_code = name[0:4]
-                voice = texttospeech.types.VoiceSelectionParams(
+                synthesis_voice = texttospeech.types.VoiceSelectionParams(
                     name=name,
                     language_code=language_code
                 )
                 log.info("{} voice {}: {}".format(user, users[user], message))
         else:
-            voice = texttospeech.types.VoiceSelectionParams(
+            synthesis_voice = texttospeech.types.VoiceSelectionParams(
                 name=name,
                 language_code=language_code
             )
 
         synthesis_input = texttospeech.type.SynthesisInput(text=message)
     
-    response = client.synthesize_speech(synthesis_input, voice, audio_config)
+    response = client.synthesize_speech(synthesis_input, synthesis_voice, audio_config)
 
     tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
 
