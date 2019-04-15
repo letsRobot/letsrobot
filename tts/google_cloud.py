@@ -156,9 +156,10 @@ def say(*args):
                 )
                 log.info("{} voice {}: {}".format(user, users[user], message))
         else:
+
             synthesis_voice = texttospeech.types.VoiceSelectionParams(
-                name=name,
-                language_code=language_code
+                name="en-US-Standard-A",
+                language_code="en-US"
             )
 
         synthesis_input = texttospeech.type.SynthesisInput(text=message)
