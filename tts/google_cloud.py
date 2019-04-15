@@ -146,7 +146,7 @@ def say(*args):
             else:
                 if user not in users:
                     users[user] = random.choice(voiceList)
-                    name = users[user]
+                name = users[user]
                 synthesis_voice = texttospeech.types.VoiceSelectionParams(
                     name=name,
                     language_code=name[0:4]
