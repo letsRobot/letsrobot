@@ -1,14 +1,14 @@
 # pylint: disable=no-member
 
+import logging
 import os
+import random
+import sys
 import tempfile
 import uuid
-import logging
-import sys
-import random
 
-import networking
 import mod_utils
+import networking
 
 log = logging.getLogger('LR.tts.google_cloud')
 tempDir = None
@@ -131,44 +131,51 @@ def say(*args):
     response = None
     synthesis_input = None
     synthesis_voice = None
-    log.debug(args)
-    
 
-        
-    try:
-        user = args[1]['name']
-        if randomVoices:
-            if (args[1]['anonymous']):
-                synthesis_voice = texttospeech.types.VoiceSelectionParams(
-                    name="en-US-Standard-A",
-                    language_code="en-US"
-                )
+    if (len(args) == 1):    # simple say
+        synthesis_voice = texttospeech.types.VoiceSelectionParams(
+            name=voice,
+            language_code=languageCode
+        )
+    else:
+        try:
+            user = args[1]['name']
+            if randomVoices:
+                if (args[1]['anonymous']):
+                    synthesis_voice = texttospeech.types.VoiceSelectionParams(
+                        name="en-US-Standard-A",
+                        language_code="en-US"
+                    )
+                else:
+                    if user not in users:
+                        users[user] = random.choice(voiceList)
+                    name = users[user]
+                    synthesis_voice = texttospeech.types.VoiceSelectionParams(
+                        name=name,
+                        language_code=name[0:4]
+                    )
+                    log.info("{} voice {}: {}".format(
+                        user, users[user], message))
             else:
-                if user not in users:
-                    users[user] = random.choice(voiceList)
-                name = users[user]
-                synthesis_voice = texttospeech.types.VoiceSelectionParams(
-                    name=name,
-                    language_code=name[0:4]
-                )
-                log.info("{} voice {}: {}".format(user, users[user], message))
-        else:
 
-            synthesis_voice = texttospeech.types.VoiceSelectionParams(
-                name=voice,
-                language_code=languageCode
-            )
+                synthesis_voice = texttospeech.types.VoiceSelectionParams(
+                    name=voice,
+                    language_code=languageCode
+                )
+
+        except Exception as e:
+            log.exception(e)
+            pass
 
         synthesis_input = texttospeech.types.SynthesisInput(ssml=message)
 
         response = client.synthesize_speech(
             synthesis_input, synthesis_voice, audio_config)
 
-        tempFilePath = os.path.join(tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
+        tempFilePath = os.path.join(
+            tempDir, "wav_" + str(uuid.uuid4()) + ".wav")
 
         with open(tempFilePath, 'wb') as out:
             out.write(response.audio_content)
-            os.system('aplay ' + tempFilePath + ' -D plughw:{}'.format(hwNum))
-    except Exception as e:
-        log.exception(e)
-        pass
+            os.system('aplay ' + tempFilePath +
+                      ' -D plughw:{}'.format(hwNum))
