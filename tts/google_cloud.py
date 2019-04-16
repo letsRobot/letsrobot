@@ -126,7 +126,7 @@ def setup(robot_config):
 def say(*args):
     global voice
 
-    message = args[0]
+    message = args[0].encode('utf-8').strip()
     message = "<speak>" + message + "</speak>"
     response = None
     synthesis_input = None
