@@ -36,8 +36,13 @@ def setup(robot_config):
     type = robot_config.get('tts', 'type')
     mute_anon = not robot_config.getboolean('tts', 'anon_tts')
     url_filter = robot_config.getboolean('tts', 'filter_url_tts')
-    delay_tts = robot_config.getboolean('tts', 'delay_tts')
-    delay = robot_config.getint('tts', 'delay')
+    
+    if robot_config.has_option('tts', 'delay_tts') and robot_config.has_option('tts', 'delay'):
+        delay_tts = robot_config.getboolean('tts', 'delay_tts')
+        delay = robot_config.getint('tts', 'delay')
+    else:
+        delay_tts = False
+        delay = 0
 
     if delay_tts and not robot_config.getboolean('messenger', 'enable'):
         log.error("Warning! delayed TTS requires messenger.")
