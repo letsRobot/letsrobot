@@ -334,8 +334,6 @@ def setupMessengerSocket(robot_config):
         if robot_config.getboolean('tts', 'delay_tts'):
             log.debug('adding onHandleChatMessageRemoved handler')
             messengerSocket.on('message_removed', tts.onHandleChatMessageRemoved)
-        else:
-            log.critical('WHAT THE FUCK')
 
         return messengerSocket
     else:
