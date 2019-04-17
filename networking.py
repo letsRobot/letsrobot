@@ -324,12 +324,19 @@ def setupAppSocket(on_handle_exclusive_control):
     appServerSocketIO.on('disconnect', onHandleAppServerDisconnect)
     return appServerSocketIO
 
-def setupMessengerSocket():
+def setupMessengerSocket(robot_config):
     global messengerSocket
     
     if not no_chat_server:
         log.debug('Connecting socket.io to messenger chat host port : %s %s', messengerHost, messengerPort)
         startListenForMessengerServer()
+
+        if robot_config.getboolean('tts', 'delay_tts'):
+            log.debug('adding onHandleChatMessageRemoved handler')
+            messengerSocket.on('message_removed', tts.onHandleChatMessageRemoved)
+        else:
+            log.critical('WHAT THE FUCK')
+
         return messengerSocket
     else:
         log.info("messenger chat server connection disabled")

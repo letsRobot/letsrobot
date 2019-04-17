@@ -305,7 +305,7 @@ appServerSocketIO = networking.setupAppSocket(on_handle_exclusive_control)
 # If messenger is enabled, connect a chat socket for return messages
 if robot_config.getboolean('messenger', 'enable'):
     log.info("Loading messenger")
-    messengerSocket = networking.setupMessengerSocket()
+    messengerSocket = networking.setupMessengerSocket(robot_config)
 
 # If custom hardware extensions have been enabled, load them if they exist. Otherwise load the default
 # controller for the specified hardware type.

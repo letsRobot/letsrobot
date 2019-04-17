@@ -4,9 +4,9 @@ import re
 import audio_util
 import logging
 import platform
+import time
 
 log = logging.getLogger('LR.tts')
-
 
 if (sys.version_info > (3, 0)):
     import importlib
@@ -15,10 +15,14 @@ type = 'none'
 tts_module = None
 mute = False
 mute_anon = None
+delay_tts = False
+delay = 0
 urlRegExp = "(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"   #pylint: disable=W1401
 url_filter = None
 hw_num = None
 banned=[]
+tts_queue=[]
+tts_deleted=[]
 
 def setup(robot_config):
     global type
@@ -26,11 +30,20 @@ def setup(robot_config):
     global mute_anon
     global url_filter
     global hw_num
+    global delay_tts
+    global delay
     
     type = robot_config.get('tts', 'type')
     mute_anon = not robot_config.getboolean('tts', 'anon_tts')
     url_filter = robot_config.getboolean('tts', 'filter_url_tts')
+    delay_tts = robot_config.getboolean('tts', 'delay_tts')
+    delay = robot_config.getint('tts', 'delay')
 
+    if delay_tts and not robot_config.getboolean('messenger', 'enable'):
+        log.error("Warning! delayed TTS requires messenger.")
+        log.error("delayed TTS disabled.")
+        delay_tts = False
+  
     # get playback device hardware num from name.
     if robot_config.has_option('tts', 'speaker_device'): 
         audio_device = robot_config.get('tts', 'speaker_device')
@@ -90,6 +103,8 @@ def setup(robot_config):
     tts_module.setup(robot_config)
 
 def say(*args):
+    global tts_queue
+    global tts_deleted
     message = args[0]
     
     if mute:
@@ -99,6 +114,17 @@ def say(*args):
         if len(args) == 1:
             tts_module.say(message)
         else:
+            if delay_tts:
+                tts_queue.append(args[1]['_id'])
+                time.sleep(delay)
+                tts_queue.remove(args[1]['_id'])
+                if args[1]['_id'] in tts_deleted:
+                    tts_deleted.remove(args[1]['_id'])
+                    log.info('{} deleted before TTS played!'.format(args[1]['_id']))
+                    return()
+                else:
+                    log.info('{} now being played.'.format(args[1]['_id']))
+
             user = args[1]['name']
             if mute_anon and args[1]['anonymous'] == True:
                 exit()
@@ -107,7 +133,7 @@ def say(*args):
                     exit()
             if user not in banned: 
                 tts_module.say(message, args[1])
-    
+ 
 def mute_tts():
     global mute
     mute = True
@@ -155,4 +181,8 @@ def volume(vol):
         os.system("amixer set PCM -- 100%d%%" % new_vol)
         os.system("amixer -c %s cset numid=3 %d%%" % (hw_num, new_vol))
     
-
+def onHandleChatMessageRemoved(*args):
+   global tts_deleted
+   log.debug("MessageRemoved for {} received".format(args[0]['message_id']))
+   if args[0]['message_id'] in tts_queue and args[0] not in tts_deleted:
+      tts_deleted.append(args[0]['message_id'])
