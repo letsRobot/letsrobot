@@ -14,14 +14,14 @@ Setup the Cozmo SDK on your computer using their instructions:
 
 Clone Nocturnal's fork of the runmyrobot scripts:
 
-* git clone https://github.com/Nocturnal42/runmyrobot.git
+* git clone https://github.com/letsRobot/letsrobot.git
 
 Edit runmyrobot/letsrobot.sample.conf:
 
 * Enter your owner, robot_id, camera_id from LetsRobot.tv
 * change [robot] `type=none` to `type=cozmo`
 * change [tts] `type=none` to `type=cozmo_tts`
-* change [ffmpeg] `type=ffmpeg` to `type=none`
+* change [ffmpeg] `type=ffmpeg-arecord` to `type=none`
 * Save file as letsrobot.conf
 
 ## Extra Mac setup instructions:
@@ -31,7 +31,7 @@ brew install ffmpeg
 ## Starting Cozmo:
 
 * Using the Cozmo app enter SDK mode and connect your mobile device to the host machine.
-* Execute the LetsRobot controller using `python3 controller.py`
+* Execute the LetsRobot controller using `python3 letsrobot.py`
 * For audio streaming execute python send_video.py YOURCAMERAID 0 --no-camera &
 
 ## Update the Let's Robot robot configuration to have these custom controls:
@@ -200,6 +200,7 @@ In addition to the standard chat commands, Cozmo has several specific chat comma
 * `.color` or `.colour` Enable / Disable colour. Colour reduces the resolution of the video.
 
 ## Note for audio streaming on MacOS:
+NOTE : These instructions are out of date. The current method to stream audio involves changing the audio_input_format to avfoundation, video type to ffmpeg and no_camera to true.
 
 The `startAudioCaptureLinux` function in send_video.py calls ffmpeg with alsa input. If you want to stream audio from your mac use `-f avfoundation -i ":0"` in place of `-f alsa -ar 44100 -ac %d -i hw:%d`.
 

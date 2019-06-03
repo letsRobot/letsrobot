@@ -28,21 +28,21 @@ Setup the Cozmo SDK on your computer using their instructions for windows:
 
 Clone Nocturnal's fork of the runmyrobot scripts:
 
-* git clone https://github.com/Nocturnal42/runmyrobot.git
+* git clone https://github.com/letsRobot/letsrobot.git
 
 Edit runmyrobot/letsrobot.sample.conf:
 
 * Enter your owner, robot_id, camera_id from LetsRobot.tv
 * change [robot] `type=none` to `type=cozmo`
 * change [tts] `type=none` to `type=cozmo_tts`
-* change [ffmpeg] `type=ffmpeg` to `type=none`
+* change [ffmpeg] `type=ffmpeg-arecord` to `type=none`
 * Save file as letsrobot.conf
 * examine the [cozmo] section and change variables as appropriate
 
 ## Starting Cozmo:
 
 * Using the Cozmo app enter SDK mode and connect your mobile device to the host machine.
-* Execute the LetsRobot controller using `python controller.py`
+* Execute the LetsRobot letsRobot/letsrobot controller using `python letsrobot.py`
 
 ## Update the Let's Robot robot configuration to have these custom controls:
 Please see [Customizing Your UI](https://letsrobot.readme.io/docs/customizing-your-ui) for more help
@@ -211,6 +211,7 @@ In addition to the standard chat commands, Cozmo has several specific chat comma
 
 
 ## Note for audio streaming:
+NOTE: These instructions are out of date. The current method involves setting video type to ffmpeg, no_camera to true, audio_input_format to dshow, audio_input_device to the audio device name which can be obtained from the instructions below.
 
 To stream audio you will need to have a microphone or webcam with microphone attached to your computer. First you need to determine the device name for your microphone.
 
