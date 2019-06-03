@@ -36,8 +36,9 @@ Edit runmyrobot/letsrobot.sample.conf:
 * change [robot] `type=none` to `type=cozmo`
 * change [tts] `type=none` to `type=cozmo_tts`
 * change [ffmpeg] `type=ffmpeg-arecord` to `type=none`
-* Save file as letsrobot.conf
+* In [ffmpeg] comment out the existing ffmpeg_location and uncomment the windows version below it.
 * examine the [cozmo] section and change variables as appropriate
+* Save file as letsrobot.conf
 
 ## Starting Cozmo:
 
