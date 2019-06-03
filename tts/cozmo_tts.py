@@ -23,7 +23,6 @@ def set_colour(command, args):
         colour = not colour
         coz.camera.color_image_enabled = colour
 
-
 def set_annotated(command, args):
     global annotated
     if extended_command.is_authed(args['name']) == 2:
@@ -73,6 +72,7 @@ def setup(robot_config):
         send_online_status = robot_config.getboolean('cozmo', 'send_online_status')
         annotated = robot_config.getboolean('cozmo', 'annotated')
         colour = robot_config.getboolean('cozmo', 'colour')
+        coz.camera.color_image_enabled = colour
     else:
         send_online_status = True
     
