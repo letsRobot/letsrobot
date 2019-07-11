@@ -1,4 +1,8 @@
-# LetsRobot.tv
+# WARNING! WARNING! WARNING!
+# THIS DOCUMENTATION IS OUT OF DATE AND NO LONGER ACCURATE.
+# FOLLOW THESE INSTRUCTIONS AT YOUR PERIL
+
+# remo.tv
 
 # We're in Beta!
 This repo is officially ready for public use, but we're still working out some kinks. If you find something's wrong, we would love to hear it! Message us on discord, and if it's a problem with our code, we'll make a bug report and fix it!
@@ -16,15 +20,13 @@ We are also developing a GUI to help make the setup process easier.
 Shout out to Nocturnal, Roy, and Skeeter for making a more awesome developer friendly tool! 
 We still need to test on more robots before we can make the official switch, and we still need to do more documentation. We highly encourage you to give this a shot and let us know if you run into any issues.
 
-## Open Robot Control Code For Connecting to LetsRobot.tv 
+## Open Robot Control Code For Connecting to remo.tv 
 
-LetsRobot.tv is a robotic telepresence network. Anyone can connect a robot and allow users all over the world to interact with it. Our vision is to have a social platform that powers robots worldwide. These robots will be controlled by the crowd to offer experiences unlike that of any current media experience, turning passive viewers into active doers.
-
-You can find additional documentation including information about our API on our [readme.io](https://letsrobot.readme.io/) page as well.
+remo.tv is a robotic telepresence network. Anyone can connect a robot and allow users all over the world to interact with it. Our vision is to have a social platform that powers robots worldwide. These robots will be controlled by the crowd to offer experiences unlike that of any current media experience, turning passive viewers into active doers.
 
 ## Initializing and Setting up the Raspberry Pi
 
-The brain of your robot is the Raspberry Pi, it connects everything to LetsRobot.tv and runs all of the hardware. The first step is to set up your Pi.
+The brain of your robot is the Raspberry Pi, it connects everything to remo.tv and runs all of the hardware. The first step is to set up your Pi.
 
 1. ### Flash a MicroSD Card
 
@@ -65,14 +67,14 @@ The brain of your robot is the Raspberry Pi, it connects everything to LetsRobot
    2.  If this is your first time running raspi-config, it will ask you to  Setup Locale, Timezone, and Wifi Country as soon as you start raspi-config. Choose appropriate settings for your location.
     
    3. Change your password! This is very important as leaving the password as the default, will allow anyone on the same network to gain direct access to you robot.
-   ![raspi-config main screen](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/raspi-config.png)
+   ![raspi-config main screen](https://raw.githubusercontent.com/remotv/controller/master/documentation/raspi-config.png)
 
 
    4.   Network Options. Add your wifi SSID and Password, if that fails to connect try these  [instructions](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) after exiting raspi-config.
-![raspi-config networking options screen](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/raspi-config-network.png)
+![raspi-config networking options screen](https://raw.githubusercontent.com/remotv/controller/master/documentation/raspi-config-network.png)
 
    5.   Interfacing Options. Enable SSH, you will want to be able to connect to your robot using your computer remote. If for no other reason to copy and paste the command line instructions to avoid typos.  You may want to also enable I2C here if you plan on using the Adafruit Motor Hat or others that use I2C.
-![raspi-config interfacing options screen](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/raspi-config-interfacing.png)
+![raspi-config interfacing options screen](https://raw.githubusercontent.com/remotv/controller/master/documentation/raspi-config-interfacing.png)
    6.   Exit the Raspi-config. To exit use your right arrow key to move and select `<Back>`, hit enter. Then do the same thing to select the `<Finish>` button.
 5. ### Reboot your Raspberry Pi
 
@@ -81,7 +83,7 @@ The brain of your robot is the Raspberry Pi, it connects everything to LetsRobot
 
    When you reboot to the command line your IP address should be shown in the last few messages before the login prompt. Write it down.
 
-6. ### [](https://github.com/runmyrobot/runmyrobot/blob/master/README.md#connect-via-ssh-to-the-raspberry-pi)Connect via SSH to your Raspberry Pi
+6. ### [](https://github.com/remotv/controller/blob/master/README.md#connect-via-ssh-to-the-raspberry-pi)Connect via SSH to your Raspberry Pi
 
    Switch over to your computer on the connected to the same network as the Raspberry pi is connected.
 
@@ -101,28 +103,28 @@ The brain of your robot is the Raspberry Pi, it connects everything to LetsRobot
    Run the following command through the ssh terminal.
    ```sudo apt-get update```
 
-## Create A Robot on Your LetsRobot.tv Account
-1. Load LetsRobot.tv and select  _sign up / log in_  on the upper right of the page.
+## Create A Robot on Your remo.tv Account
+1. Load remo.tv and select  _sign up / log in_  on the upper right of the page.
 
 2. Login or create an account
 
-   ![letsrobot login](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-login.png)
+   ![remotv login](https://raw.githubusercontent.com/remotv/controller/master/documentation/letsrobot-login.png)
 
 3. Navigate to your profile and click + Add a new Robot!
 
-   ![letsrobot add new](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-add-new.png)
+   ![remotv add new](https://raw.githubusercontent.com/remotv/controller/master/documentation/letsrobot-add-new.png)
 
 4. Now edit your new robot.
 
-   ![letsrobot create new robot](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-create-robot.png)
+   ![remotv create new robot](https://raw.githubusercontent.com/remotv/controller/master/documentation/letsrobot-create-robot.png)
 
 5. Fill out the Name and Description, then select a resolution.
   
-   ![letsrobot robot profile](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-robot-profile.png)
+   ![remotv robot profile](https://raw.githubusercontent.com/remotv/controller/master/documentation/letsrobot-robot-profile.png)
    
 6. Enter a Stream Key and  **BE SURE TO SAVE**
  
-   ![letsrobot robot settings](https://raw.githubusercontent.com/letsRobot/letsrobot/master/documentation/letsrobot-robot-settings.png)
+   ![remotv robot settings](https://raw.githubusercontent.com/remotv/controller/master/documentation/letsrobot-robot-settings.png)
    
 
 ## Using the Optional Guided Install Script
@@ -131,30 +133,30 @@ We made an installer to get you up and running as quickly as we can! All you nee
 
 1. Copy and paste this command into a terminal.
 ```
-wget -O - https://raw.githubusercontent.com/letsRobot/letsrobot/master/scripts/install.sh | bash -
+wget -O - https://raw.githubusercontent.com/remotv/controller/master/scripts/install.sh | bash -
 ```
 2. If you are ready to install, press `enter` on your keyboard.
-![install-1](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-1.png)
+![install-1](https://raw.githubusercontent.com/remotv/controller/master/documentation/install-1.png)
 
-3. Enter the username you signed up for LetsRobot with.
-![Install-2](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-2.png)
+3. Enter the username you signed up for remo.tv with.
+![Install-2](https://raw.githubusercontent.com/remotv/controller/master/documentation/install-2.png)
 
 4. Enter your robot ID.
-![Install-3](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-3.png)
+![Install-3](https://raw.githubusercontent.com/remotv/controller/master/documentation/install-3.png)
 
 5. Enter your camera ID.
-![Install-4](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-4.png)
+![Install-4](https://raw.githubusercontent.com/remotv/controller/master/documentation/install-4.png)
 
 6. Select your robot type. You need to select your choice with `space` before pressing enter.
-![Install-5](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-5.png)
+![Install-5](https://raw.githubusercontent.com/remotv/controller/master/documentation/install-5.png)
 
 7. Enter your stream key. If you did not set one, your stream key is `hello`.
-![Install-6](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-6.png)
+![Install-6](https://raw.githubusercontent.com/remotv/controller/master/documentation/install-6.png)
 
-8. Installation is complete. It is safe to reboot your robot or you can run it manually by running `python letsrobot.py` in the `letsrobot` directory.
-![Install-7](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/install-7.png)
+8. Installation is complete. It is safe to reboot your robot or you can run it manually by running `python controller.py` in the `controller` directory.
+![Install-7](https://raw.githubusercontent.com/remotv/controller/master/documentation/install-7.png)
 
-## Installing LetsRobot control scripts on a Raspberry Pi
+## Installing remotv control scripts on a Raspberry Pi
 
 The RasPi will need the following things install so it can talk to your motors and talk to the internet. Make sure you don’t get any errors in the console when doing the step below. If you have an issue, you can run this line again, and that will usually fix it!
 
@@ -163,36 +165,36 @@ The RasPi will need the following things install so it can talk to your motors a
    sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip libttspico-utils git
    ```
 
-2. Download the LetsRobot control scripts from our github
+2. Download the remotv control scripts from our github
    ```
-   git clone https://github.com/letsRobot/letsrobot.git ~/letsrobot
+   git clone https://github.com/remotv/controller.git ~/remotv
    ```
 
 3. Install python requirements
 
    ```
-   sudo python -m pip install -r ~/letsrobot/requirements.txt
+   sudo python -m pip install -r ~/remotv/requirements.txt
    ```
    
-4. Open the new letsrobot directory
+4. Open the new remotv directory
    ```
-   cd letsrobot
+   cd remotv
    ```
 
-5. Copy letsrobot.sample.conf to letsrobot.conf
+5. Copy controller.sample.conf to controller.conf
 
    ```
-   cp letsrobot.sample.conf letsrobot.conf
+   cp controller.sample.conf controller.conf
    ```
 
 ## Configure the controller
 
-1. Edit the letsrobot.conf file created in the previous section.
+1. Edit the controller.conf file created in the previous section.
    ```
-   nano letsrobot.conf
+   nano controller.conf
    ```
 2. Configure the [robot] section
-   * owner should be the username you have registered the robot under on the LetsRobot site.
+   * owner should be the username you have registered the robot under on the remo.tv site.
    * robot_id should be the robot ID for your robot, obtained in step 2 of the Bring your Bot to life section.
    * camera_id should be the camera ID for your robot, obtained in same step as robot ID.
    * turn_delay is only used by the motor_hat and mdd10. This changes how long your bot turns for. I suggest you leave this at the default value until after you bot is moving.
@@ -241,7 +243,7 @@ The RasPi will need the following things install so it can talk to your motors a
 
 1. Copy the start_robot script to your home directory.
 
-   ```cp ~/letsrobot/scripts/start_robot ~```
+   ```cp ~/remotv/scripts/start_robot ~```
 
 2. Add the startup script to the crontab
    ```
@@ -375,7 +377,7 @@ Install [DRV8835 Motor Driver library](https://github.com/pololu/drv8835-motor-d
 Install [MC33926 Motor Driver library](https://github.com/pololu/dual-mc33926-motor-driver-rpi)
 
 # A note about the Raspi Cam Module
-Sometimes enabling the Raspberry Pi Camera module in `raspi-config` doesn't completely load the kernel drivers for it. If you don't see `/dev/video0` on your system, or `letsrobot.py` complains about not finding it, then do the following:
+Sometimes enabling the Raspberry Pi Camera module in `raspi-config` doesn't completely load the kernel drivers for it. If you don't see `/dev/video0` on your system, or `controller.py` complains about not finding it, then do the following:
 
 1. Enable the kernel module for your current session: 
 ```
@@ -391,7 +393,7 @@ Now you should see `video0` if you do `ls /dev/ | grep video`
 
 # High Level Overview
 
-![robot client topology](https://raw.githubusercontent.com/letsrobot/letsrobot/master/documentation/RobotClientTopology.png)
+![robot client topology](https://raw.githubusercontent.com/remotv/controller/master/documentation/RobotClientTopology.png)
 
 The robot client connects via websockets to the API service to retrieve configuration information, to the chat to receive chat messages, the video/audio relays to send its camera and microphone capture, and to the control service to receive user commands.
 
