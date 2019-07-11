@@ -1,3 +1,5 @@
+# This file is deprecated.
+
 # Transitioning from RunMyRobot to LetsRobot
 
 ## Passing Arugments

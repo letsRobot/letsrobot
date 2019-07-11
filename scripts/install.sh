@@ -5,8 +5,10 @@
 # endings from CRLF to LF.
 # Version 2.0.5
 
+# TODO: refactor for remo
+
 do_robot_owner() {
-    ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
+    ROBOT_OWNER=$(whiptail --inputbox "Please enter your remo.tv username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
     fi

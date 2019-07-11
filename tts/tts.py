@@ -50,7 +50,7 @@ def setup(robot_config):
     if robot_config.has_option('tts', 'speaker_device'): 
         audio_device = robot_config.get('tts', 'speaker_device')
     else:
-        log.warn("letsrobot.conf is out of date. Consider updating.")
+        log.warn("controller.conf is out of date. Consider updating.")
         audio_device = robot_config.get('tts', 'audio_device')
 
     # convert the device to hw num if not on windows
@@ -61,13 +61,13 @@ def setup(robot_config):
                 if robot_config.has_option('tts', 'speaker_num'):
                     robot_config.set('tts', 'speaker_num', str(temp_hw_num))
                 else:
-                    log.warn("letsrobot.conf is out of date. Consider updating.")
+                    log.warn("controller.conf is out of date. Consider updating.")
                     robot_config.set('tts', 'hw_num', str(temp_hw_num))
     
     if robot_config.has_option('tts', 'speaker_num'):
         hw_num = robot_config.get('tts', 'speaker_num')
     else:
-        log.warn("letsrobot.conf is out of date. Consider updating.")
+        log.warn("controller.conf is out of date. Consider updating.")
         hw_num = robot_config.get('tts', 'hw_num')
     
     #import the appropriate tts handler module.

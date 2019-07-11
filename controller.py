@@ -33,12 +33,12 @@ except ImportError:
     sys.exit()
 
 try: 
-    robot_config.readfp(open('letsrobot.conf'))
+    robot_config.readfp(open('controller.conf'))
 except IOError:
-    print("unable to read letsrobot.conf, please check that you have copied letsrobot.sample.conf to letsrobot.conf and modified it appropriately.")
+    print("unable to read controller.conf, please check that you have copied controller.sample.conf to controller.conf and modified it appropriately.")
     sys.exit()
 except:
-    print ("Error in letsrobot.conf:", sys.exc_info()[0])
+    print ("Error in controller.conf:", sys.exc_info()[0])
     sys.exit()
 
 handlingCommand = False    
@@ -65,7 +65,7 @@ file_handler.setFormatter(file_formatter)
 
 log.addHandler(console_handler)
 log.addHandler(file_handler)
-log.critical('LetsRobot Controller Starting up')
+log.critical('RemoTV Controller Starting up')
 
 # Log all unhandled exceptions.
 def exceptionLogger(exctype, value, tb):
@@ -298,10 +298,10 @@ if commandArgs.custom_chat:
 import atexit
 atexit.register(log.debug, "Attempting to clean up and exit nicely")
 
-log.critical('LetsRobot Controller Started')
+log.critical('RemoTV Controller Started')
 while not terminate.locked():
     time.sleep(1)
     watchdog.watch()
 
-log.critical('LetsRobot Controller Exiting')
+log.critical('RemoTV Controller Exiting')
 sys.exit()

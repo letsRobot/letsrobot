@@ -1,15 +1,15 @@
 # MQTT Publish controller
-[MQTT](http://mqtt.org/) is a Machine-to-Machine communication protocol supporting a lightweight publish/subscribe message transport. It is commonly used in IoT and home automation applications. This LetsRobt Hardware controller will allow commands recieved from the LetsRobot site to be published to a MQTT Broker. Various remote robots, devices, and software can subscribe to the MQTT Broker to recieve messages. This configuration will allow the command processing to be decoupled from the LetsRobot Client software both in software processing and, if you choose, the network/system location.
+[MQTT](http://mqtt.org/) is a Machine-to-Machine communication protocol supporting a lightweight publish/subscribe message transport. It is commonly used in IoT and home automation applications. This LetsRobt Hardware controller will allow commands recieved from the remo site to be published to a MQTT Broker. Various remote robots, devices, and software can subscribe to the MQTT Broker to recieve messages. This configuration will allow the command processing to be decoupled from the remo Client software both in software processing and, if you choose, the network/system location.
 
 ![MQTT Publish Topography](https://raw.githubusercontent.com/Papershaper/letsrobot/master/documentation/mqtt_pub_topography.png)
       
 ## Potential Uses
-Using the MQTT Pub hardward with LetsRobot, you can broadcast the command messages from the site to many different devices in your robot environment. It would also be possible to publish messages to devices that already have a MQTT interface.
+Using the MQTT Pub hardward with remo, you can broadcast the command messages from the site to many different devices in your robot environment. It would also be possible to publish messages to devices that already have a MQTT interface.
 
 A common example would be to seperate the video/audio streaming services from the command processing software. That is you could support a camera with video that is on a seperate computer/RPI than the robot or robots.
 
 ## mqtt_pub description
-The mqtt_pub.py script is a implementation of the LetsRobot Client Hardware Controller. The script uses the Eclipse foundation Paho Python library.
+The mqtt_pub.py script is a implementation of the remo Client Hardware Controller. The script uses the Eclipse foundation Paho Python library.
 
 It contains methods for ```setup()``` and ```move()```. On ```setup()``` the script will load all configurations. It will create a mqtt client and attach handlers for connection, disconnection, and message publishing. 
 
@@ -18,14 +18,14 @@ When ```move()``` is called, the script will attempt a connection to the configu
 The mqtt_pub script does not contain the MQTT Broker, or Subscription methods.
 
 ## MQTT Requirements and MQTT components
-To use the mqtt_pub script, the mqtt library 'paho' must be installed on the machine with the Letsrobot client software. Instructions for the installation of paho mqtt can be found [here](https://pypi.org/project/paho-mqtt/)
+To use the mqtt_pub script, the mqtt library 'paho' must be installed on the machine with the remo client software. Instructions for the installation of paho mqtt can be found [here](https://pypi.org/project/paho-mqtt/)
 
 In addition, to use the mqtt capabilities, a MQTT Broker must be available to be connected and running. The Mosquitto project has a Broker as well as command line publish and subscribe clients. Information on Mosquitto can be found [here](https://mosquitto.org/).  Information on installing a Mosquitto Broker on a RaspberryPI can be found [here](https://www.switchdoc.com/2018/02/tutorial-installing-and-testing-mosquitto-mqtt-on-raspberry-pi/)
 
 Finally, the robot that will use the MQTT message stream will need to have software that can subscribe to the MQTT Broker then take action on the messages. This software is not difficult to write using the paho library in python. 
 
 ## mqtt_pub Configuration
-to use the mqtt_pub controller software it must be configured to operate in the letsrobot.conf file.
+to use the mqtt_pub controller software it must be configured to operate in the controller.conf file.
 
 At the top section of the file, set the hardward controller type to "mqtt_pub"
 ```python

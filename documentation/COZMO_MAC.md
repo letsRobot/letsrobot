@@ -1,5 +1,7 @@
-# CozmoLetsRobot
-Host Anki Cozmo on LetsRobot.tv
+# This file is deprecated.
+
+# CozmoRemoTV
+Host Anki Cozmo on remo.tv
 
 ## Pre-setup
 

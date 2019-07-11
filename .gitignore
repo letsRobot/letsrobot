@@ -29,7 +29,7 @@ gpio.conf
 *.log.5
 
 
-letsrobot.conf
+controller.conf
 hardware/hardware_custom.py
 tts/tts_custom.py
 chat_custom.py
