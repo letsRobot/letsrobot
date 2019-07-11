@@ -70,17 +70,6 @@ def setup(robot_config):
         log.warn("letsrobot.conf is out of date. Consider updating.")
         hw_num = robot_config.get('tts', 'hw_num')
     
-    if type != 'none':
-        # set volume level
-
-        # tested for 3.5mm audio jack
-        #if robot_config.getint('tts', 'tts_volume') > 50:
-            #os.system("amixer set PCM -- -100")
-
-        # tested for USB audio device
-        os.system("amixer -c %s cset numid=3 %d%%" % (hw_num, robot_config.getint('tts', 'tts_volume')))
-
-
     #import the appropriate tts handler module.
     log.debug("loading module tts/%s", type)
     if robot_config.getboolean('misc', 'custom_tts'):
@@ -104,19 +93,22 @@ def setup(robot_config):
     #call the tts handlers setup function
     tts_module.setup(robot_config)
 
-def say(*args):
+def say(args):
     global tts_queue
     global tts_deleted
-    message = args[0]
     
     if mute:
         exit()
     else:
         #check the number of arguments passed, and hand off as appropriate to the tts handler
-        if len(args) == 1:
-            tts_module.say(message)
+        if not isinstance(args, dict):
+            log.debug("message : %s", args)
+            tts_module.say(args)
         else:
+            message = args["message"]
+            log.debug("message : %s", message)
             if delay_tts:
+                log.info('TTS message delayed')
                 tts_queue.append(args[1]['_id'])
                 time.sleep(delay)
                 tts_queue.remove(args[1]['_id'])
@@ -126,15 +118,13 @@ def say(*args):
                     return()
                 else:
                     log.info('{} now being played.'.format(args[1]['_id']))
-
-            user = args[1]['name']
-            if mute_anon and args[1]['anonymous'] == True:
-                exit()
+            user = args['sender']
             if url_filter:
                 if re.search(urlRegExp, message):
+                    log.info('message blocked for URL')
                     exit()
             if user not in banned: 
-                tts_module.say(message, args[1])
+                tts_module.say(message, args)
  
 def mute_tts():
     global mute

@@ -98,5 +98,5 @@ def connectSerial(serialDevice, serialBaud):
     return(ser)
     
 def move(args):
-    command = args['command']
+    command = args['button']['command']
     sendSerialCommand(ser, command)

@@ -13,18 +13,14 @@ import os
 import sys
 import logging
 import robot_util
+import time
 log = logging.getLogger('LR.video.ffmpeg')
 
-robotID=None
+robotKey=None
+server=None
 no_mic=True
 no_camera=True
 mic_off=False
-audioPort=None
-audioHost=None
-videoPort=None
-videoHost=None
-messenger=None
-stream_key=None
 
 x_res = 640
 y_res = 480
@@ -56,20 +52,13 @@ brightness=None
 contrast=None
 saturation=None
 
-server_override=False
-
 def setup(robot_config):
-    global robotID
+    global robotKey
     global no_mic
     global no_camera
-    global messenger
-
-    global videoPort
-    global videoHost
-    global audioHost
-    global audioPort
 
     global stream_key
+    global server
 
     global x_res
     global y_res
@@ -98,26 +87,17 @@ def setup(robot_config):
     global contrast
     global saturation
 
-    global server_override
-   
-    robotID = robot_config.get('robot', 'robot_id')
+    robotKey = robot_config.get('robot', 'robot_key')
+    server = robot_config.get('misc', 'server')
  
     no_mic = robot_config.getboolean('camera', 'no_mic')
     no_camera = robot_config.getboolean('camera', 'no_camera')
-    messenger = robot_config.getboolean('messenger', 'enable')
 
     ffmpeg_location = robot_config.get('ffmpeg', 'ffmpeg_location')
     v4l2_ctl_location = robot_config.get('ffmpeg', 'v4l2-ctl_location')
 
-    stream_key = robot_config.get('robot', 'stream_key')
-
     x_res = robot_config.getint('camera', 'x_res')
     y_res = robot_config.getint('camera', 'y_res')
-
-    server_override = robot_config.getboolean('misc', 'server_override')
-
-    log.info("getting websocket relay host")
-    websocketRelayHost = networking.getWebsocketRelayHost()
 
     if not no_camera:
         if robot_config.has_option('camera', 'brightness'):
@@ -127,10 +107,6 @@ def setup(robot_config):
         if robot_config.has_option('camera', 'saturation'):
             saturation = robot_config.get('camera', 'saturation')
         
-        videoHost = websocketRelayHost['host']
-        videoPort = networking.videoPort
-        log.debug("Relay host for video: %s:%s" % (videoHost, videoPort))
-
         video_device = robot_config.get('camera', 'camera_device')
         video_codec = robot_config.get('ffmpeg', 'video_codec')
         video_bitrate = robot_config.get('ffmpeg', 'video_bitrate')        
@@ -159,10 +135,6 @@ def setup(robot_config):
         else:
             audio_device = robot_config.get('camera', 'audio_device')
 
-        audioHost = websocketRelayHost['host']
-        audioPort = networking.audioPort
-        log.debug("Relay host for audio: %s:%s" % (audioHost, audioPort))
-
         audio_codec = robot_config.get('ffmpeg', 'audio_codec')
         audio_bitrate = robot_config.get('ffmpeg', 'audio_bitrate')        
         audio_sample_rate = robot_config.get('ffmpeg', 'audio_sample_rate')
@@ -185,102 +157,24 @@ def setup(robot_config):
         if audio_input_format == 'alsa':
             audio_device = 'hw:' + str(audio_hw_num)
 
-    # load settings from site
-    if not server_override:
-        refreshFromOnlineSettings()
-        networking.appServerSocketIO.on('command_to_robot', onCommandToRobot)
-        networking.appServerSocketIO.on('robot_settings_changed', onRobotSettingsChanged)
-
-def refreshFromOnlineSettings():
-    global x_res
-    global y_res
-    global mic_off
-    log.info("refreshing from online settings")
-    onlineSettings = networking.getOnlineRobotSettings(robotID)
-    log.debug("onlineSettings : %s", onlineSettings)
-   
-    if 'xres' in onlineSettings.keys(): 
-        x_res = onlineSettings['xres']
-        y_res = onlineSettings['yres']
-        log.info("Setting resolution to %ix%i",x_res, y_res)
-    else:
-        x_res = 640
-        y_res = 480
-        log.info("Site missing resolution, defaulting to 640x480")
-
-    if onlineSettings['mic_enabled']:
-        log.info("Mic Enabled")
-        mic_off = False
-    else:
-        log.info("Mic Disabled")
-        mic_off = True
-
 def start():
     if not no_camera:
         watchdog.start("FFmpegCameraProcess", startVideoCapture)
-        schedule.task(90, networking.sendOnlineState, True)
-        atexit.register(networking.sendOnlineState, False)
         
     if not no_mic:
         if not mic_off:
 #        watchdog.start("FFmpegAudioProcess", startAudioCapture)
             watchdog.start("FFmpegAudioProcess", startAudioCapture)
 
-def onRobotSettingsChanged(*args):
-    log.info('set message recieved: %s', args)
-    refreshFromOnlineSettings()        
-
-    if not no_camera:
-        restartVideoCapture()
- 
-    if not no_mic:
-        restartAudioCapture()
-
-#TODO : Fix this, basically the server can turn video off, but not on again. 
-#       Looks like a bug introduced when it was changed to be able to turn on
-#       a camera that was specifically off.
-def onCommandToRobot(*args):
-    global robotID
-
-    if len(args) > 0 and 'robot_id' in args[0] and args[0]['robot_id'] == robotID:
-        commandMessage = args[0]
-        log.info('command for this robot received:', commandMessage)
-        command = commandMessage['command']
-
-        if command == 'VIDOFF':
-            log.info('disabling camera capture process')
-            log.debug("args : %s", args)
-            stopAudioCapture()
-            stopVideoCapture()
-
-        if command == 'VIDON':
-            if not no_camera:
-                log.info('enabling camera capture process')
-                log.debug("args : %s", args)
-                startVideoCapture()
-                if not no_mic:       
-                    startAudioCapture()
-
 def startVideoCapture():
     global video_process
     global video_start_count
-    global videoPort
-    global videoHost
 
     video_start_count += 1
     log.debug("Video start count : %s", video_start_count)
 
-    if video_start_count % 10 == 0:
-        log.info("getting websocket relay host")
-        websocketRelayHost = networking.getWebsocketRelayHost()
-        log.debug("websocketRelayHost : %s", websocketRelayHost)
-        videoHost = websocketRelayHost['host']
-        log.info("getting video port")
-        videoPort = networking.getVideoPort()
-        log.debug("Relay host for video: %s:%s" % (videoHost, videoPort))
-        audioPort = networking.getAudioPort()
-        log.debug("Audio relay port : %s" % (audioPort))
- 
+#    if video_start_count % 10 == 0:
+#    server refresh
 
     # set brightness
     if (brightness is not None):
@@ -297,14 +191,15 @@ def startVideoCapture():
         log.info("setting saturation : %s", saturation)
         os.system("v4l2-ctl -c saturation={saturation}".format(saturation=saturation))
 
+    if networking.internetStatus:
     
-    videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
+       videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
                         ' -r 25 {in_options} -i {video_device} {video_filter}'
                         ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
                         ' -muxdelay 0.001 {out_options}'
-                        ' http://{video_host}:{video_port}/{stream_key}/{xres}/{yres}/')
+                        ' http://{server}:1567/transmit?name={channel}-video')
                         
-    videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
+       videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
                             input_format=video_input_format,
                             in_options=video_input_options,
                             video_device=video_device, 
@@ -312,26 +207,28 @@ def startVideoCapture():
                             video_codec=video_codec,
                             video_bitrate=video_bitrate,
                             out_options=video_output_options,
-                            video_host=videoHost, 
-                            video_port=videoPort, 
+                            server=server,
+                            channel=networking.channel,
                             xres=x_res, 
-                            yres=y_res, 
-                            stream_key=stream_key)
+                            yres=y_res)
 
-    log.debug("videoCommandLine : %s", videoCommandLine)
-    try:
-        video_process=subprocess.Popen(shlex.split(videoCommandLine))
-    except OSError: # Can't find / execute ffmpeg
-        log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
-        robot_util.terminate()
+       log.debug("videoCommandLine : %s", videoCommandLine)
+       try:
+          video_process=subprocess.Popen(shlex.split(videoCommandLine))
+       except OSError: # Can't find / execute ffmpeg
+          log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
+          robot_util.terminate()
 
-    if video_process != None:
-        try:
-            atexit.unregister(atExitVideoCapture) # Only python 3
-        except AttributeError:
-            pass
-        atexit.register(atExitVideoCapture)
-        video_process.wait()
+       if video_process != None:
+          try:
+             atexit.unregister(atExitVideoCapture) # Only python 3
+          except AttributeError:
+             pass
+          atexit.register(atExitVideoCapture)
+          video_process.wait()
+    else:
+       log.debug("No Internet/Server : sleeping video start for 15 seconds")
+       time.sleep(15)
 
 def atExitVideoCapture():
     try:
@@ -358,7 +255,7 @@ def startAudioCapture():
     audioCommandLine += (' {in_options} -i {audio_device} -f mpegts'
                          ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
                          ' -muxdelay 0.001 {out_options}'
-                         ' http://{audio_host}:{audio_port}/{stream_key}/640/480/')
+                         ' http://{server}:1567/transmit?name={channel}-audio')
 
     audioCommandLine = audioCommandLine.format(ffmpeg=ffmpeg_location,
                             audio_input_format=audio_input_format,
@@ -369,9 +266,8 @@ def startAudioCapture():
                             audio_codec=audio_codec,
                             audio_bitrate=audio_bitrate,
                             out_options=audio_output_options,
-                            audio_host=audioHost,
-                            audio_port=audioPort,
-                            stream_key=stream_key)
+                            server=server,
+                            channel=networking.channel)
                             
     log.debug("audioCommandLine : %s", audioCommandLine)
     try:
@@ -498,3 +394,4 @@ def audioChatHandler(command, args):
                         except ValueError: # Catch someone passing not a number
                             pass
                     networking.sendChatMessage(".Audio bitrate is %s" % audio_bitrate)
+

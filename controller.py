@@ -14,6 +14,7 @@ import sys
 import watchdog
 import logging
 import logging.handlers
+import json
 
 if (sys.version_info > (3, 0)):
     import importlib
@@ -85,8 +86,7 @@ def str2bool(v):
 # appropriate to be overidden from the command line.
 # check the command line for and config file overrides.
 parser = argparse.ArgumentParser(description='start robot control program')
-parser.add_argument('--robot-id', help='Robot ID', default=robot_config.get('robot', 'robot_id'))
-parser.add_argument('--info-server', help="Server that robot will connect to for information about servers and things", default=robot_config.get('misc', 'info_server'))
+parser.add_argument('--robot-key', help='Robot API Key', default=robot_config.get('robot', 'robot_key'))
 parser.add_argument('--type', help="Serial or motor_hat or gopigo2 or gopigo3 or l298n or motozero or pololu", default=robot_config.get('robot', 'type'))
 parser.add_argument('--video', default=robot_config.get('camera', 'type'))
 parser.add_argument('--custom-hardware', type=str2bool, default=robot_config.getboolean('misc', 'custom_hardware'))
@@ -94,11 +94,6 @@ parser.add_argument('--custom-tts', type=str2bool, default=robot_config.getboole
 parser.add_argument('--custom-chat', type=str2bool, default=robot_config.getboolean('misc', 'custom_chat'))
 parser.add_argument('--custom-video', type=str2bool, default=robot_config.getboolean('misc', 'custom_video'))
 parser.add_argument('--ext-chat-command', type=str2bool, default=robot_config.getboolean('tts', 'ext_chat'))
-parser.add_argument('--secure-cert', type=str2bool, default=robot_config.getboolean('misc', 'secure_cert'))
-parser.add_argument('--right-wheel-forward-speed', type=int)
-parser.add_argument('--right-wheel-backward-speed', type=int)
-parser.add_argument('--left-wheel-forward-speed', type=int)
-parser.add_argument('--left-wheel-backward-speed', type=int)
 
 parser.add_argument('--no-mic', dest='no_mic', action='store_true')
 parser.set_defaults(no_mic=False)
@@ -109,14 +104,12 @@ commandArgs = parser.parse_args()
 log.debug('command line arguments : %s', commandArgs)
 
 # push command line variables back into the config
-robot_config.set('robot', 'robot_id', str(commandArgs.robot_id))
+robot_config.set('robot', 'robot_key', str(commandArgs.robot_key))
 robot_config.set('robot', 'type', commandArgs.type)
-robot_config.set('misc', 'info_server', commandArgs.info_server)
 robot_config.set('misc', 'custom_hardware', str(commandArgs.custom_hardware))
 robot_config.set('misc', 'custom_tts', str(commandArgs.custom_tts))
 robot_config.set('misc', 'custom_chat', str(commandArgs.custom_chat))
 robot_config.set('tts', 'ext_chat', str(commandArgs.ext_chat_command))
-robot_config.set('misc', 'secure_cert', str(commandArgs.secure_cert))
 
 if commandArgs.no_mic:
     robot_config.set('camera', 'no_mic', 'True')
@@ -125,13 +118,9 @@ if commandArgs.no_camera:
     robot_config.set('camera', 'no_camera', 'True')
 
 # set variables pulled from the config
-robotID = commandArgs.robot_id
-infoServer = commandArgs.info_server
+robotKey = commandArgs.robot_key
 ext_chat = commandArgs.ext_chat_command
-no_chat_server = robot_config.getboolean('misc', 'no_chat_server')
 enable_async = robot_config.getboolean('misc', 'enable_async')
-auto_wifi = robot_config.getboolean('misc', 'auto_wifi')
-secret_key = robot_config.get('misc', 'secret_key')
 
 if ext_chat:
     import extended_command
@@ -139,86 +128,52 @@ if ext_chat:
 
 # Functions
 
-# TODO impliment a exclusive control function in hardware / tts / chat custom.
-# this will probably mean a dummy function in all the handlers.
-def handle_exclusive_control(args):
-        if 'status' in args and 'robot_id' in args and args['robot_id'] == robotID:
+def handle_message(ws, message):
+    log.debug(message)
 
-            status = args['status']
+    try:
+        messageData = json.loads(message)
+    except:
+        log.error("Unable to parse message")
+        return
 
-        if status == 'start':
-                log.info("start exclusive control")
-        if status == 'end':
-                log.info("end exclusive control")
-                
-                
+    try:
+        if "e" not in messageData:
+            log.error("Malformed Message")
+        event = messageData["e"]
+        data = messageData["d"]
+
+        if event == "BUTTON_COMMAND":
+            on_handle_command(data)
+           # handle_command(data)
+
+        elif event == "MESSAGE_RECIEVED":
+            on_handle_chat_message(data)
+
+        elif event == "ROBOT_VALIDATED":
+            networking.handleConnectChatChannel(data["host"])
+
+        else:
+            log.error("Unknown event type")
+
+
+    except Exception as e:
+        print(e)
+
 def handle_chat_message(args):
     log.info("chat message received: %s", args)
 
     if ext_chat:
         extended_command.handler(args)
             
-    rawMessage = args['message']
-    withoutName = rawMessage.split(']')[1:]
-    message = "".join(withoutName)
+    message = args["message"]
 
     try:
-        if message[1] == ".":
-            exit()
-        else:
-            tts.say(message, args)
+        if not message[0] == ".":
+            tts.say(args)
     except IndexError:
         exit()
-    
-def configWifiLogin(secretKey):
-    WPA_FILE_TEMPLATE = robot_config.get('misc', 'wpa_template')
-    
-    url = 'https://%s/get_wifi_login/%s' % (infoServer, secretKey)
-    try:
-        log.debug("GET %s", url)
-        response = urllib2.urlopen(url).read()
-        responseJson = json.loads(response)
-        log.debug("get wifi login response: %s", response)
-
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", 'r') as originalWPAFile:
-            originalWPAText = originalWPAFile.read()
-
-        wpaText = WPA_FILE_TEMPLATE.format(name=responseJson['wifi_name'], password=responseJson['wifi_password'])
-
-
-        log.debug('original WPAText ( %s )', originalWPAText)
-        log.debug('new WPAText ( %s )', wpaText)
         
-        if originalWPAText != wpaText:
-
-            wpaFile = open("/etc/wpa_supplicant/wpa_supplicant.conf", 'w')        
-
-            print(wpaText)
-            print()
-            wpaFile.write(wpaText)
-            wpaFile.close()
-
-            log.info('Updated WIFI settings')
-            say("Updated wifi settings. I will automatically reset in 10 seconds.")
-            time.sleep(8)
-            log.info('Rebooting...')
-            say("Reseting")
-            time.sleep(2)
-            os.system("reboot")
-        
-    except:
-        log.error("exception while configuring setting wifi %s", url)
-        log.debug("wifi settings traceback", exc_info=1)
-
-# TODO changeVolumeNormal() and handleLoudCommand() dont belong here, should
-# be in a custom handler
-def changeVolumeNormal():
-    os.system("amixer -c 2 cset numid=3 %d%%" % robot_config.getint('tts', 'tts_volume'))
-
-def handleLoudCommand(seconds):
-    os.system("amixer -c 2 cset numid=3 %d%%" % 100)
-    schedule.single_task(seconds, changeVolumeNormal)
-    
 def handle_command(args):
         global handlingCommand
         handlingCommand = True
@@ -228,39 +183,18 @@ def handle_command(args):
         if move_handler == None:
            return
 
-        if 'command' in args and 'robot_id' in args and args['robot_id'] == robotID:
-        
-            log.debug('got command : %s', args)
+        log.debug('got command : %s', args)
+        move_handler(args)
 
-            move_handler(args)
-
-# TODO WALL and LOUD don't belong here, should be in custom handler.
-            command = args['command']
-            if command in ("SOUND2", "WALL", "LOUD"):
-                handlingCommand = False
-            
-            if command == 'LOUD':
-                handleLoudCommand(25)
-
-            if commandArgs.type == 'motor_hat':
-                if command == 'WALL':
-                    handleLoudCommand(25)
-                    os.system("aplay -D plughw:2,0 /home/pi/wall.wav")
-                if command == 'SOUND2':
-                    handleLoudCommand(25)
-                    os.system("aplay -D plughw:2,0 /home/pi/sound2.wav")
-                                                        
         handlingCommand = False
        
 
 def on_handle_command(*args):
+   log.debug("on_handle_command : {} {}".format(handlingCommand, enable_async))
    if handlingCommand and not enable_async:
        return
    else:
        thread.start_new_thread(handle_command, args)
-
-def on_handle_exclusive_control(*args):
-   thread.start_new_thread(handle_exclusive_control, args)
 
 def on_handle_chat_message(*args):
    if chat_module == None:
@@ -268,14 +202,6 @@ def on_handle_chat_message(*args):
    else:
        thread.start_new_thread(chat_module.handle_chat, args)
    
-# if auto_wifi is enabled, schdule a task for it.
-def auto_wifi_task():
-    if secret_key is not None:
-         configWifiLogin(secret_key)
-    t = Timer(10, auto_wifi_task)
-    t.daemon = True
-    t.start()
-
 def restart_controller(command, args):
     if extended_command.is_authed(args['name']) == 2: # Owner
         terminate.acquire()
@@ -288,8 +214,6 @@ if robot_config.getboolean('misc', 'watchdog'):
     os.system("sudo modprobe bcm2835_wdt")
     os.system("sudo /usr/sbin/service watchdog start")
 
-log.info("info server : %s", infoServer)
-
 # Load and start TTS
 log.info("Loading tts")
 import tts.tts as tts
@@ -297,15 +221,7 @@ tts.setup(robot_config)
 
 # Connect to the networking sockets
 log.info("Loading networking")
-networking.setupSocketIO(robot_config)
-controlSocketIO = networking.setupControlSocket(on_handle_command)
-chatSocket = networking.setupChatSocket(on_handle_chat_message)
-appServerSocketIO = networking.setupAppSocket(on_handle_exclusive_control)
-
-# If messenger is enabled, connect a chat socket for return messages
-if robot_config.getboolean('messenger', 'enable'):
-    log.info("Loading messenger")
-    messengerSocket = networking.setupMessengerSocket(robot_config)
+networking.setupWebSocket(robot_config, handle_message)
 
 # If custom hardware extensions have been enabled, load them if they exist. Otherwise load the default
 # controller for the specified hardware type.
@@ -379,11 +295,6 @@ if commandArgs.custom_chat:
     else:
        log.warning("Unable to find chat_custom.py")
     
-# add auto wifi task
-if auto_wifi:
-    log.info("Adding auto wifi task")
-    auto_wifi_task()
-
 import atexit
 atexit.register(log.debug, "Attempting to clean up and exit nicely")
 

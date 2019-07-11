@@ -36,12 +36,6 @@ log = logging.getLogger('LR.extended_command')
 # Done
 #/devmode on
 #/devmode off
-#/anon control on
-#/anon control off
-#/anon tts on
-#/anon tts off
-#/anon off
-#/anon on
 #/tts mute
 #/tts unmute
 #/brightness (int)
@@ -55,9 +49,8 @@ log = logging.getLogger('LR.extended_command')
 move_handler = None
 dev_mode = None
 dev_mode_mods = False
-anon_control = True
 owner = None
-robot_id = None
+robot_key = None
 api_key = None
 stationary = None
 exclusive = False
@@ -70,20 +63,24 @@ whiteListCommand=[]
 
 def setup(robot_config):
     global owner
-    global robot_id
+    global robot_key
     global api_key
     global buttons_json
     global mods
     
     owner = robot_config.get('robot', 'owner')
-    robot_id = robot_config.get('robot', 'robot_id')
+    robot_key = robot_config.get('robot', 'robot_key')
 
     if robot_config.has_option('robot', 'api_key'):
         api_key = robot_config.get('robot', 'api_key')
         if api_key == "":
             api_key = None
     
-    mods = networking.getOwnerDetails(owner)['moderators']
+    mods = ""
+#############################################
+#############################################
+#############################################
+
 #    mods = networking.getOwnerDetails(owner)['robocaster']['moderators']
     if robot_config.has_option('misc', 'global_mods'):
         if robot_config.getboolean('misc', 'global_mods'):
@@ -104,41 +101,6 @@ def add_command(command, function):
     global commands
     commands[command] = function
     
-def anon_handler(command, args):
-    global anon_control
-
-    if len(command) > 1:
-        if is_authed(args['name']): # Moderator
-            log.info("anon chat command called by %s", args['name'])
-            if command[1] == 'on':
-                log.info("Anon control / TTS enabled")
-                anon_control = True
-                tts.unmute_anon_tts()
-                robot_util.setAnonControl(True, robot_id, api_key)
-            elif command[1] == 'off':
-                log.info("Anon control / TTS disabled");
-                anon_control = False
-                tts.mute_anon_tts()
-                robot_util.setAnonControl(False, robot_id, api_key)
-            elif len(command) > 3:
-                if command[1] == 'control':
-                    if command[2] == 'on':
-                        log.info("Anon control enabled")
-                        anon_control = True
-                        robot_util.setAnonControl(True, robot_id, api_key)
-                    elif command[2] == 'off':
-                        log.info("Anon control disabled")
-                        anon_control = False
-                        robot_util.setAnonControl(False, robot_id, api_key)
-                elif command[1] == 'tts':
-                    if command[2] == 'on':
-                        log.info("Anon TTS enabled")
-                        tts.unmute_anon_tts()
-                    elif command[2] == 'off':
-                        log.info("Anon TTS disabled")
-                        tts.mute_anon_tts()
-    log.debug("anon_control : %s", str(anon_control))
-
 def whitelist_handler(command, args):
     global whiteList
     global whiteListCommand
@@ -244,17 +206,6 @@ def untimeout_handler(command, args):
                 log.info("%s removed %s from timeout list", args['name'], user)
                 tts.unmute_user_tts(user)            
     
-
-def public_mode_handler(command, args):
-    if len(command) > 1:
-        if api_key != None:
-            if is_authed(args['name']) == 2: # Owner
-                if command[1] == 'on':
-                    log.info("Owner enabled private mode")
-                    robot_util.setPrivateMode(True, robot_id, api_key)
-                elif command[1] == 'off':
-                    log.info("Owner disabled private mode")
-                    robot_util.setPrivateMode(False, robot_id, api_key)
     
 def devmode_handler(command, args):
     global dev_mode
@@ -266,13 +217,9 @@ def devmode_handler(command, args):
                 log.info("Owner enabled dev mode")
                 dev_mode = True
                 dev_mode_mods = False
-                if api_key != None:
-                    robot_util.setDevMode(True, robot_id, api_key)
             elif command[1] == 'off':
                 log.info("Owner disabled dev mode")
                 dev_mode = False
-                if api_key != None:
-                    robot_util.setDevMode(False, robot_id, api_key)
             elif command[1] == 'mods':
                 log.info("Owner enabled dev mode with mod control")
                 dev_mode = True
@@ -287,17 +234,22 @@ def mic_handler(command, args):
     if is_authed(args['name']) == 1: # Owner
         if len(command) > 1:
             if command[1] == 'mute':
-                if api_key != None:
-                    log.info("Owner disabled mic")
-                    robot_util.setMicEnabled(True, robot_id, api_key)
+
+################################
+################################
+################################
+
                 # Mic Mute
                 return
             elif command[1] == 'unmute':
                 if api_key != None:
-                    log.info("owner enabled mic")
-                    robot_util.setMicEnabled(False, robot_id, api_key)
                 # Mic Unmute
-                return
+                
+################################
+################################
+################################
+                
+                    return
 
 def tts_handler(command, args):
     log.debug("tts : %s", tts)
@@ -329,56 +281,25 @@ def stationary_handler(command, args):
             stationary = not stationary
         log.info("stationary is %s", stationary)
 
-def global_chat_handler(command, args):
-    if len(command) > 1:
-        if api_key != None:
-            if is_authed(args['name']) == 2: # Owner
-                if command[1] == 'on':
-                    robot_util.setGlobalChat(False, robot_id, api_key)
-                    return
-                elif command[1] == 'off':
-                    robot_util.setGlobalChat(True, robot_id, api_key)
-                    return
-
-def word_filter_handler(command, args):
-    if len(command) > 1:
-        if api_key != None:
-            if is_authed(args['name']) == 2: # Owner
-                if command[1] == 'on':
-                    robot_util.setWordFilter(True, robot_id, api_key)
-                    return
-                elif command[1] == 'off':
-                    robot_util.setWordFilter(False, robot_id, api_key)
-                    return
-
-def show_exclusive_handler(command, args):
-    if len(command) > 1:
-        if api_key != None:
-            if is_authed(args['name']) == 2: # Owner
-                if command[1] == 'on':
-                    robot_util.setShowExclusive(False, robot_id, api_key)
-                    return
-                elif command[1] == 'off':
-                    robot_util.setShowExclusive(True, robot_id, api_key)
-                    return
-
+def test_messages(command, args):
+   log.debug(command)
+   log.debug(args)
+   command = args["message"].split(' ')[1:]
+   networking.sendChatMessage(command)
+ 
 # This is a dictionary of commands and their handler functions
-commands={    '.anon'       :    anon_handler,
-              '.ban'        :    ban_handler,
+commands={    '.ban'        :    ban_handler,
               '.unban'      :    unban_handler,
               '.timeout'    :    timeout_handler,
               '.untimout'   :    untimeout_handler,
               '.devmode'    :    devmode_handler,
               '.mic'        :    mic_handler,
               '.tts'        :    tts_handler,
-              '.global_chat':    global_chat_handler,
-              '.public'    :    public_mode_handler,
-              '.show_exclusive':     show_exclusive_handler,
-              '.word_filter':    word_filter_handler,
               '.stationary' :    stationary_handler,
               '.table'      :    stationary_handler,
               '.whitelist'  :    whitelist_handler,
-              '.exclusive'  :    exclusive_handler
+              '.exclusive'  :    exclusive_handler,
+              '.test'       :    test_messages
 	        }
 
 def handler(args):
@@ -387,7 +308,7 @@ def handler(args):
 # [1:]
 
     try:	
-        command = command.split(']')[1:][0].split(' ')[1:]
+        command = command.split(' ')
         log.debug("command : %s", command)
     except IndexError: # catch empty messages
         return
@@ -399,21 +320,20 @@ def handler(args):
 # This function checks the user sending the command, and if authorized
 # call the move handler.
 def move_auth(args):
-    user = args['user']
-    anon = args['anonymous']
+    user = args['user']['username']
    
     # Check if stationary mode is enabled
     if stationary:
-        direction = args['command']
-        if direction == 'F' or direction == 'B':
+        direction = args['button']['hot_key']
+        if direction == 'f' or direction == 'b':
             log.debug("No forward for you.....")
             return 
 
     # Check if command is in the whitelist required commands
-    if args['command'] in whiteListCommand:
+    if args['button']['hot_key'] in whiteListCommand:
         if user not in whiteList:
-            log.debug("%s not authed for command %s" % (user, args['command']))
-            return    
+            log.debug("%s not authed for command %s" % (user, args['button']['hot_key']))
+            return
 
     # check if exclusive control is enabled
     if exclusive and (user != owner):
@@ -426,11 +346,9 @@ def move_auth(args):
             log.debug("%s not authed for exclusive control", user)
             return
     elif exclusive:
-        log.debug("%s %s is authed", user, args['command'])
+        log.debug("%s %s is authed", user, args['button']['hot_key'])
                
-    if anon_control == False and anon:
-        return
-    elif dev_mode_mods:
+    if dev_mode_mods:
         if is_authed(user):
             move_handler(args)
         else:
