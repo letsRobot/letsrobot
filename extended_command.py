@@ -330,7 +330,7 @@ def move_auth(args):
             return 
 
     # Check if command is in the whitelist required commands
-    if args['button']['commnd'] in whiteListCommand:
+    if args['button']['command'] in whiteListCommand:
         if user not in whiteList:
             log.debug("%s not authed for command %s" % (user, args['button']['command']))
             return
