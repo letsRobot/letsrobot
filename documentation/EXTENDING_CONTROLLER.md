@@ -1,3 +1,5 @@
+# Some information in this file is deprecated. Proceed with caution.
+
 # Extending Controller Functions
 
 The controller is designed to make modifying the functionality as easy as possible, while still allowing the core code to be updated without requiring users to modify the controller with their custom functionality every time.
@@ -30,7 +32,7 @@ def move(args):
 ```
 ### setup() function
 
-The ```setup()``` function is passed the ConfigParser object for the letsrobot.conf file. You can create a new section for your hardware in the letsrobot.conf file, and store configuration variables there. Variables in the configuration can be accessed with ```robot_config.get(section, option)```, ```robot_config.getint(section, option)``` and ```robot_config.getboolean(section, option)```.
+The ```setup()``` function is passed the ConfigParser object for the controller.conf file. You can create a new section for your hardware in the controller.conf file, and store configuration variables there. Variables in the configuration can be accessed with ```robot_config.get(section, option)```, ```robot_config.getint(section, option)``` and ```robot_config.getboolean(section, option)```.
 
 Any initial hardware setup should happen when the ```setup()``` function is called. This function is only called once.
 
@@ -49,7 +51,7 @@ It should be mostly self explainitory, The most important part is the ```'comman
 ```
 
 The controller will block, and ignore any other commands from the server until the ```move()``` function finishes. If you want to impliment your own blocking, or impliment proper asynchronous movement commands, you can disable the blocking by setting ```enable_async=True``` in the misc
-section of letsrobot.conf
+section of controller.conf
 
 ## Adding New TTS Support
 
@@ -73,7 +75,7 @@ def say(*args):
 
 ### setup() function
 
-The ```setup()``` function is passed the ConfigParser object for the letsrobot.conf file. You can create a new section for your tts in the letsrobot.conf file, and store configuration variables there. Variables in the configuration can be accessed with ```robot_config.get(section, option)```, ```robot_config.getint(section, option)``` and ```robot_config.getboolean(section, option)```.
+The ```setup()``` function is passed the ConfigParser object for the controller.conf file. You can create a new section for your tts in the controller.conf file, and store configuration variables there. Variables in the configuration can be accessed with ```robot_config.get(section, option)```, ```robot_config.getint(section, option)``` and ```robot_config.getboolean(section, option)```.
 
 Any initial tts setup should happen when the ```setup()``` function is called. This function is only called once.
 
@@ -94,7 +96,7 @@ The actual code required to take the text message, and play it as audio should r
 
 ## Extending Existing Hardware
 
-When the ```custom_hardware``` option in the ```misc``` section of letsrobot.conf is set to true, the controller will look for a file named ```hardware_custom.py``` in the hardware directory. If that file exists it will load  that instead of the file relating to the hardware type specified in letsrobot.conf.
+When the ```custom_hardware``` option in the ```misc``` section of controller.conf is set to true, the controller will look for a file named ```hardware_custom.py``` in the hardware directory. If that file exists it will load  that instead of the file relating to the hardware type specified in controller.conf.
 
 In this way, existing hardware functions can be modified and extended, or entirely replaced. Though if you are replacing the functions entirely, you may be better off creating a new hardware type instead.
 
@@ -139,7 +141,7 @@ only needs to contain the commands that aren't handled in the hardware module. A
 
 This is very similar to extending existing hardware as outlined above. Except that where extending hardware involes adding new functions, extending TTS is more about modifying the way messages are handled.
 
-When the ```custom_tts``` option in the ```misc``` section of letsrobot.conf is set to true, the controller will look for a file named ```tts_custom.py``` in the tts directory. If that file exists it will load that instead of the file relating to the tts type specified in letsrobot.conf.
+When the ```custom_tts``` option in the ```misc``` section of controller.conf is set to true, the controller will look for a file named ```tts_custom.py``` in the tts directory. If that file exists it will load that instead of the file relating to the tts type specified in controller.conf.
 
 In this way, existing tts functions can be modified and extended, or entirely replaced. Though if you are replacing the functions entirely, you may be better off creating a new hardware type instead.
 
@@ -188,7 +190,7 @@ This is similar to extending TTS, and many things could be done in either. The d
 
 Simple say messages are not seen by the chat handler.
 
-When the ```custom_chat``` option in the ```misc``` section of letsrobot.conf is set to true, the controller will look for a file named ```chat_custom.py``` in the same directory as the controller. If that file exists it will load that file, and call it instead of the chat handler.
+When the ```custom_chat``` option in the ```misc``` section of controller.conf is set to true, the controller will look for a file named ```chat_custom.py``` in the same directory as the controller. If that file exists it will load that file, and call it instead of the chat handler.
 
 The ```chat_custom.py``` file needs to contain two functions, similar to those required by the other custom handlers.
 
@@ -217,7 +219,7 @@ This example will block anonymous users from attempting to access any of the ext
 
 ### setup() function
 
-The ```setup()``` function takes two arguments. The robot_config object containing the details of the letsrobot.conf files, and a function object for the controllers chat handler function. In order to allow this function to be called later in the ```handle_chat()``` function, it should be stored in a global variable.
+The ```setup()``` function takes two arguments. The robot_config object containing the details of the controller.conf files, and a function object for the controllers chat handler function. In order to allow this function to be called later in the ```handle_chat()``` function, it should be stored in a global variable.
 
 ### handle_chat() Function
 
@@ -234,7 +236,7 @@ Once the function has examined or modified the object, it should pass it off to 
 This example shows how to use the ```extended_command``` module to add an additional ```.reboot``` command, to reboot the controller. This is not exclusive to chat_custom, it can be done anywhere. 
 
 It also shows how to replace all mentions of 'john madden' in chat with 'the antichrist' for tts. This could also be done in tts_custom.
-r
+
 ## tts_custom.example.py
 
 This example shows how to play a custom sound file for specific users, before their tts chat message is played.

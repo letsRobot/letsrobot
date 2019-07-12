@@ -298,10 +298,10 @@ if commandArgs.custom_chat:
 import atexit
 atexit.register(log.debug, "Attempting to clean up and exit nicely")
 
-log.critical('LetsRobot Controller Started')
+log.critical('RemoTV Controller Started')
 while not terminate.locked():
     time.sleep(1)
     watchdog.watch()
 
-log.critical('LetsRobot Controller Exiting')
+log.critical('RemoTV Controller Exiting')
 sys.exit()

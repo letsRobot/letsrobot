@@ -1,5 +1,5 @@
 # Google Cloud Text To Speech API
-The Google Cloud TTS API offers high fidelity, ultra realistic speech synthesis. It has recently been made available for use on Let's Robot by skeeter_mcbee. A demo is available on its website, https://cloud.google.com/text-to-speech.
+The Google Cloud TTS API offers high fidelity, ultra realistic speech synthesis. It has recently been made available for use on RemoTV by skeeter_mcbee. A demo is available on its website, https://cloud.google.com/text-to-speech.
 
 This is not a free service. Prices may vary, but as of the time of this writing, a free one year trial is available with $300 credit towards all Google Cloud Platform services.
 
@@ -45,9 +45,9 @@ python -m pip install --upgrade google-cloud-texttospeech
 ```
 
 ## Using it with the Robot
-1. In letsrobot.conf, set your tts `type` to `google_cloud`.
-2. Choose a voice from [this list](https://cloud.google.com/text-to-speech/docs/voices). 
-    1. In letsrobot.conf, set your `google_cloud key_file` to the full path of your key file.
-    2. In letsrobot.conf, set your `google_cloud language_code` to the language code of the voice you want to use.
-    3. In letsrobot.conf, set your `google_cloud voice` to the voice name of the voice you want to use.
+1. In controller.conf, set your tts `type` to `google_cloud`.
+2. Choose a voice from [this list](https://cloud.google.com/text-to-speech/docs/voices). Make the following changes in the `[google_cloud]` section of `controller.conf `
+    1. Set `key_file` to the full path of your key file. (i.e., `/home/pi/googlecloudkey.json`)
+    2. Set `language_code` to the language code of the voice you want to use. It needs to match the one in the voice you use. (i.e., `en-US`)
+    3. Set `voice` to the voice name of the voice you want to use. It needs to have a matching language code in the front. (i.e., `en-US-Wavenet-A`)
 

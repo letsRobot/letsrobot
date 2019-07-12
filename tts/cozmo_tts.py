@@ -1,3 +1,5 @@
+# TODO This file still has letsrobot.tv hardcoded into it.
+
 import time
 import cozmo
 import _thread as thread

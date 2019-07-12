@@ -1,28 +1,14 @@
 #!/bin/bash
-# Let's Robot installer script
+# Remo installer script
 # See LICENSE for copyright and license details
 # When editing this file, it is advisable to enable word wrap, and set your line
-# endings from CRLF to LF.
-# Version 2.0.5
+# endings from CRLF to LF. (THIS IS VERY IMPORTANT FOR BASH)
+# Version 3.0.0
 
 do_robot_owner() {
-    ROBOT_OWNER=$(whiptail --inputbox "Please enter your letsrobot.tv username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
+    ROBOT_OWNER=$(whiptail --inputbox "Please enter your remo.tv username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
-    fi
-}
-
-do_robot_id() {
-    ROBOT_ID=$(whiptail --inputbox "Please enter your robot ID." 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
-    if [ $? -eq 0 ]; then
-        sed -i "/^\[robot]/,/^\[/{s/^robot_id[[:space:]]*=.*/robot_id=$ROBOT_ID/}" $CONF_FILE
-    fi
-}
-
-do_camera_id() {
-    CAMERA_ID=$(whiptail --inputbox "Please enter your camera ID." 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
-    if [ $? -eq 0 ]; then
-        sed -i "/^\[robot]/,/^\[/{s/^camera_id[[:space:]]*=.*/camera_id=$CAMERA_ID/}" $CONF_FILE
     fi
 }
 
@@ -48,19 +34,19 @@ do_robot_type() {
     fi
 }
 
-do_stream_key() {
-    STREAM_KEY=$(whiptail --passwordbox "Please enter your stream key" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
+do_robot_key() {
+    ROBOT_KEY=$(whiptail --inputbox "Please enter your robots API key." 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
-    elif [ $RET -eq 0 ]; then
-        sed -i "/^\[robot]/,/^\[/{s/^stream_key[[:space:]]*=.*/stream_key=$STREAM_KEY/}" $CONF_FILE
+    elif [ $RED -eq 0 ]; then
+        sed -i "/^\[robot]/,/^\[/{s/^robot_key[[:space:]]*=.*/robot_key=$ROBOT_KEY/}" $CONF_FILE
     fi
 }
 
-REPO_DIR="/home/$USER/letsrobot"
-CONF_FILE="$REPO_DIR/letsrobot.conf"
-whiptail --yesno "You are about to install everything needed to get your robot connected to letsrobot.tv. Before we can start, you need to get a robot ID and camera ID. You can get that by pressing the \"Connect your Robot\" button on the site.
+REPO_DIR="/home/$USER/remotv"
+CONF_FILE="$REPO_DIR/controller.conf"
+whiptail --yesno "You are about to install everything needed to get your robot connected to remo.tv. This script assumes you have done the necessary steps to add a robot to the site.
 
 Ready to start?" 20 60 1
 if [ $? -eq 1 ]; then   # user pressed no
@@ -70,21 +56,19 @@ fi
 
 sudo apt-get update
 sudo apt-get upgrade --assume-yes
-sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git screen --assume-yes
+sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git --assume-yes
 
-git clone https://github.com/letsrobot/letsrobot.git $REPO_DIR
+git clone https://github.com/remotv/controller.git $REPO_DIR
 python -m pip install -r $REPO_DIR/requirements.txt
-cp $REPO_DIR/letsrobot.sample.conf $CONF_FILE
+cp $REPO_DIR/controller.sample.conf $CONF_FILE
 
 do_robot_owner
-do_robot_id
-do_camera_id
+do_robot_key
 do_robot_type
-do_stream_key
 
 cp $REPO_DIR/scripts/start_robot /home/$USER/start_robot
 chmod +x /home/$USER/start_robot
 
 (crontab -l 2>/dev/null; echo "@reboot /home/$USER/start_robot") | crontab -
 
-whiptail --msgbox "Installation is now complete. Please reboot your robot. See you on LetsRobot.tv!"  20 60 1
+whiptail --msgbox "Installation is now complete. Please reboot your robot. See you on remo.tv!"  20 60 1
