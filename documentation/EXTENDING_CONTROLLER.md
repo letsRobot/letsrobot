@@ -1,3 +1,5 @@
+# Some information in this file is deprecated. Proceed with caution.
+
 # Extending Controller Functions
 
 The controller is designed to make modifying the functionality as easy as possible, while still allowing the core code to be updated without requiring users to modify the controller with their custom functionality every time.
@@ -234,7 +236,7 @@ Once the function has examined or modified the object, it should pass it off to 
 This example shows how to use the ```extended_command``` module to add an additional ```.reboot``` command, to reboot the controller. This is not exclusive to chat_custom, it can be done anywhere. 
 
 It also shows how to replace all mentions of 'john madden' in chat with 'the antichrist' for tts. This could also be done in tts_custom.
-r
+
 ## tts_custom.example.py
 
 This example shows how to play a custom sound file for specific users, before their tts chat message is played.

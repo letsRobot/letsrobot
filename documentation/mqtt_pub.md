@@ -1,3 +1,5 @@
+# Some information in this document is deprecated. Proceed at your own risk.
+
 # MQTT Publish controller
 [MQTT](http://mqtt.org/) is a Machine-to-Machine communication protocol supporting a lightweight publish/subscribe message transport. It is commonly used in IoT and home automation applications. This LetsRobt Hardware controller will allow commands recieved from the remo site to be published to a MQTT Broker. Various remote robots, devices, and software can subscribe to the MQTT Broker to recieve messages. This configuration will allow the command processing to be decoupled from the remo Client software both in software processing and, if you choose, the network/system location.
 
