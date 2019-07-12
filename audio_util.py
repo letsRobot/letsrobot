@@ -2,7 +2,7 @@ import subprocess
 import re
 import logging
 
-log = logging.getLogger('LR.audio_util')
+log = logging.getLogger('RemoTV.audio_util')
 
 def getAudioDeviceByName(name, command):
     text = subprocess.check_output(command)

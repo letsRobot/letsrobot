@@ -3,7 +3,7 @@ import tempfile
 import uuid
 import logging
 
-log = logging.getLogger('LR.tts.pico')
+log = logging.getLogger('RemoTV.tts.pico')
 
 tempDir = None
 pico_voice = None

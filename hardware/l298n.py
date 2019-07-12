@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import extended_command
 import logging
-log = logging.getLogger('LR.hardware.l298n')
+log = logging.getLogger('RemoTV.hardware.l298n')
 
 sleeptime=None 
 rotatetimes=None

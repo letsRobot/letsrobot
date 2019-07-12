@@ -33,12 +33,12 @@ except ImportError:
     sys.exit()
 
 try: 
-    robot_config.readfp(open('letsrobot.conf'))
+    robot_config.readfp(open('controller.conf'))
 except IOError:
-    print("unable to read letsrobot.conf, please check that you have copied letsrobot.sample.conf to letsrobot.conf and modified it appropriately.")
+    print("unable to read controller.conf, please check that you have copied controller.sample.conf to controller.conf and modified it appropriately.")
     sys.exit()
 except:
-    print ("Error in letsrobot.conf:", sys.exc_info()[0])
+    print ("Error in controller.conf:", sys.exc_info()[0])
     sys.exit()
 
 handlingCommand = False    
@@ -50,7 +50,7 @@ terminate = thread.allocate_lock()
 robot_util.terminate = terminate
 
 # Enable logging, based upon the settings in the conf file.
-log = logging.getLogger('LR')
+log = logging.getLogger('RemoTV')
 log.setLevel(logging.DEBUG)
 console_handler=logging.StreamHandler()
 console_handler.setLevel(logging.getLevelName(robot_config.get('logging', 'console_level')))
@@ -65,7 +65,7 @@ file_handler.setFormatter(file_formatter)
 
 log.addHandler(console_handler)
 log.addHandler(file_handler)
-log.critical('LetsRobot Controller Starting up')
+log.critical('RemoTV Controller Starting up')
 
 # Log all unhandled exceptions.
 def exceptionLogger(exctype, value, tb):

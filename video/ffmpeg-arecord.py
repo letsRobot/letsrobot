@@ -2,7 +2,7 @@
 import video.ffmpeg as ffmpeg
 import logging
 
-log = logging.getLogger('LR.video.ffmpeg-arecord')
+log = logging.getLogger('RemoTV.video.ffmpeg-arecord')
 
 
 arecord_path = None

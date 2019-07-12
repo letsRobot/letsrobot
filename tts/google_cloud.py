@@ -10,7 +10,7 @@ import uuid
 import mod_utils
 import networking
 
-log = logging.getLogger('LR.tts.google_cloud')
+log = logging.getLogger('RemoTV.tts.google_cloud')
 tempDir = None
 client = None
 voice = None

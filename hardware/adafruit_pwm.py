@@ -1,6 +1,6 @@
 from Adafruit_PWM_Servo_Driver import PWM
 import logging
-log = logging.getLogger('LR.hardware.adafruit_pwm')
+log = logging.getLogger('RemoTV.hardware.adafruit_pwm')
 
 def setup(robot_config):
     pwm = PWM(int(robot_config.get('adafruit_pwm', 'address'),16)) 

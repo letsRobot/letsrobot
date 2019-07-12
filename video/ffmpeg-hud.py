@@ -17,7 +17,7 @@ import psutil
 import datetime
 import networking
 
-log = logging.getLogger('LR.video.ffmpeg-hud')
+log = logging.getLogger('RemoTV.video.ffmpeg-hud')
 
 hud_correct = False
 hud_correct_x = 0

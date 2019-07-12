@@ -5,7 +5,7 @@ import schedule
 import robot_util
 import logging
 
-log = logging.getLogger('LR.extended_command')
+log = logging.getLogger('RemoTV.extended_command')
 
 # TODO 
 # If I pull the send_video stuff into controller, the ability to restart the ffmpeg process would
@@ -106,14 +106,14 @@ def whitelist_handler(command, args):
     global whiteListCommand
     
     if len(command) > 2:
-        if is_authed(args['name']) == 2: # Owner
+        if is_authed(args['sender']) == 2: # Owner
             user = command[2]
             if command[1] == 'add':
                 whiteList.append(user)
-                log.info("%s added to whitelist", args['name'])
+                log.info("%s added to whitelist", args['sender'])
             elif command[1] == 'del':
                 whiteList.remove(user)
-                log.info("%s removed from whitelist", args['name'])
+                log.info("%s removed from whitelist", args['sender'])
             elif command[1] == 'command':
                 if len(command) > 3:
                     new_command = command[3]
@@ -132,7 +132,7 @@ def exclusive_handler(command, args):
     log.debug("exclusive_handler : %s %s", command, args)
 
     if len(command) >= 2:
-        if is_authed(args['name']) == 2: # Owner
+        if is_authed(args['sender']) == 2: # Owner
             if command[1] == 'off':
                 exclusive = False
                 log.info("Exclusive control disabled")
@@ -158,9 +158,9 @@ def ban_handler(command, args):
     
     if len(command) > 1:
         user = command[1]
-        if is_authed(args['name']): # Moderator
+        if is_authed(args['sender']): # Moderator
             banned.append(user)
-            log.info("%s added %s to ban list", args['name'], user)
+            log.info("%s added %s to ban list", args['sender'], user)
             tts.mute_user_tts(user)            
 
 def unban_handler(command, args):
@@ -168,10 +168,10 @@ def unban_handler(command, args):
 
     if len(command) > 1:
         user = command[1]
-        if is_authed(args['name']): # Moderator
+        if is_authed(args['sender']): # Moderator
             if user in banned:
                 banned.remove(user)
-                log.info("%s removed %s from ban list", args['name'], user)
+                log.info("%s removed %s from ban list", args['sender'], user)
                 tts.unmute_user_tts(user)            
 
 def timeout_handler(command, args):
@@ -179,10 +179,10 @@ def timeout_handler(command, args):
 
     if len(command) > 1:
         user = command[1]
-        if is_authed(args['name']): # Moderator
+        if is_authed(args['sender']): # Moderator
             banned.append(user)
             schedule.single_task(5, untimeout_user, user)
-            log.info("%s added %s to timeout list", args['name'], user)
+            log.info("%s added %s to timeout list", args['sender'], user)
             tts.mute_user_tts(user)            
             
     
@@ -200,10 +200,10 @@ def untimeout_handler(command, args):
 
     if len(command) > 1:
         user = command[1]
-        if is_authed(args['name']): # Moderator
+        if is_authed(args['sender']): # Moderator
             if user in banned:
                 banned.remove(user)
-                log.info("%s removed %s from timeout list", args['name'], user)
+                log.info("%s removed %s from timeout list", args['sender'], user)
                 tts.unmute_user_tts(user)            
     
     
@@ -212,7 +212,7 @@ def devmode_handler(command, args):
     global dev_mode_mods
    
     if len(command) > 1:
-        if is_authed(args['name']) == 2: # Owner
+        if is_authed(args['sender']) == 2: # Owner
             if command[1] == 'on':
                 log.info("Owner enabled dev mode")
                 dev_mode = True
@@ -231,7 +231,7 @@ def devmode_handler(command, args):
 # probably be updated to mute the mic directly, rather than just doing it on
 # the server settings. 
 def mic_handler(command, args):
-    if is_authed(args['name']) == 1: # Owner
+    if is_authed(args['sender']) == 1: # Owner
         if len(command) > 1:
             if command[1] == 'mute':
 
@@ -254,7 +254,7 @@ def mic_handler(command, args):
 def tts_handler(command, args):
     log.debug("tts : %s", tts)
     if len(command) > 1:
-        if is_authed(args['name']) == 2: # Owner
+        if is_authed(args['sender']) == 2: # Owner
             if command[1] == 'mute':
                 log.info("Owner muted TTS")
                 tts.mute_tts()
@@ -271,7 +271,7 @@ def tts_handler(command, args):
 
 def stationary_handler(command, args):
     global stationary
-    if is_authed(args['name']) == 2: # Owner
+    if is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             if command[1] == 'on':
                 stationary = True
@@ -324,15 +324,15 @@ def move_auth(args):
    
     # Check if stationary mode is enabled
     if stationary:
-        direction = args['button']['hot_key']
+        direction = args['button']['command']
         if direction == 'f' or direction == 'b':
             log.debug("No forward for you.....")
             return 
 
     # Check if command is in the whitelist required commands
-    if args['button']['hot_key'] in whiteListCommand:
+    if args['button']['commnd'] in whiteListCommand:
         if user not in whiteList:
-            log.debug("%s not authed for command %s" % (user, args['button']['hot_key']))
+            log.debug("%s not authed for command %s" % (user, args['button']['command']))
             return
 
     # check if exclusive control is enabled
@@ -346,7 +346,7 @@ def move_auth(args):
             log.debug("%s not authed for exclusive control", user)
             return
     elif exclusive:
-        log.debug("%s %s is authed", user, args['button']['hot_key'])
+        log.debug("%s %s is authed", user, args['button']['command'])
                
     if dev_mode_mods:
         if is_authed(user):

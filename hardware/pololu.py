@@ -1,5 +1,5 @@
 import logging
-log = logging.getLogger('LR.hardware.pololu')
+log = logging.getLogger('RemoTV.hardware.pololu')
 
 try:
     from pololu_drv8835_rpi import motors, MAX_SPEED

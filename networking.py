@@ -15,7 +15,7 @@ else:
 #    import thread
     import urllib2  #pylint: disable=import-error
 
-log = logging.getLogger('LR.networking')
+log = logging.getLogger('RemoTV.networking')
 
 robot_key = None
 webSocket = None

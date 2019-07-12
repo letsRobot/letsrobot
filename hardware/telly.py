@@ -2,7 +2,7 @@ import robot_util
 import mod_utils
 import extended_command
 import logging
-log = logging.getLogger('LR.hardware.telly')
+log = logging.getLogger('RemoTV.hardware.telly')
 
 module = None
 ser = None

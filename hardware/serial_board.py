@@ -3,7 +3,7 @@ import serial.tools.list_ports as ports
 import sys
 import logging
 import robot_util
-log = logging.getLogger('LR.hardware.serial_board')
+log = logging.getLogger('RemoTV.hardware.serial_board')
 
 ser = None
 serialDevice = None

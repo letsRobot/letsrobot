@@ -7,7 +7,7 @@ import random
 import networking
 import logging
 
-log = logging.getLogger('LR.tts.polly')
+log = logging.getLogger('RemoTV.tts.polly')
 
 client = None
 polly = None

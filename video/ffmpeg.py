@@ -14,7 +14,7 @@ import sys
 import logging
 import robot_util
 import time
-log = logging.getLogger('LR.video.ffmpeg')
+log = logging.getLogger('RemoTV.video.ffmpeg')
 
 robotKey=None
 server=None

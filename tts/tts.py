@@ -6,7 +6,7 @@ import logging
 import platform
 import time
 
-log = logging.getLogger('LR.tts')
+log = logging.getLogger('RemoTV.tts')
 
 if (sys.version_info > (3, 0)):
     import importlib
