@@ -55,6 +55,7 @@ The RasPi will need the following things install so it can talk to your motors a
    - `type` should be the hardware type for the motor controller of your bot. Available types are currently.
      - `adafruit_pwm`
      - `cozmo`
+     - `diddyborg`
      - `gopigo2`
      - `gopigo3`
      - `l298n`
@@ -91,7 +92,7 @@ The RasPi will need the following things install so it can talk to your motors a
      - `pico`
      - Amazon Polly
      - `cozmo_tts`
-     - Google Cloud
+     - `google_cloud`
 
 ## Setting up your start_robot file on the Raspberry Pi
 
