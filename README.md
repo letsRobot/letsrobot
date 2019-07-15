@@ -6,7 +6,12 @@
 
 # remo.tv
 
+## Basic setup
+If this is your first time working with a Raspberry Pi or Linux, we recommend following our [initializtion tutorial](https://github.com/remotv/controller/wiki/Initializing-the-Raspberry-Pi) to get started.
+
 ## Installing remotv control scripts on a Raspberry Pi
+
+If doing things manually isn't your style, we made an [optional guided installation](https://github.com/remotv/controller/wiki/Optional-Guided-Installation-Script) script that handles mostly everything for you.
 
 The RasPi will need the following things install so it can talk to your motors and talk to the internet. Make sure you don’t get any errors in the console when doing the step below. If you have an issue, you can run this line again, and that will usually fix it!
 
@@ -236,6 +241,8 @@ Install [DRV8835 Motor Driver library](https://github.com/pololu/drv8835-motor-d
 ## Pololu MC33926 Motor Driver
 
 Install [MC33926 Motor Driver library](https://github.com/pololu/dual-mc33926-motor-driver-rpi)
+
+# Check out the [Wiki](https://github.com/remotv/controller/wiki) for more information
 
 # A note about the Raspi Cam Module
 
