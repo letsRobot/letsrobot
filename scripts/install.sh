@@ -23,7 +23,7 @@ do_robot_type() {
         "pololu" "Pololu" OFF \
         "adafruit_pwm" "Adafruit PWM" OFF \
         "owi_arm" "OWI Arm" OFF \
-        "diddyborg" "Diddyborg" OFF \
+        "thunderborg" "ThunderBorg" OFF \
         "none" "None" ON \
         3>&1 1>&2 2>&3)
     RET=$?
