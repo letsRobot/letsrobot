@@ -23,7 +23,7 @@ voiceSpeakingRate = 1.0
 ssmlEnabled = None
 randomVoices = None
 users = {}
-messenger = None
+# messenger = None
 
 try:
   from google.oauth2 import service_account
@@ -66,9 +66,9 @@ def new_voice(command, args):
         users[user] = command[1]
       else:
         users[user] = random.choice(voiceList)
-  if messenger:
-    networking.sendChatMessage(
-      ".{} your voice is now {}".format(user, users[user]))
+  # if messenger:
+  #   networking.sendChatMessage(
+  #     ".{} your voice is now {}".format(user, users[user]))
 
 
 def setup(robot_config):
@@ -83,14 +83,14 @@ def setup(robot_config):
   global voiceSpeakingRate
   global ssmlEnabled
   global randomVoices
-  global messenger
+  # global messenger
   ssmlEnabled = robot_config.getboolean('google_cloud', 'ssml_enabled')
   voice = robot_config.get('google_cloud', 'voice')
   keyFile = robot_config.get('google_cloud', 'key_file')
   languageCode = robot_config.get('google_cloud', 'language_code')
   voicePitch = robot_config.getfloat('google_cloud', 'voice_pitch')
   voiceSpeakingRate = robot_config.getfloat('google_cloud', 'voice_speaking_rate')
-  messenger = robot_config.getboolean('messenger', 'enable')
+  # messenger = robot_config.getboolean('messenger', 'enable')
   
   if robot_config.has_option('google_cloud', 'random_voices'):
     randomVoices = robot_config.getboolean('google_cloud', 'random_voices')
