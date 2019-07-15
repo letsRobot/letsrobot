@@ -60,7 +60,6 @@ The RasPi will need the following things install so it can talk to your motors a
    - `type` should be the hardware type for the motor controller of your bot. Available types are currently.
      - `adafruit_pwm`
      - `cozmo`
-     - `diddyborg`
      - `gopigo2`
      - `gopigo3`
      - `l298n`
@@ -75,6 +74,7 @@ The RasPi will need the following things install so it can talk to your motors a
      - `pololu`
      - `serial_board`
      - `telly`
+     - `thunderborg`
    - Configure your hardwares section. Each hardware type can have their own section it the controller. Look through the file for a section named the same as your hardware controller. If the section exists, read through it and adjust the variable as required.
 
 3. Configure the `[camera]` section
@@ -167,18 +167,19 @@ The following hardware is supported.
 - Adafruit Motor Hat
 - Adafruit PWM / Servo Hat
 - Anki Cozmo
+- Cytron MDD10 10 Amp Motor Driver
 - GoPiGo 2
 - GoPiGo 3
 - L298N Dual Motor Controller
 - Pololu Maestro Servo Controller (experimental)
 - MAX7219 SPI Led Driver
-- Pololu Dual MC33926 Motor Driver (experimental)
-- Pololu DRV8835 Dual Motor Driver
-- Cytron MDD10 10 Amp Motor Driver
 - MotoZero 4 Motor Controller
+- MQTT Publish commands to a local MQTT Broker
 - OWI 535 Robotic Arm (USB controller)
 - Serial Based controllers (Parallaxy or Arduinos)
-- MQTT Publish commands to a local MQTT Broker
+- PiBorg ThunderBorg Motor Driver
+- Pololu Dual MC33926 Motor Driver (experimental)
+- Pololu DRV8835 Dual Motor Driver
 
 Missing something?, you can add it, open source! Instructions for adding new hardware can be found [here.](EXTENDING_CONTROLLER.md)
 
