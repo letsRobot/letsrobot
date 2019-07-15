@@ -6,7 +6,7 @@
 # Version 3.0.0
 
 do_robot_owner() {
-    ROBOT_OWNER=$(whiptail --inputbox "Please enter your remo.tv username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
+    ROBOT_OWNER=$(whiptail --inputbox "Please enter your username" 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     if [ $? -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^owner[[:space:]]*=.*/owner=$ROBOT_OWNER/}" $CONF_FILE
     fi
@@ -35,11 +35,11 @@ do_robot_type() {
 }
 
 do_robot_key() {
-    ROBOT_KEY=$(whiptail --inputbox "Please enter your robots API key." 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
+    ROBOT_KEY=$(whiptail --inputbox "Please enter your robots' API key." 20 60 "" 20 60 1 3>&1 1>&2 2>&3)
     RET=$?
     if [ $RET -eq 1 ]; then
         return 0
-    elif [ $RED -eq 0 ]; then
+    elif [ $RET -eq 0 ]; then
         sed -i "/^\[robot]/,/^\[/{s/^robot_key[[:space:]]*=.*/robot_key=$ROBOT_KEY/}" $CONF_FILE
     fi
 }
