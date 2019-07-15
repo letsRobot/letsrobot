@@ -2,10 +2,19 @@ import logging
 import sys
 import time
 
-import hardware.ThunderBorgLib as ThunderBorg
-import mod_utils
 
+import mod_utils
 log = logging.getLogger('RemoTV.hardware.diddyborg')
+
+try:
+    import hardware.ThunderBorgLib as ThunderBorg
+except:
+    log.critical('Cannot start ThunderBorg. ThunderBorgLib.py missing. Do the following')
+    log.critical('wget -O ~/examples.zip http://www.piborg.org/downlaods/thunderborg/examples.zip')
+    log.critical('unzip ~/examples.zip')
+    log.critical('cp ~/examples/ThunderBorg.py ~/remotv/hardware/ThunderBorgLib.py')
+    sys.exit(1)
+
 
 TB = ThunderBorg.ThunderBorg()
 TB.Init()

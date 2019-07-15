@@ -37,3 +37,4 @@ tts/secret.py
 video/video_custom.py
 
 hardware/maestro.py
+hardware/ThunderBorgLib.py
