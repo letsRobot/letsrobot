@@ -45,7 +45,7 @@ def play_anim(command, args):
             
 def set_forward_speed(command, args):
     global forward_speed
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             try:
                 forward_speed=int(command[1])
@@ -55,7 +55,7 @@ def set_forward_speed(command, args):
 
 def set_turn_speed(command, args):
     global turn_speed
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             try:
                 turn_speed=int(command[1])
@@ -65,7 +65,7 @@ def set_turn_speed(command, args):
 
 def set_volume(command, args):
     global volume
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             try:
                 tmp=int(command[1])
@@ -78,7 +78,7 @@ def set_volume(command, args):
 def set_charging(command, args):
     global charging
     global low_battery
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             try: 
                 if command[1] == "on":
@@ -95,7 +95,7 @@ def set_charging(command, args):
 
 def set_stay_on_dock(command, args):
     global stay_on_dock
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             try: 
                 if command[1] == "on":
@@ -222,7 +222,7 @@ def move(args):
     global coz
     global is_headlight_on
     global low_battery
-    command = args['command']
+    command = args['button']['command']
 
     try:
         if coz.is_on_charger and not charging:

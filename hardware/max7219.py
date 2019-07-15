@@ -89,7 +89,7 @@ def SetLED_Full():
     spi.writebytes([0x0F])
         
 def move(args):
-    command = args['command']
+    command = args['button']['command']
     
     if command == 'LED_OFF':
         SetLED_Off()

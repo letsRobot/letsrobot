@@ -48,5 +48,5 @@ def setup(robot_config):
     #TODO consider opening connection with keep alive in set up, then restore/when sending
     
 def move(args):
-    command = args['command']
+    command = args['button']['command']
     sendmqttCommand(command)

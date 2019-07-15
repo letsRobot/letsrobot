@@ -18,7 +18,7 @@ def setup(robot_config):
     drivingSpeed = robot_config.getint('mc33926', 'driving_speed')   
 
 def move(args):
-    command = args['command']
+    command = args['button']['command']
     
     drivingSpeed = -180
     if direction == 'F':

@@ -65,7 +65,7 @@ def setup(robot_config):
 	
 
 def move(args):
-    direction = args['command']
+    direction = args['button']['command']
     
     if direction == 'F':
         GPIO.output(Motor1B, GPIO.HIGH)

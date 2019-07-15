@@ -13,7 +13,7 @@ def setup(robot_config):
     return    
     
 def move(args):
-    command = args['command']
+    command = args['button']['command']
     
     if command == 'L':
         gopigo.left_rot()

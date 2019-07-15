@@ -16,7 +16,7 @@ def setup(robot_config):
     turn_time=robot_config.getfloat('gopigo2', 'turn_time')    
 
 def move(args):
-    command = args['command']
+    command = args['button']['command']
     e = easyGoPiGo3
     if command == 'L':
         e.set_motor_dps(e.MOTOR_LEFT, -e.get_speed())

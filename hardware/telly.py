@@ -21,7 +21,7 @@ def move(args):
     module.move(args)
 
 def set_eeprom(command, args):
-    if is_authed(args['name']) == 1: # Owner
+    if is_authed(args['sender']) == 1: # Owner
         if len(command) >= 2: 
             try:
                 if command[1] == 'left':

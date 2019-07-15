@@ -28,7 +28,7 @@ def setup(robot_config):
     servo.setTarget(1, 6000)
  
 def move(args):
-    direction = args['command']
+    direction = args['button']['command']
 
     if direction == 'F':
         servo.setTarget(0, 12000)

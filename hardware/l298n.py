@@ -14,14 +14,14 @@ StepPinRight=None
 
 def set_rotate_time(command, args):
     global rotatetimes
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             rotatetimes=float(command[1])
             log.info("rotate time multiplier set to : %f", float(command[1]))
 
 def set_sleep_time(command, args):
     global sleeptime
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         if len(command) > 1:
             sleeptime=float(command[1])
             log.info("sleep time set to : %f", float(command[1]))
@@ -60,7 +60,7 @@ def setup(robot_config):
     GPIO.setup(StepPinRight, GPIO.OUT)
 
 def move(args):
-    direction = args['command']
+    direction = args['button']['command']
     if direction == 'F':
         GPIO.output(StepPinForward, GPIO.HIGH)
         time.sleep(sleeptime)

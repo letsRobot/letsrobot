@@ -52,7 +52,7 @@ def SpeedNormal():
 def move(args):
     global maxSpeedEnabled
 	                
-    command = args['command']
+    command = args['button']['command']
 
     if command == 'MAXSPEED':
         handleMaxSpeedCommand()

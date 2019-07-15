@@ -49,7 +49,7 @@ def MoveArm(Duration, ArmCmd):
 
 def move(args):
     global led
-    command = args['command']
+    command = args['button']['command']
     
     if command == 'L':
         MoveArm(0.15, [0,2,0]) # Rotate counter-clockwise
