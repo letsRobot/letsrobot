@@ -68,7 +68,7 @@ def setup(robot_config):
     global buttons_json
     global mods
     
-    owner = robot_config.get('robot', 'owner')
+    owner = robot_config.get('robot', 'owner').split(',')
     robot_key = robot_config.get('robot', 'robot_key')
 
     if robot_config.has_option('robot', 'api_key'):
@@ -89,7 +89,7 @@ def setup(robot_config):
 
 # check if the user is the owner or moderator, 0 for not, 1 for moderator, 2 for owner
 def is_authed(user):
-    if user == owner:
+    if user in owner:
         return(2)
     elif user in mods:
         return(1)
@@ -286,6 +286,10 @@ def test_messages(command, args):
    log.debug(args)
    command = args["message"].split(' ')[1:]
    networking.sendChatMessage(command)
+
+def help_handler(command, args):
+   networking.sendChatMessage('.Available commands : {}'.format(' '.join(sorted(commands))))
+   
  
 # This is a dictionary of commands and their handler functions
 commands={    '.ban'        :    ban_handler,
@@ -299,6 +303,7 @@ commands={    '.ban'        :    ban_handler,
               '.table'      :    stationary_handler,
               '.whitelist'  :    whitelist_handler,
               '.exclusive'  :    exclusive_handler,
+              '.help'       :    help_handler,
               '.test'       :    test_messages
 	        }
 
@@ -336,7 +341,7 @@ def move_auth(args):
             return
 
     # check if exclusive control is enabled
-    if exclusive and (user != owner):
+    if exclusive and (user not in owner):
         if exclusive_mods:
             if user not in mods:
                 if user != exclusive_user: 

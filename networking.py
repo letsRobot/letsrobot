@@ -22,6 +22,7 @@ webSocket = None
 server = None
 channel = None
 chat = None
+authenticated = False
 
 internetStatus = True
 
@@ -53,6 +54,8 @@ def onHandleWebSocketOpen(ws):
     log.info("websocket connected")
 
 def onHandleWebSocketClose(ws):
+    global authenticated
+    authenticated = False
     log.info("websocket disconnect")
 
 def onHandleWebSocketError(ws, error):
@@ -61,6 +64,7 @@ def onHandleWebSocketError(ws, error):
 def handleConnectChatChannel(host):
     global channel
     global chat
+    global authenticated
 
     response = getChatChannels(host)
     log.debug(response)
@@ -70,7 +74,7 @@ def handleConnectChatChannel(host):
     chat = response["channels"][0]["chat"]
     webSocket.send(json.dumps(
         {"e": "GET_CHAT", "d": response["channels"][0]["chat"]}))
-
+    authenticated = True
 
 def setupWebSocket(robot_config, onHandleMessage):
     global robot_key

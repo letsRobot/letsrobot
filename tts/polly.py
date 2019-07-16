@@ -48,7 +48,7 @@ def setup(robot_config):
     global fallback_tts
     global messenger
     
-    owner = robot_config.get('robot', 'owner')
+    owner = robot_config.get('robot', 'owner').split(',')
     owner_voice = robot_config.get('polly', 'owner_voice')
     robot_voice = robot_config.get('polly', 'robot_voice')
     random_voice = robot_config.getboolean('polly', 'random_voices')
@@ -70,8 +70,9 @@ def setup(robot_config):
     polly = boto3.client('polly', aws_access_key_id=access_key,
                             aws_secret_access_key=secrets_key,
                             region_name=region_name)
-                            
-    users[owner] = owner_voice
+    
+    for i in owner:                      
+        users[i] = owner_voice
     users['jill'] = 'Amy'
 
     if random_voice: # random voices enabled

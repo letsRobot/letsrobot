@@ -170,6 +170,9 @@ def startVideoCapture():
     global video_process
     global video_start_count
 
+    while not networking.authenticated:
+        time.sleep(1)
+
     video_start_count += 1
     log.debug("Video start count : %s", video_start_count)
 
@@ -248,6 +251,9 @@ def restartVideoCapture():
 
 def startAudioCapture():
     global audio_process
+
+    while not networking.authenticated:
+        time.sleep(1)
 
     audioCommandLine = '{ffmpeg} -f {audio_input_format}'
     if audio_input_format != "avfoundation":
@@ -328,6 +334,8 @@ def videoChatHandler(command, args):
                         except ValueError: # Catch someone passing not a number
                             pass
                     networking.sendChatMessage(".Video bitrate is %s" % video_bitrate)
+        else:
+            networking.sendChatMessge("command only available to owner")
 
 
 def brightnessChatHandler(command, args):
