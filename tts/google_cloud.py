@@ -38,7 +38,7 @@ def setup(robot_config):
     voice = robot_config.get('google_cloud', 'voice')
     keyFile = robot_config.get('google_cloud', 'key_file')
 
-    if robot_config.hasoption('tts', 'speaker_num'):
+    if robot_config.has_option('tts', 'speaker_num'):
         hwNum = robot_config.get('tts', 'speaker_num')
     else:
         hwNum = robot_config.getint('tts', 'hw_num')
@@ -94,4 +94,4 @@ def say(*args):
 
     with open(tempFilePath, 'wb') as out:
         out.write(response.audio_content)
-        os.system('aplay ' + tempFilePath + ' -D plughw:%d,0' % hwNum)
+        os.system('aplay ' + tempFilePath + ' -D plughw:{}'.format(hwNum))
