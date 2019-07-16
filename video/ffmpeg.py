@@ -310,7 +310,7 @@ def videoChatHandler(command, args):
     global video_bitrate
 
     if len(command) > 1:
-        if extended_command.is_authed(args['name']) == 2: # Owner
+        if extended_command.is_authed(args['sender']) == 2: # Owner
             if command[1] == 'start':
                 if not video_process.returncode == None:
                     watchdog.start("FFmpegCameraProcess", startVideoCapture)
@@ -333,7 +333,7 @@ def videoChatHandler(command, args):
 def brightnessChatHandler(command, args):
     global brightness
     if len(command) > 1:
-        if extended_command.is_authed(args['name']): # Moderator
+        if extended_command.is_authed(args['sender']): # Moderator
             try:
                 new_brightness = int(command[1])
             except ValueError:
@@ -346,7 +346,7 @@ def brightnessChatHandler(command, args):
 def contrastChatHandler(command, args):
     global contrast
     if len(command) > 1:
-        if extended_command.is_authed(args['name']): # Moderator
+        if extended_command.is_authed(args['sender']): # Moderator
             try:
                 new_contrast = int(command[1])
             except ValueError:
@@ -358,7 +358,7 @@ def contrastChatHandler(command, args):
 
 def saturationChatHandler(command, args):
     if len(command) > 2:
-        if extended_command.is_authed(args['name']): # Moderator
+        if extended_command.is_authed(args['sender']): # Moderator
             try:
                 new_saturation = int(command[1])
             except ValueError:
@@ -373,7 +373,7 @@ def audioChatHandler(command, args):
     global audio_bitrate
 
     if len(command) > 1:
-        if extended_command.is_authed(args['name']) == 2: # Owner
+        if extended_command.is_authed(args['sender']) == 2: # Owner
             if command[1] == 'start':
                 mic_off = false
                 if audio_process.returncode != None:
