@@ -37,7 +37,11 @@ def setup(robot_config):
     ssmlEnabled = robot_config.getboolean('google_cloud', 'ssml_enabled')
     voice = robot_config.get('google_cloud', 'voice')
     keyFile = robot_config.get('google_cloud', 'key_file')
-    hwNum = robot_config.getint('tts', 'hw_num')
+
+    if robot_config.hasoption('tts', 'speaker_num'):
+        hwNum = robot_config.get('tts', 'speaker_num')
+    else:
+        hwNum = robot_config.getint('tts', 'hw_num')
     languageCode = robot_config.get('google_cloud', 'language_code')
     voicePitch = robot_config.getfloat('google_cloud', 'voice_pitch')
     voiceSpeakingRate = robot_config.getfloat(
