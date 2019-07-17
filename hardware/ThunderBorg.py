@@ -55,12 +55,20 @@ def move(args):
     if direction == 'F':
         TB.SetMotor1(inverseLeft)
         TB.SetMotor2(rightMotorMax)
+        time.sleep(sleepTime);
+        TB.SetMotors(0.0);
     if direction == 'B':
         TB.SetMotor1(leftMotorMax)
         TB.SetMotor2(inverseRight)
+        time.sleep(sleepTime);
+        TB.SetMotors(0.0);
     if direction == 'L':
         TB.SetMotor1(leftMotorMax)
         TB.SetMotor2(rightMotorMax)
+        time.sleep(sleepTime);
+        TB.SetMotors(0.0);
     if direction == 'R':
         TB.SetMotor1(inverseLeft)
         TB.SetMotor2(inverseRight)
+        time.sleep(sleepTime);
+        TB.SetMotors(0.0);
