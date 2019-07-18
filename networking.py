@@ -21,6 +21,7 @@ robot_key = None
 webSocket = None
 server = None
 channel = None
+channel_id = None
 chat = None
 authenticated = False
 
@@ -62,18 +63,28 @@ def onHandleWebSocketError(ws, error):
     log.error("WebSocket ERROR: {}".format(error))
 
 def handleConnectChatChannel(host):
-    global channel
+    global channel_id
     global chat
     global authenticated
 
     response = getChatChannels(host)
     log.debug(response)
-    channel = response["channels"][0]["id"]
+    # Loop throught the return json and looked for the named channel, otherwise
+    # use the first channel
+    for key in response["channels"]:
+        if key["name"] == channel:
+            channel_id = key["id"]
+            chat = key["chat"]
+            log.info("channel {} found with id : {}".format(channel, channel_id))
+    if channel_id == None:
+        channel_id = response["channels"][0]["id"]
+        chat = response["channels"][0]["chat"]
+        log.warning("channel {} NOT found, joining : {}".format(channel, channel_id))
+
     webSocket.send(json.dumps(
-        {"e": "JOIN_CHANNEL", "d": channel}))
-    chat = response["channels"][0]["chat"]
+        {"e": "JOIN_CHANNEL", "d": channel_id}))
     webSocket.send(json.dumps(
-        {"e": "GET_CHAT", "d": response["channels"][0]["chat"]}))
+        {"e": "GET_CHAT", "d": chat}))
     authenticated = True
 
 def setupWebSocket(robot_config, onHandleMessage):
@@ -83,8 +94,13 @@ def setupWebSocket(robot_config, onHandleMessage):
     global webSocket
     global server
 
+    global channel
+
     robot_key = robot_config.get('robot', 'robot_key')
     server = robot_config.get('misc', 'server')
+
+    if robot_config.has_option('robot', 'channel'):
+        channel = robot_config.get('robot', 'channel')
 
     bootMessages = robot_config.get('tts', 'boot_message')
     bootMessageList = bootMessages.split(',')

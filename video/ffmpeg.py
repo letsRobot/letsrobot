@@ -211,7 +211,7 @@ def startVideoCapture():
                             video_bitrate=video_bitrate,
                             out_options=video_output_options,
                             server=server,
-                            channel=networking.channel,
+                            channel=networking.channel_id,
                             xres=x_res, 
                             yres=y_res)
 
@@ -273,7 +273,7 @@ def startAudioCapture():
                             audio_bitrate=audio_bitrate,
                             out_options=audio_output_options,
                             server=server,
-                            channel=networking.channel)
+                            channel=networking.channel_id)
                             
     log.debug("audioCommandLine : %s", audioCommandLine)
     try:
