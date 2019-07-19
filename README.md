@@ -18,7 +18,7 @@ The RasPi will need the following things install so it can talk to your motors a
 1. Install the required software libraries and tools. Make sure you don’t get any errors in the console when doing the step below. If you have an issue, you can run this line again, and that will usually fix it!
 
    ```sh
-   sudo apt-get install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip libttspico-utils git
+   sudo apt install ffmpeg python-serial python-dev libgnutls28-dev espeak python-smbus python-pip git
    ```
 
 2. Download the remotv control scripts from our github
