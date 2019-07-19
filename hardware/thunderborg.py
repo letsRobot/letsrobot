@@ -9,10 +9,13 @@ log = logging.getLogger('RemoTV.hardware.diddyborg')
 try:
     import hardware.ThunderBorgLib as ThunderBorg
 except:
-    log.critical('Cannot start ThunderBorg. ThunderBorgLib.py missing. Do the following')
-    log.critical('wget -O ~/examples.zip http://www.piborg.org/downlaods/thunderborg/examples.zip')
+    log.critical(
+        'Cannot start ThunderBorg. ThunderBorgLib.py missing. Do the following')
+    log.critical(
+        'wget -O ~/examples.zip http://www.piborg.org/downlaods/thunderborg/examples.zip')
     log.critical('unzip ~/examples.zip')
-    log.critical('cp ~/examples/ThunderBorg.py ~/remotv/hardware/ThunderBorgLib.py')
+    log.critical(
+        'cp ~/examples/ThunderBorg.py ~/remotv/hardware/ThunderBorgLib.py')
     sys.exit(1)
 
 
@@ -42,9 +45,9 @@ def setup(robot_config):
             log.critical('TB.i2cAddress = 0x%02X' % boards[0])
         sys.exit(1)
 
-    leftMotorMax = robot_config.getfloat('diddyborg', 'left_motor_max')
-    rightMotorMax = robot_config.getfloat('diddyborg', 'right_motor_max')
-    sleepTime = robot_config.getfloat('diddyborg', 'sleep_time')
+    leftMotorMax = robot_config.getfloat('thunderborg', 'left_motor_max')
+    rightMotorMax = robot_config.getfloat('thunderborg', 'right_motor_max')
+    sleepTime = robot_config.getfloat('thunderborg', 'sleep_time')
 
 
 def move(args):
@@ -55,20 +58,20 @@ def move(args):
     if direction == 'F':
         TB.SetMotor1(inverseLeft)
         TB.SetMotor2(rightMotorMax)
-        time.sleep(sleepTime);
-        TB.SetMotors(0.0);
+        time.sleep(sleepTime)
+        TB.SetMotors(0.0)
     if direction == 'B':
         TB.SetMotor1(leftMotorMax)
         TB.SetMotor2(inverseRight)
-        time.sleep(sleepTime);
-        TB.SetMotors(0.0);
+        time.sleep(sleepTime)
+        TB.SetMotors(0.0)
     if direction == 'L':
         TB.SetMotor1(leftMotorMax)
         TB.SetMotor2(rightMotorMax)
-        time.sleep(sleepTime);
-        TB.SetMotors(0.0);
+        time.sleep(sleepTime)
+        TB.SetMotors(0.0)
     if direction == 'R':
         TB.SetMotor1(inverseLeft)
         TB.SetMotor2(inverseRight)
-        time.sleep(sleepTime);
-        TB.SetMotors(0.0);
+        time.sleep(sleepTime)
+        TB.SetMotors(0.0)
