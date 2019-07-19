@@ -1,5 +1,6 @@
 #from video.ffmpeg import *
 import video.ffmpeg as ffmpeg
+import networking
 import logging
 
 log = logging.getLogger('RemoTV.video.ffmpeg-arecord')
@@ -31,7 +32,7 @@ def startAudioCapture():
                        ' {ffmpeg} -i - -ar {audio_sample_rate} -f mpegts'
                        ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
                        ' -bufsize 8192k -muxdelay 0.001 {out_options}'
-                       ' http://{audio_host}:{audio_port}/{stream_key}/640/480/')
+                       ' http://{server}:1567/transmit?name={channel}-audio')
 
     audioCommandLine = audioCommandLine.format(arecord=arecord_path,
                             arecord_format=arecord_format,
@@ -43,9 +44,8 @@ def startAudioCapture():
                             audio_codec=ffmpeg.audio_codec,
                             audio_bitrate=ffmpeg.audio_bitrate,
                             out_options=ffmpeg.audio_output_options,
-                            audio_host=ffmpeg.audioHost,
-                            audio_port=ffmpeg.audioPort,
-                            stream_key=ffmpeg.stream_key)
+                            server=ffmpeg.server,
+                            channel=networking.channel_id)
 
     log.debug("audioCommandLine : %s", audioCommandLine)
     ffmpeg.audio_process=ffmpeg.subprocess.Popen(audioCommandLine, shell=True)
