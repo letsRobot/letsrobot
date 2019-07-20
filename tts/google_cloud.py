@@ -42,7 +42,7 @@ def setup(robot_config):
         hwNum = robot_config.get('tts', 'speaker_num')
     else:
         hwNum = robot_config.getint('tts', 'hw_num')
-    languageCode = voice[:4]
+    languageCode = voice[:5]
     voicePitch = robot_config.getfloat('google_cloud', 'voice_pitch')
     voiceSpeakingRate = robot_config.getfloat(
         'google_cloud', 'voice_speaking_rate')
