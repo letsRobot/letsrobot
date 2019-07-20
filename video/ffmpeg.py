@@ -88,7 +88,11 @@ def setup(robot_config):
     global saturation
 
     robotKey = robot_config.get('robot', 'robot_key')
-    server = robot_config.get('misc', 'server')
+
+    try: #support for old config i guess possibly remove
+        server = robot_config.get('misc', 'video_server')
+    except:
+        server = robot_config.get('misc', 'server')
  
     no_mic = robot_config.getboolean('camera', 'no_mic')
     no_camera = robot_config.getboolean('camera', 'no_camera')
