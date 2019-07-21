@@ -19,6 +19,7 @@ languageCode = None
 randomVoices = None
 ssmlEnabled = None
 standardVoices = None
+strictLanguages = []
 tempDir = None
 voice = None
 voiceList = []
@@ -35,6 +36,7 @@ def setup(robot_config):
     global randomVoices
     global ssmlEnabled
     global standardVoices
+    global strictLanguages
     global tempDir
     global voice
     global voiceList
@@ -49,6 +51,10 @@ def setup(robot_config):
         randomVoices = robot_config.getboolean('google_cloud', 'random_voices')
         standardVoices = robot_config.getboolean(
             'google_cloud', 'standard_voices')
+        strictLanguages = robot_config.get('google_cloud', 'strict_languages')
+        strictLanguages = strictLanguages.split(',')
+        for i in range(0, len(strictLanguages)):
+            strictLanguages[i] = strictLanguages[i].strip()
     else:
         randomVoices = False
 
@@ -72,10 +78,16 @@ def setup(robot_config):
         for voice in voices:
             if standardVoices:
                 if 'Standard' in voice.name:
-                    voiceList.append(voice.name)
+                    if len(strictLanguages) > 0 and voice.name[:5] in strictLanguages:
+                        voiceList.append(voice.name)
+                    elif len(strictLanguages) == 0:
+                        voiceList.append(voice.name)
             else:
                 if 'Wavenet' in voice.name:
-                    voiceList.append(voice.name)
+                    if len(strictLanguages) > 0 and voice.name[:5] in strictLanguages:
+                        voiceList.append(voice.name)
+                    elif len(strictLanguages) == 0:
+                        voiceList.append(voice.name)
     else:
         voice = texttospeech.types.VoiceSelectionParams(
             name=voice,
