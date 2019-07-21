@@ -75,7 +75,7 @@ def setup(robot_config):
                     voiceList.append(voice.name)
             else:
                 if 'Wavenet' in voice.name:
-                    voiceList.appen(voice.name)
+                    voiceList.append(voice.name)
     else:
         voice = texttospeech.types.VoiceSelectionParams(
             name=voice,
