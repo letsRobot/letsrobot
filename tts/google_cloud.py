@@ -1,36 +1,43 @@
 # pylint: disable=no-member
 
+import logging
 import os
+import random
 import tempfile
 import uuid
-import logging
 
-from google.oauth2 import service_account
 from google.cloud import texttospeech
+from google.oauth2 import service_account
 
 log = logging.getLogger('RemoTV.tts.google_cloud')
 
-ssmlEnabled = None
-tempDir = None
-client = None
-voice = None
-hwNum = None
 audio_config = None
+client = None
+hwNum = None
 keyFile = None
 languageCode = None
+randomVoices = None
+ssmlEnabled = None
+standardVoices = None
+tempDir = None
+voice = None
+voiceList = None
 voicePitch = 0.0
 voiceSpeakingRate = 1.0
 
 
 def setup(robot_config):
-    global ssmlEnabled
-    global tempDir
-    global client
-    global voice
-    global hwNum
     global audio_config
+    global client
+    global hwNum
     global keyFile
     global languageCode
+    global randomVoices
+    global ssmlEnabled
+    global standardVoices
+    global tempDir
+    global voice
+    global voiceList
     global voicePitch
     global voiceSpeakingRate
 
@@ -38,24 +45,42 @@ def setup(robot_config):
     voice = robot_config.get('google_cloud', 'voice')
     keyFile = robot_config.get('google_cloud', 'key_file')
 
+    if robot_config.has_option('google_cloud', 'random_voices'):
+        randomVoices = robot_config.getboolean('google_cloud', 'random_voices')
+        standardVoices = robot_config.getboolean(
+            'google_cloud', 'standard_voices')
+    else:
+        randomVoices = False
+
     if robot_config.has_option('tts', 'speaker_num'):
         hwNum = robot_config.get('tts', 'speaker_num')
     else:
         hwNum = robot_config.getint('tts', 'hw_num')
-    languageCode = voice[:5]
+
     voicePitch = robot_config.getfloat('google_cloud', 'voice_pitch')
     voiceSpeakingRate = robot_config.getfloat(
-        'google_cloud', 'voice_speaking_rate')
+        'google_cloud', 'voice_speaking_rate'
+    )
 
     client = texttospeech.TextToSpeechClient(
         credentials=service_account.Credentials.from_service_account_file(
             keyFile)
     )
 
-    voice = texttospeech.types.VoiceSelectionParams(
-        name=voice,
-        language_code=languageCode
-    )
+    if randomVoices:
+        voices = client.list_voices().voices
+        for voice in voices:
+            if standardVoices:
+                if 'Standard' in voice.name:
+                    voiceList.append(voice.name)
+            else:
+                if 'Wavenet' in voice.name:
+                    voiceList.appen(voice.name)
+    else:
+        voice = texttospeech.types.VoiceSelectionParams(
+            name=voice,
+            language_code=voice[:5]
+        )
 
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
@@ -87,6 +112,13 @@ def say(*args):
             pass
     else:
         synthesis_input = texttospeech.types.SynthesisInput(text=message)
+
+    if randomVoices:
+        voiceSelection = random.choice(voiceList)
+        voice = texttospeech.types.VoiceSelectionParams(
+            name=voiceSelection,
+            language_code=voiceSelection[:5]
+        )
 
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
 
