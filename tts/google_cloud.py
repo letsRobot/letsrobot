@@ -21,7 +21,7 @@ ssmlEnabled = None
 standardVoices = None
 tempDir = None
 voice = None
-voiceList = None
+voiceList = []
 voicePitch = 0.0
 voiceSpeakingRate = 1.0
 
