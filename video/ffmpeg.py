@@ -89,9 +89,9 @@ def setup(robot_config):
 
     robotKey = robot_config.get('robot', 'robot_key')
 
-    try: #support for old config i guess possibly remove
+    if robot_config.has_option('misc', 'video_server'):
         server = robot_config.get('misc', 'video_server')
-    except:
+    else:
         server = robot_config.get('misc', 'server')
  
     no_mic = robot_config.getboolean('camera', 'no_mic')
