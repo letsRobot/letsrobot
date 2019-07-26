@@ -147,7 +147,7 @@ def handle_message(ws, message):
             on_handle_command(data)
            # handle_command(data)
 
-        elif event == "MESSAGE_RECIEVED":
+        elif event == "MESSAGE_RECEIVED":
             on_handle_chat_message(data)
 
         elif event == "ROBOT_VALIDATED":
