@@ -20,6 +20,7 @@ log = logging.getLogger('RemoTV.networking')
 robot_key = None
 webSocket = None
 server = None
+version = 'dev'
 channel = None
 channel_id = None
 chat = None
@@ -32,7 +33,7 @@ no_chat_server = None
 bootMessage = None
 
 def getChatChannels(host):
-    url = 'http://%s:3231/api/channels/list/%s' % (server, host)
+    url = 'http://%s:3231/api/%s/channels/list/%s' % (server, version, host)
     response = robot_util.getWithRetry(url)
     log.debug("getChatChannels : %s", response)
     return json.loads(response)
@@ -93,11 +94,13 @@ def setupWebSocket(robot_config, onHandleMessage):
     global bootMessage
     global webSocket
     global server
+    global version
 
     global channel
 
     robot_key = robot_config.get('robot', 'robot_key')
     server = robot_config.get('misc', 'server')
+    version = robot_config.get('misc', 'api_version')
 
     if robot_config.has_option('robot', 'channel'):
         channel = robot_config.get('robot', 'channel')
