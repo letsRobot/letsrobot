@@ -7,6 +7,11 @@ from cozmo.objects import LightCube1Id, LightCube2Id, LightCube3Id
 import tts.tts as tts
 import extended_command
 import networking
+import sys
+import os
+import schedule
+import extended_command
+import PIL
 
 coz = None
 is_headlight_on = False
@@ -89,7 +94,7 @@ def set_charging(command, args):
                     low_battery = 0
                     charging = 0
                 print("charging set to : %d" % charging)
-                networking.sendChargeState(charging)
+#                networking.sendChargeState(charging)
             except ValueError:
                 pass
 
@@ -106,17 +111,47 @@ def set_stay_on_dock(command, args):
             except ValueError:
                 pass
 
+def set_colour(command, args):
+    global colour 
+    if extended_command.is_authed(args['sender']) == 2:
+        colour = not colour
+        coz.camera.color_image_enabled = colour
+
+def set_annotated(command, args):
+    global annotated
+    if extended_command.is_authed(args['sender']) == 2:
+        annotated = not annotated
+
+def set_flipped(command, args):
+    global flipped
+    if extended_command.is_authed(args['sender']) == 2:
+        flipped = not flipped
+
 def setup(robot_config):
     global forward_speed
     global turn_speed
-    global coz
+    global server
     global volume
     global charge_high
     global charge_low
     global stay_on_dock
-    
-    coz = tts.tts_module.getCozmo()
-    mod_utils.repeat_task(30, check_battery, coz)
+    global annotated
+    global colour
+    global ffmpeg_location
+
+    ffmpeg_location = robot_config.get('ffmpeg', 'ffmpeg_location')
+
+    while not coz:
+        try:
+           time.sleep(0.5)
+           print("not coz")
+        except (KeyboardInterrupt, SystemExit):
+           sys.exit()
+
+    if robot_config.has_option('misc', 'video_server'):
+        server = robot_config.get('misc', 'video_server')
+    else:
+        server = robot_config.get('misc', 'server')
 
     if robot_config.has_section('cozmo'):
         forward_speed = robot_config.getint('cozmo', 'forward_speed')
@@ -125,6 +160,12 @@ def setup(robot_config):
         charge_high = robot_config.getfloat('cozmo', 'charge_high')
         charge_low = robot_config.getfloat('cozmo', 'charge_low')
         stay_on_dock = robot_config.getboolean('cozmo', 'stay_on_dock')
+        send_online_status = robot_config.getboolean('cozmo', 'send_online_status')
+        annotated = robot_config.getboolean('cozmo', 'annotated')
+        colour = robot_config.getboolean('cozmo', 'colour')
+        coz.camera.color_image_enabled = colour
+    else:
+        send_online_status = True
 
     if robot_config.getboolean('tts', 'ext_chat'): #ext_chat enabled, add motor commands
         extended_command.add_command('.anim', play_anim)
@@ -133,9 +174,82 @@ def setup(robot_config):
         extended_command.add_command('.vol', set_volume)
         extended_command.add_command('.charge', set_charging)
         extended_command.add_command('.stay', set_stay_on_dock)
+        extended_command.add_command('.annotate', set_annotated)
+        extended_command.add_command('.color', set_colour)
+        extended_command.add_command('.colour', set_colour)
+
+#    if send_online_status:
+#        print("Enabling online status")
+#        schedule.repeat_task(10, updateServer)
 
     coz.set_robot_volume(volume/100) # set volume
 
+def setup_coz(robot_config):
+    cozmo.setup_basic_logging()
+    cozmo.robot.Robot.drive_off_charger_on_connect = False
+
+    try:
+        thread.start_new_thread(cozmo.connect, (run,))
+    except KeyboardInterrupt as e:
+        pass        
+    except cozmo.ConnectionError as e:
+        sys.exit("A connection error occurred: %s" % e)
+
+    
+    return
+    
+def run(coz_conn):
+    global coz
+    coz = coz_conn.wait_for_robot()
+    coz.enable_stop_on_cliff(True)
+    
+    while 1:
+        time.sleep(1)
+            
+def run_video():
+
+    # Turn on image receiving by the camera
+    coz.camera.image_stream_enabled = True
+
+    coz.say_text( "hey everyone, lets robot!", in_parallel=True)
+
+    while True:
+        time.sleep(0.25)
+
+        from subprocess import Popen, PIPE
+        from sys import platform
+
+        #Frames to file
+        #p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-qscale', '5', '-r', '25', 'outtest.mpg'], stdin=PIPE)
+        
+        if not os.path.isfile(ffmpeg_location):
+            print("Error: cannot find " + str(ffmpeg_location) + " check ffmpeg is installed. Terminating controller")
+            thread.interrupt_main()
+            thread.exit()
+
+        while not networking.authenticated:
+            time.sleep(1)
+
+        p = Popen([ffmpeg_location, '-nostats', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25','-b:v', '400k', "-f","mpegts", "http://{}:1567/transmit?name={}-video".format(server, networking.channel_id)], stdin=PIPE)
+        
+        try:
+            while True:
+                if coz:
+                    image = coz.world.latest_image
+                    if image:
+                        if annotated:
+                            image = image.annotate_image()
+                        else:
+                            image = image.raw_image
+                        image.save(p.stdin, 'PNG')
+                else:
+                    time.sleep(.1)
+            p.stdin.close()
+            p.wait()
+        except cozmo.exceptions.SDKShutdown:
+            p.stdin.close()
+            p.wait()
+            pass               
 
 def light_cubes(robot: cozmo.robot.Robot):
     cube1 = robot.world.get_light_cube(LightCube1Id)  # looks like a paperclip
@@ -290,19 +404,19 @@ def move(args):
     
         #things to say with TTS disabled
         elif command == 'sayhi':
-            tts.say( "hi! I'm cozmo!" )
+            say( "hi! I'm cozmo!" )
         elif command == 'saywatch':
-            tts.say( "watch this" )
+            say( "watch this" )
         elif command == 'saylove':
-            tts.say( "i love you" )
+            say( "i love you" )
         elif command == 'saybye':
-            tts.say( "bye" )
+            say( "bye" )
         elif command == 'sayhappy':
-            tts.say( "I'm happy" )
+            say( "I'm happy" )
         elif command == 'saysad':
-            tts.say( "I'm sad" )
+            say( "I'm sad" )
         elif command == 'sayhowru':
-            tts.say( "how are you?" )
+            say( "how are you?" )
         
         #cube controls
         elif command == "lightcubes":
@@ -317,5 +431,11 @@ def move(args):
             print( "singing song" )
             sing_song( coz )
 
+    except cozmo.exceptions.RobotBusy:
+        return False
+
+def say(message):
+    try:
+        coz.say_text(message, duration_scalar=0.75)
     except cozmo.exceptions.RobotBusy:
         return False
