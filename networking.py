@@ -20,7 +20,7 @@ log = logging.getLogger('RemoTV.networking')
 robot_key = None
 webSocket = None
 server = None
-version = 'dev'
+version = None
 channel = None
 channel_id = None
 chat = None
@@ -100,7 +100,11 @@ def setupWebSocket(robot_config, onHandleMessage):
 
     robot_key = robot_config.get('robot', 'robot_key')
     server = robot_config.get('misc', 'server')
-    version = robot_config.get('misc', 'api_version')
+
+    if robot_config.has_option('misc', 'api_version'):
+        version = robot_config.get('misc', 'api_version')
+    else:
+        version = 'dev'
 
     if robot_config.has_option('robot', 'channel'):
         channel = robot_config.get('robot', 'channel')
