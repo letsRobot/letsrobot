@@ -97,10 +97,16 @@ def is_authed(user):
         return(0)
 
 # add a new command handler, this will also allow for overriding existing ones.
-def add_command(command, function):
+def add_command(command, function, perm=2):
     global commands
-    commands[command] = function
-    
+
+    if perm > 2:
+        perm = 2
+    elif perm < 0:
+        perm = 0
+ 
+    commands[command] = {'func':function, 'perm': perm}
+
 def whitelist_handler(command, args):
     global whiteList
     global whiteListCommand
@@ -288,23 +294,31 @@ def test_messages(command, args):
    networking.sendChatMessage(command)
 
 def help_handler(command, args):
-   networking.sendChatMessage('.Available commands : {}'.format(' '.join(sorted(commands))))
+   available = ""
+   user = is_authed(args['sender'])
+
+   for key in sorted(commands):
+       print(key)
+       if commands[key]['perm'] <= user:
+           available = available + " " + key 
+
+   networking.sendChatMessage('.Available commands : ' + available)
    
  
 # This is a dictionary of commands and their handler functions
-commands={    '.ban'        :    ban_handler,
-              '.unban'      :    unban_handler,
-              '.timeout'    :    timeout_handler,
-              '.untimout'   :    untimeout_handler,
-              '.devmode'    :    devmode_handler,
-              '.mic'        :    mic_handler,
-              '.tts'        :    tts_handler,
-              '.stationary' :    stationary_handler,
-              '.table'      :    stationary_handler,
-              '.whitelist'  :    whitelist_handler,
-              '.exclusive'  :    exclusive_handler,
-              '.help'       :    help_handler,
-              '.test'       :    test_messages
+commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
+              '.unban'      :    {'func':unban_handler, 'perm':2},
+              '.timeout'    :    {'func':timeout_handler, 'perm':2},
+              '.untimout'   :    {'func':untimeout_handler, 'perm':2},
+              '.devmode'    :    {'func':devmode_handler, 'perm':2},
+              '.mic'        :    {'func':mic_handler, 'perm':2},
+              '.tts'        :    {'func':tts_handler, 'perm':2},
+              '.stationary' :    {'func':stationary_handler, 'perm':2},
+              '.table'      :    {'func':stationary_handler, 'perm':2},
+              '.whitelist'  :    {'func':whitelist_handler, 'perm':2},
+              '.exclusive'  :    {'func':exclusive_handler, 'perm':2},
+              '.help'       :    {'func':help_handler, 'perm':0},
+              '.test'       :    {'func':test_messages, 'perm':0}
 	        }
 
 def handler(args):
@@ -320,7 +334,7 @@ def handler(args):
     
     if command != None:
         if command[0] in commands:
-            commands[command[0]](command, args)
+            commands[command[0]]['func'](command, args)
 
 # This function checks the user sending the command, and if authorized
 # call the move handler.

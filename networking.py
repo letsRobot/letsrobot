@@ -77,6 +77,8 @@ def handleConnectChatChannel(host):
             channel_id = key["id"]
             chat = key["chat"]
             log.info("channel {} found with id : {}".format(channel, channel_id))
+            break
+
     if channel_id == None:
         channel_id = response["channels"][0]["id"]
         chat = response["channels"][0]["chat"]
