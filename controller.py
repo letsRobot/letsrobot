@@ -56,9 +56,14 @@ console_handler=logging.StreamHandler()
 console_handler.setLevel(logging.getLevelName(robot_config.get('logging', 'console_level')))
 console_formatter=logging.Formatter('%(asctime)s - %(filename)s : %(message)s','%H:%M:%S')
 console_handler.setFormatter(console_formatter)
-file_handler=logging.handlers.RotatingFileHandler(robot_config.get('logging', 'log_file'),
+try:
+    file_handler=logging.handlers.RotatingFileHandler(robot_config.get('logging', 'log_file'),
         maxBytes=robot_config.getint('logging', 'max_size'),
         backupCount=robot_config.getint('logging', 'num_backup'))
+except IOError:
+    print("Error: Unable to write to log files. Check that they not owned by root, and that controller has write permissions to them")
+    sys.exit()
+            
 file_handler.setLevel(logging.getLevelName(robot_config.get('logging', 'file_level')))
 file_formatter=logging.Formatter('%(asctime)s %(name)s %(levelname)s - %(message)s','%Y-%m-%d %H:%M:%S')
 file_handler.setFormatter(file_formatter)

@@ -298,7 +298,6 @@ def help_handler(command, args):
    user = is_authed(args['sender'])
 
    for key in sorted(commands):
-       print(key)
        if commands[key]['perm'] <= user:
            available = available + " " + key 
 
