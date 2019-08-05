@@ -191,7 +191,7 @@ When `ext_chat` is enabled, the following chat commands are available. To use, j
 - `.ban NAME` Ban user NAME from controlling your bots
 - `.unban NAME` remove user NAME from the ban list
 - `.timeout NAME` Timeout user NAME from controlling your bots for 5 minutes
-- `.untimout NAME` remove user NAME from the timeout list.
+- `.untimeout NAME` remove user NAME from the timeout list.
 - `.brightness X` set the camera brightness [0..255]
 - `.contrast X` set the camera contrast [0..255]
 - `.saturation X` set the camera saturation [0..255]

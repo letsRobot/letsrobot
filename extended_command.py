@@ -308,7 +308,7 @@ def help_handler(command, args):
 commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.unban'      :    {'func':unban_handler, 'perm':2},
               '.timeout'    :    {'func':timeout_handler, 'perm':2},
-              '.untimout'   :    {'func':untimeout_handler, 'perm':2},
+              '.untimeout'   :    {'func':untimeout_handler, 'perm':2},
               '.devmode'    :    {'func':devmode_handler, 'perm':2},
               '.mic'        :    {'func':mic_handler, 'perm':2},
               '.tts'        :    {'func':tts_handler, 'perm':2},
