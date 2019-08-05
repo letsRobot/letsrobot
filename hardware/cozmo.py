@@ -141,13 +141,6 @@ def setup(robot_config):
 
     ffmpeg_location = robot_config.get('ffmpeg', 'ffmpeg_location')
 
-    while not coz:
-        try:
-           time.sleep(0.5)
-           print("not coz")
-        except (KeyboardInterrupt, SystemExit):
-           sys.exit()
-
     if robot_config.has_option('misc', 'video_server'):
         server = robot_config.get('misc', 'video_server')
     else:
@@ -194,8 +187,14 @@ def setup_coz(robot_config):
         pass        
     except cozmo.ConnectionError as e:
         sys.exit("A connection error occurred: %s" % e)
-
     
+    while not coz:
+        try:
+           time.sleep(0.5)
+           print("not coz")
+        except (KeyboardInterrupt, SystemExit):
+           sys.exit()
+
     return
     
 def run(coz_conn):
