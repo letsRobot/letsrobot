@@ -101,7 +101,7 @@ def startVideoCapture():
         ffmpeg.video_process=ffmpeg.subprocess.Popen(ffmpeg.shlex.split(videoCommandLine), stdin=ffmpeg.subprocess.PIPE)
     except OSError: # Can't find / execute ffmpeg
         log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
-        robot_util.terminate()
+        robot_util.terminate_controller()
     
     ffmpeg.atexit.register(ffmpeg.atExitVideoCapture)
     #ffmpeg.video_process.wait()

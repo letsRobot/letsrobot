@@ -221,10 +221,10 @@ def startVideoCapture():
 
        log.debug("videoCommandLine : %s", videoCommandLine)
        try:
-          video_process=subprocess.Popen(shlex.split(videoCommandLine))
+          video_process=subprocess.Popen(shlex.split(videoCommandLine), stderr=subprocess.PIPE)
        except OSError: # Can't find / execute ffmpeg
           log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
-          robot_util.terminate()
+          robot_util.terminate_controller()
 
        if video_process != None:
           try:
@@ -233,6 +233,11 @@ def startVideoCapture():
              pass
           atexit.register(atExitVideoCapture)
           video_process.wait()
+
+          error = video_process.communicate()
+          log.debug("ffmpeg video error message : {}".format(error))
+          log.error("ffmpeg video error : {}".format(error[1].decode().split('] ')[1]))
+
     else:
        log.debug("No Internet/Server : sleeping video start for 15 seconds")
        time.sleep(15)
@@ -281,7 +286,7 @@ def startAudioCapture():
                             
     log.debug("audioCommandLine : %s", audioCommandLine)
     try:
-        audio_process=subprocess.Popen(shlex.split(audioCommandLine))
+        audio_process=subprocess.Popen(shlex.split(audioCommandLine), stderr=subprocess.PIPE)
     except OSError: # Can't find / execute ffmpeg
         log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
         robot_util.terminate()
@@ -293,6 +298,10 @@ def startAudioCapture():
            pass
        atexit.register(atExitAudioCapture)
        audio_process.wait()
+
+       error = audio_process.communicate()
+       log.debug("ffmpeg audio error message : {}".format(error))
+       log.error("ffmpeg audio error : {}".format(error[1].decode().split('] ')[1]))
     
 def atExitAudioCapture():
     try:
