@@ -1,4 +1,5 @@
 #from video.ffmpeg import *
+from video.ffmpeg_process import *
 import video.ffmpeg as ffmpeg
 import networking
 import logging
@@ -48,13 +49,7 @@ def startAudioCapture():
                             channel=networking.channel_id)
 
     log.debug("audioCommandLine : %s", audioCommandLine)
-    ffmpeg.audio_process=ffmpeg.subprocess.Popen(audioCommandLine, shell=True)
-    ffmpeg.atexit.register(ffmpeg.atExitAudioCapture)
-    ffmpeg.audio_process.wait()
-    try:
-        ffmpeg.atexit.unregister(ffmpeg.atExitVideoCapture) # Only python 3
-    except AttributeError:
-        pass
+    ffmpeg.startFFMPEG(audioCommandLine, 'ffmpeg-arecord Audio',  ffmpeg.atExitAudioCapture, 'audio_process')
 
 def start():
    ffmpeg.start()

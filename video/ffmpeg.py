@@ -1,5 +1,6 @@
 #   TODO :  Look at making it so the ffmpeg process toggles a boolean, that is 
 # used to update the server with online state appropriately. 
+from video.ffmpeg_process import *
 
 import audio_util
 import networking
@@ -14,6 +15,8 @@ import sys
 import logging
 import robot_util
 import time
+import signal
+
 log = logging.getLogger('RemoTV.video.ffmpeg')
 
 robotKey=None
@@ -44,9 +47,6 @@ audio_output_options = None
 video_input_options = None
 video_output_options = None
 video_start_count = 0
-
-video_process = None
-audio_process = None
 
 brightness=None
 contrast=None
@@ -170,6 +170,54 @@ def start():
 #        watchdog.start("FFmpegAudioProcess", startAudioCapture)
             watchdog.start("FFmpegAudioProcess", startAudioCapture)
 
+# This starts the ffmpeg command string passed in command, and stores procces in the global
+# variable named after the string passed in process. It registers an atexit function pass in atExit
+# and uses the string passed in name as part of the error messages.
+def startFFMPEG(command, name, atExit, process):
+    try:
+        if sys.platform.startswith('linux') or sys.platform == "darwin":
+            ffmpeg_process=subprocess.Popen(command, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+        else: 
+            ffmpeg_process=subprocess.Popen(command, stderr=subprocess.PIPE, shell=True)
+        globals()[process] = ffmpeg_process
+    except OSError: # Can't find / execute ffmpeg
+        log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
+        robot_util.terminate_controller()
+        return()
+
+    if ffmpeg_process != None:
+        try:
+            atexit.unregister(atExit) # Only python 3
+        except AttributeError:
+            pass
+        atexit.register(atExit)
+        ffmpeg_process.wait()
+
+
+        if ffmpeg_process.returncode > 0:
+            log.debug("ffmpeg exited abnormally with code {}".format(ffmpeg_process.returncode))
+            error = ffmpeg_process.communicate()
+            log.debug("ffmpeg {} error message : {}".format(name, error))
+            try:
+                log.error("ffmpeg {} : {}".format(name, error[1].decode().split('] ')[1]))
+            except IndexError:
+                pass
+        else:
+            log.debug("ffmpeg exited normally with code {}".format(ffmpeg_process.returncode))
+
+
+        atexit.unregister(atExit)
+
+def stopFFMPEG(ffmpeg_process):
+    try:
+        if sys.platform.startswith('linux') or sys.platform == "darwin":
+            os.killpg(os.getpgid(ffmpeg_process.pid), signal.SIGTERM)
+        else:
+            subprocess.call(['taskkill', '/F', '/T', '/PID', str(ffmpeg_process.pid)])
+
+    except OSError: # process is already terminated
+        pass
+
 def startVideoCapture():
     global video_process
     global video_start_count
@@ -220,40 +268,20 @@ def startVideoCapture():
                             yres=y_res)
 
        log.debug("videoCommandLine : %s", videoCommandLine)
-       try:
-          video_process=subprocess.Popen(shlex.split(videoCommandLine), stderr=subprocess.PIPE)
-       except OSError: # Can't find / execute ffmpeg
-          log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
-          robot_util.terminate_controller()
-
-       if video_process != None:
-          try:
-             atexit.unregister(atExitVideoCapture) # Only python 3
-          except AttributeError:
-             pass
-          atexit.register(atExitVideoCapture)
-          video_process.wait()
-
-          error = video_process.communicate()
-          log.debug("ffmpeg video error message : {}".format(error))
-          log.error("ffmpeg video error : {}".format(error[1].decode().split('] ')[1]))
+       startFFMPEG(videoCommandLine, 'Video',  atExitVideoCapture, 'video_process')
 
     else:
        log.debug("No Internet/Server : sleeping video start for 15 seconds")
        time.sleep(15)
 
 def atExitVideoCapture():
-    try:
-        video_process.terminate
-    except OSError: # process is already terminated
-        pass
-
+    stopFFMPEG(video_process)
 
 def stopVideoCapture():
     if video_process != None:
         watchdog.stop('FFmpegCameraProcess')
-        video_process.terminate()
-    
+        stopFFMPEG(video_process)
+ 
 def restartVideoCapture(): 
     stopVideoCapture()
     watchdog.start("FFmpegCameraProcess", startVideoCapture)
@@ -285,39 +313,15 @@ def startAudioCapture():
                             channel=networking.channel_id)
                             
     log.debug("audioCommandLine : %s", audioCommandLine)
-    try:
-        audio_process=subprocess.Popen(shlex.split(audioCommandLine), stderr=subprocess.PIPE)
-    except OSError: # Can't find / execute ffmpeg
-        log.critical("ERROR: Can't find / execute ffmpeg, check path in conf")
-        robot_util.terminate()
-
-    if audio_process != None:
-       try:
-           atexit.unregister(atExitVideoCapture) # Only python 3
-       except AttributeError:
-           pass
-       atexit.register(atExitAudioCapture)
-       audio_process.wait()
-
-       error = audio_process.communicate()
-       log.debug("ffmpeg audio error message : {}".format(error))
-       log.error("ffmpeg audio error : {}".format(error[1].decode().split('] ')[1]))
+    startFFMPEG(audioCommandLine, 'Audio',  atExitAudioCapture, 'audio_process')
     
 def atExitAudioCapture():
-    try:
-        audio_process.terminate
-    except OSError: # process is already terminated
-        pass
+    stopFFMPEG(audio_process)
 
-# Windows command
-#    audioCommandLine = 'c:/ffmpeg/bin/ffmpeg.exe -f dshow -ar 44100 -ac %d -audio_buffer_size 250 -i audio="%s" -f mpegts -codec:a libtwolame -b:a 32k -muxdelay 0.001 http://%s:%s/%s/640/480/' % (robotSettings.mic_channels, 'TOSHIBA Web Camera - HD', audioHost, audioPort, robotSettings.stream_key)
-
-#    return subprocess.Popen(shlex.split(audioCommandLine))    
-   
 def stopAudioCapture():
     if audio_process != None:
         watchdog.stop('FFmpegAudioProcess')
-        audio_process.terminate()
+        stopFFMPEG(audio_process)
 
 def restartAudioCapture():
     stopAudioCapture()
@@ -392,17 +396,18 @@ def saturationChatHandler(command, args):
 def audioChatHandler(command, args):
     global audio_process
     global audio_bitrate
+    global mic_off
 
     if len(command) > 1:
         if extended_command.is_authed(args['sender']) == 2: # Owner
             if command[1] == 'start':
-                mic_off = false
+#                mic_off = False
                 if audio_process.returncode != None:
                     watchdog.start("FFmpegAudioProcess", startAudioCapture)
             elif command[1] == 'stop':
                 stopAudioCapture()
             elif command[1] == 'restart':
-                mic_off = false
+#                mic_off = False
                 stopAudioCapture()
                 watchdog.start("FFmpegAudioProcess", startAudioCapture)
             elif command[1] == 'bitrate':

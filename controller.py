@@ -15,13 +15,26 @@ import watchdog
 import logging
 import logging.handlers
 import json
+import atexit
 
 if (sys.version_info > (3, 0)):
     import importlib
     import _thread as thread
 else:
     import thread
- 
+    # borrowed unregister function from
+    # https://stackoverflow.com/questions/32097982/cannot-unregister-functions-from-atexit-in-python-2-7
+    def unregister(func, *targs, **kargs):
+        """unregister a function previously registered with atexit.
+           use exactly the same aguments used for before register.
+        """
+        for i in range(0,len(atexit._exithandlers)):
+            if (func, targs, kargs) == atexit._exithandlers[i] :
+                del atexit._exithandlers[i]
+                return True
+        return False 
+    atexit.unregister = unregister
+
 from threading import Timer
 
 # fail gracefully if configparser is not installed
@@ -142,28 +155,27 @@ def handle_message(ws, message):
         log.error("Unable to parse message")
         return
 
-    try:
-        if "e" not in messageData:
-            log.error("Malformed Message")
-        event = messageData["e"]
-        data = messageData["d"]
+#    try:
+    if "e" not in messageData:
+        log.error("Malformed Message")
+    event = messageData["e"]
+    data = messageData["d"]
 
-        if event == "BUTTON_COMMAND":
-            on_handle_command(data)
-           # handle_command(data)
+    if event == "BUTTON_COMMAND":
+        on_handle_command(data)
+       # handle_command(data)
 
-        elif event == "MESSAGE_RECEIVED":
-            on_handle_chat_message(data)
+    elif event == "MESSAGE_RECEIVED":
+        on_handle_chat_message(data)
 
-        elif event == "ROBOT_VALIDATED":
-            networking.handleConnectChatChannel(data["host"])
+    elif event == "ROBOT_VALIDATED":
+        networking.handleConnectChatChannel(data["host"])
 
-        else:
-            log.error("Unknown event type")
+    else:
+        log.error("Unknown event type")
 
-
-    except Exception as e:
-        print(e)
+#    except Exception as e:
+#        print(e)
 
 def handle_chat_message(args):
     log.info("chat message received: %s", args)
@@ -208,7 +220,7 @@ def on_handle_chat_message(*args):
        thread.start_new_thread(chat_module.handle_chat, args)
    
 def restart_controller(command, args):
-    if extended_command.is_authed(args['name']) == 2: # Owner
+    if extended_command.is_authed(args['sender']) == 2: # Owner
         terminate.acquire()
 
                     
@@ -300,7 +312,6 @@ if commandArgs.custom_chat:
     else:
        log.warning("Unable to find chat_custom.py")
     
-import atexit
 atexit.register(log.debug, "Attempting to clean up and exit nicely")
 
 log.critical('RemoTV Controller Started')
