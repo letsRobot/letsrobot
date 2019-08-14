@@ -150,8 +150,8 @@ def setup(robot_config):
         if robot_config.getboolean('tts', 'ext_chat'):
             extended_command.add_command('.audio', audioChatHandler)
 
-        # resolve device name to hw num, unless under windows
-        if audio_input_format != "dshow":
+        # resolve device name to hw num, only with alsa
+        if audio_input_format == "alsa":
             if audio_device != '':
                 temp_hw_num = audio_util.getMicByName(audio_device.encode('utf-8'))
                 if temp_hw_num != None:
