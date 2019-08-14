@@ -1,5 +1,4 @@
 import os
-import networking
 import tts.tts as tts
 import schedule
 import robot_util
@@ -77,14 +76,6 @@ def setup(robot_config):
             api_key = None
     
     mods = ""
-#############################################
-#############################################
-#############################################
-
-#    mods = networking.getOwnerDetails(owner)['robocaster']['moderators']
-    if robot_config.has_option('misc', 'global_mods'):
-        if robot_config.getboolean('misc', 'global_mods'):
-           mods = mods + networking.getFrontPage()['admins']
     log.info("Moderators : %s", mods)
 
 # check if the user is the owner or moderator, 0 for not, 1 for moderator, 2 for owner
@@ -116,19 +107,23 @@ def whitelist_handler(command, args):
             user = command[2]
             if command[1] == 'add':
                 whiteList.append(user)
-                log.info("%s added to whitelist", args['sender'])
+                log.info("%s added to whitelist", user)
+                robot_util.sendChatMessage("User {} added to whitelist".format(user))
             elif command[1] == 'del':
                 whiteList.remove(user)
-                log.info("%s removed from whitelist", args['sender'])
+                log.info("%s removed from whitelist", user)
+                robot_util.sendChatMessage("User {} removed from whitelist".format(user))
             elif command[1] == 'command':
                 if len(command) > 3:
                     new_command = command[3]
                     if command[2] == 'add':
                         whiteListCommand.append(new_command)
                         log.info("%s added to command whitelist" % new_command)
+                        robot_util.sendChatMessage("command {} added to whitelist".format(new_command))
                     elif command[2] == 'del':
                         whiteListCommand.remove(new_command)
-                        log.inf("%s removed from command whitelist" % new_command)
+                        log.info("%s removed from command whitelist" % new_command)
+                        robot_util.sendChatMessage("command {} removed from whitelist".format(new_command))
 
 def exclusive_handler(command, args):
     global exclusive
@@ -142,20 +137,24 @@ def exclusive_handler(command, args):
             if command[1] == 'off':
                 exclusive = False
                 log.info("Exclusive control disabled")
+                robot_util.sendChatMessage("Exclusive control disabled")
                 return
             elif len(command) < 3:
                 exclusive_user = command[1]
                 exclusive = True
                 log.info("%s given exclusive control", command[1])
+                robot_util.sendChatMessage("{} given exclusive control".format( command[1]))
                 return
             elif (len(command) >= 2) and (command[1] == 'mods'):
                 if command[2] == 'on':
                    exclusive_mods = True
                    log.info("Enabling mod control during exclusive")
+                   robot_util.sendChatMessage("Enabling mod control during exclusive")
                    return
                 elif command[2] == 'off':
                    exclusive_mods = False
                    log.info("Disabling mod control during exclusive")
+                   robot_util.sendChatMessage("Disabling mod control during exclusive")
                    return
 
 
@@ -167,6 +166,7 @@ def ban_handler(command, args):
         if is_authed(args['sender']): # Moderator
             banned.append(user)
             log.info("%s added %s to ban list", args['sender'], user)
+            robot_util.sendChatMessage("{} added to ban list".format(user))
             tts.mute_user_tts(user)            
 
 def unban_handler(command, args):
@@ -178,6 +178,7 @@ def unban_handler(command, args):
             if user in banned:
                 banned.remove(user)
                 log.info("%s removed %s from ban list", args['sender'], user)
+                robot_util.sendChatMessage("{} removed from ban list".format(user))
                 tts.unmute_user_tts(user)            
 
 def timeout_handler(command, args):
@@ -187,8 +188,9 @@ def timeout_handler(command, args):
         user = command[1]
         if is_authed(args['sender']): # Moderator
             banned.append(user)
-            schedule.single_task(5, untimeout_user, user)
+            schedule.single_task(300, untimeout_user, user)
             log.info("%s added %s to timeout list", args['sender'], user)
+            robot_util.sendChatMessage("{} timed out".format(user))
             tts.mute_user_tts(user)            
             
     
@@ -198,6 +200,7 @@ def untimeout_user(user):
     if user in banned:  
         banned.remove(user)
         log.info("%s timeout expired", user)
+        robot_util.sendChatMessage("{} timeout expired".format(user))
         tts.unmute_user_tts(user)            
 
 
@@ -210,6 +213,7 @@ def untimeout_handler(command, args):
             if user in banned:
                 banned.remove(user)
                 log.info("%s removed %s from timeout list", args['sender'], user)
+                robot_util.sendChatMessage("{} timeout cleared".format(user))
                 tts.unmute_user_tts(user)            
     
     
@@ -221,13 +225,16 @@ def devmode_handler(command, args):
         if is_authed(args['sender']) == 2: # Owner
             if command[1] == 'on':
                 log.info("Owner enabled dev mode")
+                robot_util.sendChatMessage("Local Dev mode enabled")
                 dev_mode = True
                 dev_mode_mods = False
             elif command[1] == 'off':
                 log.info("Owner disabled dev mode")
+                robot_util.sendChatMessage("Local Dev mode disabled")
                 dev_mode = False
             elif command[1] == 'mods':
                 log.info("Owner enabled dev mode with mod control")
+                robot_util.sendChatMessage("Local Dev mode with mod controls enabled")
                 dev_mode = True
                 dev_mode_mods = True
     log.debug("dev_mode : %s", str(dev_mode))
@@ -263,15 +270,18 @@ def tts_handler(command, args):
         if is_authed(args['sender']) == 2: # Owner
             if command[1] == 'mute':
                 log.info("Owner muted TTS")
+                robot_util.sendChatMessage("TTS muted")
                 tts.mute_tts()
                 return
             elif command[1] == 'unmute':
                 log.info("Owner unmuted TTS")
+                robot_util.sendChatMessage("TTS unmuted")
                 tts.unmute_tts()
                 return
             elif command[1] == 'vol':
                 if len(command) > 2:
                     log.info("Owner changed TTS Volume")
+                    robot_util.sendChatMessage("Changed TTS volume")
                     tts.volume(command[2])
                 return
 
@@ -286,12 +296,16 @@ def stationary_handler(command, args):
         else:
             stationary = not stationary
         log.info("stationary is %s", stationary)
+        if stationary:
+            robot_util.sendChatMessage("Stationary mode enabled")
+        else:
+            robot_util.sendChatMessage("Stationary mode disabled")
 
 def test_messages(command, args):
    log.debug(command)
    log.debug(args)
    command = args["message"].split(' ')[1:]
-   networking.sendChatMessage(command)
+   robot_util.sendChatMessage(command)
 
 def help_handler(command, args):
    available = ""
@@ -301,7 +315,7 @@ def help_handler(command, args):
        if commands[key]['perm'] <= user:
            available = available + " " + key 
 
-   networking.sendChatMessage('.Available commands : ' + available)
+   robot_util.sendChatMessage('.Available commands : ' + available)
    
  
 # This is a dictionary of commands and their handler functions
