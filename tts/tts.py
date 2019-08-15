@@ -170,8 +170,11 @@ def volume(vol):
         tts_module.volume(vol)
     except AttributeError:
         log.info("Setting volume to %d" % new_vol)
-        os.system("amixer set PCM -- 100%d%%" % new_vol)
-        os.system("amixer -c %s cset numid=3 %d%%" % (hw_num, new_vol))
+        # os.system("amixer set PCM -- 100%d%%" % new_vol)
+        # os.system("amixer -c %s cset numid=3 %d%%" % (hw_num, new_vol))
+        os.system("amixer -c %s set PCM %s%%" % (hw_num, new_vol))
+        
+
     
 def onHandleChatMessageRemoved(*args):
    global tts_deleted
