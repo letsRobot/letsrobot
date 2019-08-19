@@ -120,8 +120,8 @@ def setupWebSocket(robot_config, onHandleMessage):
     bootMessageList = bootMessages.split(',')
     bootMessage = random.choice(bootMessageList)
 
-    if robot_config.has_option('tts', 'ip_address'):
-        ipAddr = robot_config.getboolean('tts', 'ip_address')
+    if robot_config.has_option('tts', 'announce_ip'):
+        ipAddr = robot_config.getboolean('tts', 'announce_ip')
     if ipAddr:
         addr = os.popen("ip -4 addr show wlan0 | grep -oP \'(?<=inet\\s)\\d+(\\.\\d+){3}\'").read().rstrip()
         log.info('IPv4 Addr : {}'.format(addr))
