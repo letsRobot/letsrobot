@@ -7,6 +7,8 @@ import watchdog
 import logging
 import random
 import websocket
+import os
+
 
 if (sys.version_info > (3, 0)):
 #    import _thread as thread
@@ -31,6 +33,8 @@ internetStatus = True
 no_chat_server = None
 
 bootMessage = None
+
+ipAddr = None
 
 def getChatChannels(host):
     url = 'http://%s:3231/api/%s/channels/list/%s' % (server, version, host)
@@ -97,6 +101,7 @@ def setupWebSocket(robot_config, onHandleMessage):
     global webSocket
     global server
     global version
+    global ipAddr
 
     global channel
 
@@ -114,6 +119,13 @@ def setupWebSocket(robot_config, onHandleMessage):
     bootMessages = robot_config.get('tts', 'boot_message')
     bootMessageList = bootMessages.split(',')
     bootMessage = random.choice(bootMessageList)
+
+    if robot_config.has_option('tts', 'announce_ip'):
+        ipAddr = robot_config.getboolean('tts', 'announce_ip')
+    if ipAddr:
+        addr = os.popen("ip -4 addr show wlan0 | grep -oP \'(?<=inet\\s)\\d+(\\.\\d+){3}\'").read().rstrip()
+        log.info('IPv4 Addr : {}'.format(addr))
+        bootMessage = "My IP address is {}".format(addr)
 
 #    log.info("using socket io to connect to control %s", controlHostPort)
     log.info("configuring web socket ws://%s:3231/" % server)
