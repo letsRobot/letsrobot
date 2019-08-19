@@ -249,7 +249,7 @@ def setup(robot_config):
 
 
 def move( args ):
-    command = args['button']['command'].upper()
+    command = args['button']['command']
 
     global drivingSpeed
     
