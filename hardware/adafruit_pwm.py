@@ -11,28 +11,28 @@ def move(args):
     
     log.debug("move adafruit pwm command : %s", command)
         
-    if command == 'L':
+    if command == 'l':
         pwm.setPWM(1, 0, 300) # turn left
         pwm.setPWM(0, 0, 445) # drive forward
         time.sleep(0.5)
         pwm.setPWM(1, 0, 400) # turn neutral
         pwm.setPWM(0, 0, 335) # drive neutral
 
-    if command == 'R':
+    if command == 'r':
         pwm.setPWM(1, 0, 500) # turn right
         pwm.setPWM(0, 0, 445) # drive forward
         time.sleep(0.5)
         pwm.setPWM(1, 0, 400) # turn neutral
         pwm.setPWM(0, 0, 335) # drive neutral
 
-    if command == 'BL':
+    if command == 'bl':
         pwm.setPWM(1, 0, 300) # turn left
         pwm.setPWM(0, 0, 270) # drive backward
         time.sleep(0.5)
         pwm.setPWM(1, 0, 400) # turn neutral
         pwm.setPWM(0, 0, 335) # drive neutral
 
-    if command == 'BR':
+    if command == 'br':
         pwm.setPWM(1, 0, 500) # turn right
         pwm.setPWM(0, 0, 270) # drive backward
         time.sleep(0.5)
@@ -40,13 +40,13 @@ def move(args):
         pwm.setPWM(0, 0, 335) # drive neutral
 
         
-    if command == 'F':
+    if command == 'f':
         pwm.setPWM(0, 0, 445) # drive forward
         time.sleep(0.3)
         pwm.setPWM(0, 0, 345) # drive slowly forward
         time.sleep(0.4)
         pwm.setPWM(0, 0, 335) # drive neutral
-    if command == 'B':
+    if command == 'b':
         pwm.setPWM(0, 0, 270) # drive backward
         time.sleep(0.3)
         pwm.setPWM(0, 0, 325) # drive slowly backward

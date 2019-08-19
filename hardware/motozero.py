@@ -67,7 +67,7 @@ def setup(robot_config):
 def move(args):
     direction = args['button']['command']
     
-    if direction == 'F':
+    if direction == 'f':
         GPIO.output(Motor1B, GPIO.HIGH)
         GPIO.output(Motor1Enable,GPIO.HIGH)
 
@@ -86,7 +86,7 @@ def move(args):
         GPIO.output(Motor2B, GPIO.LOW)
         GPIO.output(Motor3A, GPIO.LOW)
         GPIO.output(Motor4B, GPIO.LOW)
-    if direction == 'B':
+    if direction == 'b':
         GPIO.output(Motor1A, GPIO.HIGH)
         GPIO.output(Motor1Enable, GPIO.HIGH)
 
@@ -106,7 +106,7 @@ def move(args):
         GPIO.output(Motor3B, GPIO.LOW)
         GPIO.output(Motor4A, GPIO.LOW)
 
-    if direction =='L':
+    if direction =='l':
         GPIO.output(Motor3B, GPIO.HIGH)
         GPIO.output(Motor3Enable, GPIO.HIGH)
 
@@ -126,7 +126,7 @@ def move(args):
         GPIO.output(Motor2B, GPIO.LOW)
         GPIO.output(Motor4B, GPIO.LOW)
 
-    if direction == 'R':
+    if direction == 'r':
         GPIO.output(Motor3A, GPIO.HIGH)
         GPIO.output(Motor3Enable, GPIO.HIGH)
 

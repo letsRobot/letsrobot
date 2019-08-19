@@ -346,43 +346,43 @@ def move(args):
                 if not stay_on_dock:
                     coz.drive_off_charger_contacts().wait_for_completed()
 
-        if command == 'F':
+        if command == 'f':
             #causes delays #coz.drive_straight(distance_mm(10), speed_mmps(50), False, True).wait_for_completed()
             coz.drive_wheels(forward_speed, forward_speed, forward_speed*4, forward_speed*4 )
             time.sleep(0.7)
             coz.drive_wheels(0, 0, 0, 0 )
-        elif command == 'B':
+        elif command == 'b':
             #causes delays #coz.drive_straight(distance_mm(-10), speed_mmps(50), False, True).wait_for_completed()
             coz.drive_wheels(-forward_speed, -forward_speed, -forward_speed*4, -forward_speed*4 )
             time.sleep(0.7)
             coz.drive_wheels(0, 0, 0, 0 )
-        elif command == 'L':
+        elif command == 'l':
             #causes delays #coz.turn_in_place(degrees(15), False).wait_for_completed()
             coz.drive_wheels(-turn_speed, turn_speed, -turn_speed*4, turn_speed*4 )
             time.sleep(0.5)
             coz.drive_wheels(0, 0, 0, 0 )
-        elif command == 'R':
+        elif command == 'r':
             #causes delays #coz.turn_in_place(degrees(-15), False).wait_for_completed()
             coz.drive_wheels(turn_speed, -turn_speed, turn_speed*4, -turn_speed*4 )
             time.sleep(0.5)
             coz.drive_wheels(0, 0, 0, 0 )
 
         #move lift
-        elif command == 'W':
+        elif command == 'w':
             coz.set_lift_height(height=1).wait_for_completed()
-        elif command == 'S':
+        elif command == 's':
             coz.set_lift_height(height=0).wait_for_completed()
 
         #look up down
         #-25 (down) to 44.5 degrees (up)
-        elif command == 'A':
+        elif command == 'a':
             #head_angle_action = coz.set_head_angle(degrees(0))
             #clamped_head_angle = head_angle_action.angle.degrees
             #head_angle_action.wait_for_completed()
             coz.move_head(-1.0)
             time.sleep(0.35)
             coz.move_head(0)
-        elif command == 'Q':
+        elif command == 'q':
             #head_angle_action = coz.set_head_angle(degrees(44.5))
             #clamped_head_angle = head_angle_action.angle.degrees
             #head_angle_action.wait_for_completed()
@@ -391,7 +391,7 @@ def move(args):
             coz.move_head(0)
 
         #toggle light
-        elif command =='V':
+        elif command =='v':
             print( "cozmo light was ", is_headlight_on )
             is_headlight_on = not is_headlight_on
             coz.set_head_light(enable=is_headlight_on)

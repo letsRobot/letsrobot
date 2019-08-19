@@ -30,25 +30,25 @@ def setup(robot_config):
 def move(args):
     direction = args['button']['command']
 
-    if direction == 'F':
+    if direction == 'f':
         servo.setTarget(0, 12000)
         servo.setTarget(1, 12000)
         time.sleep(straightDelay)
         servo.setTarget(0, 6000)
         servo.setTarget(1, 6000)
-    elif direction == 'B':
+    elif direction == 'b':
         servo.setTarget(0, 0)
         servo.setTarget(1, 0)
         time.sleep(straightDelay)
         servo.setTarget(0, 6000)
         servo.setTarget(1, 6000)
-    elif direction == 'L':
+    elif direction == 'l':
         servo.setTarget(0, 0)
         servo.setTarget(1, 12000)
         time.sleep(turnDelay)
         servo.setTarget(0, 6000)
         servo.setTarget(1, 6000)
-    elif direction == 'R':
+    elif direction == 'r':
         servo.setTarget(0, 12000)
         servo.setTarget(1, 0)
         time.sleep(turnDelay)

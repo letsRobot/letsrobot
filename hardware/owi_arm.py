@@ -51,25 +51,25 @@ def move(args):
     global led
     command = args['button']['command']
     
-    if command == 'L':
+    if command == 'l':
         MoveArm(0.15, [0,2,0]) # Rotate counter-clockwise
-    if command == 'R':
+    if command == 'r':
         MoveArm(0.15, [0,1,0]) # Rotate clockwise
-    if command == 'B':
+    if command == 'b':
         MoveArm(0.15, [128,0,0]) # Rotate Shoulder down
-    if command == 'F':
+    if command == 'f':
         MoveArm(0.15, [64,0,0]) # Rotate Shoulder up
-    if command == 'U':
+    if command == 'u':
         MoveArm(0.15, [16,0,0]) # Rotate Elbow up
-    if command == 'D':
+    if command == 'd':
         MoveArm(0.15, [32,0,0]) # Rotate Elbow down
-    if command == 'W':
+    if command == 'w':
         MoveArm(0.15, [4,0,0]) # Rotate Wrist Up
-    if command == 'S':
+    if command == 's':
         MoveArm(0.15, [8,0,0]) # Rotate Wrist Down
-    if command == 'C':
+    if command == 'c':
         MoveArm(0.15, [2,0,0]) # Open Gripper
-    if command == 'V':
+    if command == 'v':
         MoveArm(0.15, [1,0,0]) # Close Gripper
     if command == '1':
         led = 1;

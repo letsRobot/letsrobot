@@ -19,19 +19,19 @@ def setup(robot_config):
     
 def move(args):
     command = args['button']['command']
-    if direction == 'F':
+    if direction == 'f':
 	      motors.setSpeeds(drivingSpeed, drivingSpeed)
 	      time.sleep(0.3)
 	      motors.setSpeeds(0, 0)
-    if direction == 'B':
+    if direction == 'b':
 	      motors.setSpeeds(-drivingSpeed, -drivingSpeed)
 	      time.sleep(0.3)
 	      motors.setSpeeds(0, 0)
-    if direction == 'L':
+    if direction == 'l':
 	      motors.setSpeeds(-drivingSpeed, drivingSpeed)
 	      time.sleep(0.3)
 	      motors.setSpeeds(0, 0)
-    if direction == 'R':
+    if direction == 'r':
 	      motors.setSpeeds(drivingSpeed, -drivingSpeed)
 	      time.sleep(0.3)
 	      motors.setSpeeds(0, 0)

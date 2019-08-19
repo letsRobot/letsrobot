@@ -72,7 +72,7 @@ def move(args):
 
 
 def moveMDD10(command, speedPercent):
-    if command == 'F':
+    if command == 'f':
         GPIO.output(DIG1, GPIO.LOW)
         GPIO.output(DIG2, GPIO.LOW)
         p1.start(speedPercent)  # set speed for M1 
@@ -80,7 +80,7 @@ def moveMDD10(command, speedPercent):
         time.sleep(straightDelay)
         p1.start(0)
         p2.start(0)
-    if command == 'B':
+    if command == 'b':
         GPIO.output(DIG1, GPIO.HIGH)
         GPIO.output(DIG2, GPIO.HIGH)
         p1.start(speedPercent)
@@ -88,7 +88,7 @@ def moveMDD10(command, speedPercent):
         time.sleep(straightDelay)
         p1.start(0)
         p2.start(0)
-    if command == 'L':
+    if command == 'l':
         GPIO.output(DIG1, GPIO.LOW)
         GPIO.output(DIG2, GPIO.HIGH)
         p1.start(speedPercent)
@@ -96,7 +96,7 @@ def moveMDD10(command, speedPercent):
         time.sleep(turnDelay)
         p1.start(0)
         p2.start(0)
-    if command == 'R':
+    if command == 'r':
         GPIO.output(DIG1, GPIO.HIGH)
         GPIO.output(DIG2, GPIO.LOW)
         p1.start(speedPercent)

@@ -61,19 +61,19 @@ def setup(robot_config):
 
 def move(args):
     direction = args['button']['command']
-    if direction == 'F':
+    if direction == 'f':
         GPIO.output(StepPinForward, GPIO.HIGH)
         time.sleep(sleeptime)
         GPIO.output(StepPinForward, GPIO.LOW)
-    if direction == 'B':
+    if direction == 'b':
         GPIO.output(StepPinBackward, GPIO.HIGH)
         time.sleep(sleeptime)
         GPIO.output(StepPinBackward, GPIO.LOW)
-    if direction == 'L':
+    if direction == 'l':
         GPIO.output(StepPinLeft, GPIO.HIGH)
         time.sleep(sleeptime * rotatetimes)
         GPIO.output(StepPinLeft, GPIO.LOW)
-    if direction == 'R':
+    if direction == 'r':
         GPIO.output(StepPinRight, GPIO.HIGH)
         time.sleep(sleeptime * rotatetimes)
         GPIO.output(StepPinRight, GPIO.LOW)

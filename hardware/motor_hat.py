@@ -264,48 +264,45 @@ def move( args ):
     
     motorA.setSpeed(drivingSpeed)
     motorB.setSpeed(drivingSpeed)
-    if command == 'F':
+    if command == 'f':
         drivingSpeed = drivingSpeedActuallyUsed
         for motorIndex in range(4):
             runMotor(motorIndex, forward[motorIndex])
         time.sleep(straightDelay)
-    if command == 'B':
+    if command == 'b':
         drivingSpeed = drivingSpeedActuallyUsed
         for motorIndex in range(4):
             runMotor(motorIndex, backward[motorIndex])
         time.sleep(straightDelay)
-    if command == 'L':
+    if command == 'l':
         drivingSpeed = turningSpeedActuallyUsed
         for motorIndex in range(4):
             runMotor(motorIndex, left[motorIndex])
         time.sleep(turnDelay)
-    if command == 'R':
+    if command == 'r':
         drivingSpeed = turningSpeedActuallyUsed
         for motorIndex in range(4):
             runMotor(motorIndex, right[motorIndex])
         time.sleep(turnDelay)
-    if command == 'U':
+    if command == 'u':
         #mhArm.getMotor(1).setSpeed(127)
         #mhArm.getMotor(1).run(Adafruit_MotorHAT.BACKWARD)
         incrementArmServo(1, 10)
         time.sleep(0.05)
-    if command == 'D':
+    if command == 'd':
         #mhArm.getMotor(1).setSpeed(127)
         #mhArm.getMotor(1).run(Adafruit_MotorHAT.FORWARD)
         incrementArmServo(1, -10)
         time.sleep(0.05)
-    if command == 'O':
+    if command == 'o':
         #mhArm.getMotor(2).setSpeed(127)
         #mhArm.getMotor(2).run(Adafruit_MotorHAT.BACKWARD)
         incrementArmServo(2, -10)
         time.sleep(0.05)
-    if command == 'C':
+    if command == 'c':
         #mhArm.getMotor(2).setSpeed(127)
         #mhArm.getMotor(2).run(Adafruit_MotorHAT.FORWARD)
         incrementArmServo(2, 10)
         time.sleep(0.05)
 
     turnOffMotors()
-#        if command == 'WALL':
-#            handleLoudCommand()
-#            os.system("aplay -D plughw:2,0 /home/pi/wall.wav")

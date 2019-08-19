@@ -15,19 +15,19 @@ def setup(robot_config):
 def move(args):
     command = args['button']['command']
     
-    if command == 'L':
+    if command == 'l':
         gopigo.left_rot()
         time.sleep(0.15)
         gopigo.stop()
-    if command == 'R':
+    if command == 'r':
         gopigo.right_rot()
         time.sleep(0.15)
         gopigo.stop()
-    if command == 'F':
+    if command == 'f':
         gopigo.forward()
         time.sleep(0.35)
         gopigo.stop()
-    if command == 'B':
+    if command == 'b':
         gopigo.backward()
         time.sleep(0.35)
         gopigo.stop()

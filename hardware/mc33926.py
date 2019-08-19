@@ -21,25 +21,25 @@ def move(args):
     command = args['button']['command']
     
     drivingSpeed = -180
-    if direction == 'F':
+    if direction == 'f':
               motors.enable()
               motors.setSpeeds(-drivingSpeed, drivingSpeed)
               time.sleep(0.3)
               motors.setSpeeds(0, 0)
               motors.disable()
-    if direction == 'B':
+    if direction == 'b':
               motors.enable()
               motors.setSpeeds(drivingSpeed, -drivingSpeed)
               time.sleep(0.3)
               motors.setSpeeds(0, 0)
               motors.disable()
-    if direction == 'L':
+    if direction == 'l':
               motors.enable()
               motors.setSpeeds(drivingSpeed, drivingSpeed)
               time.sleep(0.3)
               motors.setSpeeds(0, 0)
               motors.disable()
-    if direction == 'R':
+    if direction == 'r':
               motors.enable()
               motors.setSpeeds(-drivingSpeed, -drivingSpeed)
               time.sleep(0.3)

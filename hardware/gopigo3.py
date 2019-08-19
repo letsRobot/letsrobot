@@ -18,21 +18,21 @@ def setup(robot_config):
 def move(args):
     command = args['button']['command']
     e = easyGoPiGo3
-    if command == 'L':
+    if command == 'l':
         e.set_motor_dps(e.MOTOR_LEFT, -e.get_speed())
         e.set_motor_dps(e.MOTOR_RIGHT, e.get_speed())
         time.sleep(turn_time)
         easyGoPiGo3.stop()
-    if command == 'R':
+    if command == 'r':
         e.set_motor_dps(e.MOTOR_LEFT, e.get_speed())
         e.set_motor_dps(e.MOTOR_RIGHT, -e.get_speed())
         time.sleep(turn_time)
         easyGoPiGo3.stop()
-    if command == 'F':
+    if command == 'f':
         easyGoPiGo3.forward()
         time.sleep(drive_time)
         easyGoPiGo3.stop()
-    if command == 'B':
+    if command == 'b':
         easyGoPiGo3.backward()
         time.sleep(drive_time)
         easyGoPiGo3.stop()
