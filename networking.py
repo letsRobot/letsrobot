@@ -9,7 +9,8 @@ import random
 import websocket
 import os
 import re
-
+import robot_util
+import schedule
 
 if (sys.version_info > (3, 0)):
 #    import _thread as thread
@@ -97,6 +98,11 @@ def handleConnectChatChannel(host):
         {"e": "GET_CHAT", "d": chat}))
     authenticated = True
 
+def checkWebSocket():
+    if not authenticated:
+        log.critical("Websocket failed to connect or authenticate correctly")
+        robot_util.terminate_controller()
+
 def setupWebSocket(robot_config, onHandleMessage):
     global robot_key
 
@@ -149,6 +155,8 @@ def setupWebSocket(robot_config, onHandleMessage):
                                 on_close=onHandleWebSocketClose)
     log.info("staring websocket listen process")
     startListenForWebSocket()
+
+    schedule.single_task(5, checkWebSocket)
     
     if robot_config.getboolean('misc', 'check_internet'):
         #schedule a task to check internet status
