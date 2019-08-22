@@ -4,8 +4,8 @@ from botocore.exceptions import ClientError
 from subprocess import Popen, PIPE
 import os
 import random
-import networking
 import logging
+import robot_util
 
 log = logging.getLogger('RemoTV.tts.polly')
 
@@ -22,7 +22,6 @@ users = {}
 robot_voice = None
 hw_num = None
 fallback_tts = None
-messenger = None
 
 def new_voice(command, args):
     global users
@@ -35,8 +34,7 @@ def new_voice(command, args):
             else:
                 users[user] = random.choice(voices)
 
-        if messenger:
-            networking.sendChatMessage(".%s your voice is now %s" %(user, users[user]))
+            robot_util.sendChatMessage(".%s your voice is now %s" %(user, users[user]))
 
 def setup(robot_config):
     global client
@@ -46,7 +44,6 @@ def setup(robot_config):
     global hw_num
     global random_voice
     global fallback_tts
-    global messenger
     
     owner = robot_config.get('robot', 'owner').split(',')
     owner_voice = robot_config.get('polly', 'owner_voice')
@@ -61,7 +58,6 @@ def setup(robot_config):
     access_key=robot_config.get('polly', 'access_key')
     secrets_key=robot_config.get('polly', 'secrets_key')
     region_name=robot_config.get('polly', 'region_name')
-    messenger = robot_config.getboolean('messenger', 'enable')
     
     client = boto3.Session(aws_access_key_id=access_key,
                             aws_secret_access_key=secrets_key,

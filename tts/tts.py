@@ -41,10 +41,12 @@ def setup(robot_config):
         delay_tts = robot_config.getboolean('tts', 'delay_tts')
         delay = robot_config.getint('tts', 'delay')
 
-    if delay_tts and not robot_config.getboolean('messenger', 'enable'):
-        log.error("Warning! delayed TTS requires messenger.")
-        log.error("delayed TTS disabled.")
-        delay_tts = False
+# TODO: Delay TTS may not currently be via, and messenger no longer exist
+#       and sending messages to chat cannot currently be disabled.
+#    if delay_tts and not robot_config.getboolean('messenger', 'enable'):
+#        log.error("Warning! delayed TTS requires messenger.")
+#        log.error("delayed TTS disabled.")
+#        delay_tts = False
   
     # get playback device hardware num from name.
     if robot_config.has_option('tts', 'speaker_device'): 
