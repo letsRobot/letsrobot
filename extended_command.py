@@ -59,14 +59,18 @@ banned=[]
 mods=[]
 whiteList=[]
 whiteListCommand=[]
+robot_config = None
 
-def setup(robot_config):
+def setup(config):
     global owner
     global robot_key
     global api_key
     global buttons_json
     global mods
-    
+    global robot_config
+
+    robot_config = config
+
     owner = robot_config.get('robot', 'owner').split(',')
     robot_key = robot_config.get('robot', 'robot_key')
 
@@ -317,7 +321,11 @@ def help_handler(command, args):
 
    robot_util.sendChatMessage('.Available commands : ' + available)
    
- 
+def save_handler(command, args):
+   if is_authed(args['sender']) == 2:
+      robot_config.write('controller.conf')
+      robot_util.sendChatMessage('.Config file saved.')
+
 # This is a dictionary of commands and their handler functions
 commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.unban'      :    {'func':unban_handler, 'perm':2},
@@ -331,6 +339,7 @@ commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.whitelist'  :    {'func':whitelist_handler, 'perm':2},
               '.exclusive'  :    {'func':exclusive_handler, 'perm':2},
               '.help'       :    {'func':help_handler, 'perm':0},
+              '.save'       :    {'func':save_handler, 'perm':2},
               '.test'       :    {'func':test_messages, 'perm':0}
 	        }
 

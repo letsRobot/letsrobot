@@ -46,13 +46,78 @@ except ImportError:
     sys.exit()
 
 try: 
-    robot_config.readfp(open('controller.conf'))
+    with open('controller.conf', 'r') as fp:
+        robot_config.readfp(fp)
 except IOError:
     print("unable to read controller.conf, please check that you have copied controller.sample.conf to controller.conf and modified it appropriately.")
     sys.exit()
 except:
     print ("Error in controller.conf:", sys.exc_info()[0])
     sys.exit()
+
+def write(self, config_file):
+    sections = 0
+    keys = 0
+    errors = 0
+    keys_in = 0
+    sections_in = 0
+
+    # count sections and keys in config
+    for section in self.sections():
+        sections_in += 1
+        for option in self[section]:
+            keys_in += 1
+
+    # read the existing config file
+    with open(config_file, 'r') as fp:
+        lines = fp.readlines()
+
+    # parse the config file line by line and update any keys found
+    for count, line in enumerate(lines):
+        temp_line = line.lstrip(' \t')
+        if temp_line[0] == '#' or temp_line[0] == ';':
+            continue # comment
+        elif temp_line[0] == '[':
+            section = temp_line.find(']')
+            if sections == -1:
+                errors += 1
+                log.error("ERROR: Unable parse line {} of config as [section] header : '{}'".format(count, line.rstrip('\r\n')))
+            else:
+                sections+=1
+                section = temp_line[1:section]
+        elif temp_line[0] == '\r' or temp_line[0] == '\n':
+            continue # blank line
+        else:
+            key = temp_line.find('=')
+            if key == -1:
+                errors += 1
+                log.error("ERROR: Unable parse line {} of config as key=value pair : '{}'".format(count, line.rstrip('\r\n')))
+            else:
+                keys += 1
+                key = temp_line[0:key]
+                key = key.strip()
+                value = robot_config.get(section, key)
+                lines[count] = '{}={}\n'.format(key, value)
+
+    if sections != sections_in:
+        log.error("ERROR: {} sections in file, {} in object".format(sections, sections_in))
+    if keys != keys_in:
+        log.error("ERROR: {} keys in file, {} in object".format(keys, keys_in))
+
+    # delete the existing config backup
+    if os.path.exists(config_file + '.bak'):
+        os.remove(config_file + '.bak');
+
+    os.rename(config_file, config_file+'.bak')
+
+    # write out the updated config file
+    f = open(config_file, 'w')
+    f.writelines(lines)
+    f.close
+
+    log.info("Config file saved.")
+
+ConfigParser.write = write
 
 handlingCommand = False    
 chat_module = None
