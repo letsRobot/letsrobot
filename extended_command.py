@@ -244,30 +244,6 @@ def devmode_handler(command, args):
     log.debug("dev_mode : %s", str(dev_mode))
     log.debug("dev_mode_mods : %s", str(dev_mode_mods))
 
-#TODO : Since audio / video has been integrated into the server, this should
-# probably be updated to mute the mic directly, rather than just doing it on
-# the server settings. 
-def mic_handler(command, args):
-    if is_authed(args['sender']) == 1: # Owner
-        if len(command) > 1:
-            if command[1] == 'mute':
-
-################################
-################################
-################################
-
-                # Mic Mute
-                return
-            elif command[1] == 'unmute':
-                if api_key != None:
-                # Mic Unmute
-                
-################################
-################################
-################################
-                
-                    return
-
 def tts_handler(command, args):
     log.debug("tts : %s", tts)
     if len(command) > 1:
@@ -332,7 +308,6 @@ commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.timeout'    :    {'func':timeout_handler, 'perm':2},
               '.untimeout'   :    {'func':untimeout_handler, 'perm':2},
               '.devmode'    :    {'func':devmode_handler, 'perm':2},
-              '.mic'        :    {'func':mic_handler, 'perm':2},
               '.tts'        :    {'func':tts_handler, 'perm':2},
               '.stationary' :    {'func':stationary_handler, 'perm':2},
               '.table'      :    {'func':stationary_handler, 'perm':2},

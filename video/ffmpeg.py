@@ -52,6 +52,9 @@ brightness=None
 contrast=None
 saturation=None
 
+old_mic_vol = 50
+mic_vol = 50
+
 def setup(robot_config):
     global robotKey
     global no_mic
@@ -149,6 +152,8 @@ def setup(robot_config):
 
         if robot_config.getboolean('tts', 'ext_chat'):
             extended_command.add_command('.audio', audioChatHandler)
+            if audio_input_format == "alsa":
+                extended_command.add_command('.mic', micHandler)
 
         # resolve device name to hw num, only with alsa
         if audio_input_format == "alsa":
@@ -420,4 +425,32 @@ def audioChatHandler(command, args):
                         except ValueError: # Catch someone passing not a number
                             pass
                     networking.sendChatMessage(".Audio bitrate is %s" % audio_bitrate)
+
+
+# Handles setting the mic volume level.
+def micHandler(command, args):
+    global old_mic_vol
+    global mic_vol
+
+    if extended_command.is_authed(args['sender']) == 2: # Owner
+        if len(command) > 1:
+            if command[1] == 'mute':
+                networking.sendChatMessage(".Warning: Mute may not actually mute mic, use .audio stop to ensure mute")
+                # Mic Mute
+                old_mic_vol = mic_vol
+                mic_vol = 0
+            elif command[1] == 'unmute':
+                # Mic Unmute
+                mic_vol = old_mic_vol
+            elif command[1] == 'vol':
+                try:
+                    new_vol = int(command[2])
+                except ValueError:
+                    log.debug("Not a valid volume level %s" % command[2])
+
+                mic_vol = new_vol % 101
+
+            log.info("Setting volume to %d" % mic_vol)
+            os.system("amixer -c {} sset 'Mic' '{}%'".format(audio_hw_num, mic_vol))
+            networking.sendChatMessage(".mic volume is %s" % mic_vol)
 
