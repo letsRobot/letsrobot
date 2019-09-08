@@ -1,3 +1,4 @@
+import sys
 sys.path.append("/home/pi/Dexter/GoPiGo3/Software/Python")
 import easygopigo3
 import time
