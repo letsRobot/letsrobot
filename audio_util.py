@@ -8,6 +8,7 @@ def getAudioDeviceByName(name, command):
     text = subprocess.check_output(command)
     log.debug("devices : %s", text)
     lines = text.splitlines()
+    del lines[:1] # Delete aplay header 
     for line in lines:
         if name in line:
             log.info("Found Audio Device : %s", line)
