@@ -8,12 +8,15 @@ def getAudioDeviceByName(name, command):
     text = subprocess.check_output(command)
     log.debug("devices : %s", text)
     lines = text.splitlines()
-    del lines[:1] # Delete aplay header 
-    for line in lines:
+    for line in lines[1:]:
         if name in line:
-            log.info("Found Audio Device : %s", line)
             result = re.match("card (.*?):", line.decode('utf8'))
-            return int(result.group(1))
+            try:
+               device = int(result.group(1))
+               log.info("Found Audio Device : %s", line)
+               return(device)
+            except:
+               log.debug("Not a valid audio device match : %s", line)
     else:
         log.error("Unable to find Audio Device : %s", name)
 
