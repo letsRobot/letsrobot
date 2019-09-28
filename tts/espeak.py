@@ -31,6 +31,7 @@ def setup(robot_config):
 
 def say(*args):
     message = args[0]
+    message = message.encode('ascii', 'ignore')
     tempFilePath = os.path.join(tempDir, "text_" + str(uuid.uuid4()))
     f = open(tempFilePath, "w")
     f.write(message)
