@@ -3,6 +3,7 @@ import serial.tools.list_ports as ports
 import sys
 import logging
 import robot_util
+import schedule
 log = logging.getLogger('RemoTV.hardware.serial_board')
 
 ser = None
@@ -43,6 +44,9 @@ def fallbackSerial():
             log.debug("Serial Fallback ignoring onboard bluetooth serial")
     log.debug("No more possible serial ports")
 
+def flushSerial():
+    ser.reset_input_buffer()
+
 def setup(robot_config):
     global serialDevice
     global serialBaud
@@ -64,6 +68,8 @@ def setup(robot_config):
     if ser is None:
         log.critical("error: could not connect to any valid serial port")
         robot_util.terminate_controller()
+
+    schedule.repeat_task(0.4, flushSerial)
 
 def connectSerial(serialDevice, serialBaud):
     global ser
