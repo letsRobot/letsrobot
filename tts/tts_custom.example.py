@@ -1,14 +1,14 @@
 import os
 import mod_utils
 # Example for adding custom code to the controller
-hw_num = None
+speaker_num = None
 module = None
 
 def setup(robot_config):
-    global hw_num
+    global speaker_num
     global module
     
-    hw_num = robot_config.getint('tts', 'hw_num')
+    speaker_num = robot_config.getint('tts', 'speaker_num')
     # Your custom setup code goes here
     
  
@@ -38,7 +38,7 @@ def say(*args):
             prefix = None
                 
         if prefix != None:
-            os.system('/usr/bin/mpg123-alsa -a hw:%d,0 %s' % (hw_num, prefix))
+            os.system('/usr/bin/mpg123-alsa -a hw:%d,0 %s' % (speaker_num, prefix))
 
     # Your custom tts interpreter code goes here
 
