@@ -20,6 +20,13 @@ gpio.conf
 \#*\#
 .\#*
 
+# Ignore Python Virtualenvironment
+bin/
+lib/
+lib64
+share/
+pyvenv.cfg
+
 *.bak
 *.log
 *.log.1
