@@ -41,7 +41,7 @@ ipAddr = None
 ood = None
 
 def getChatChannels(host):
-    url = 'http://%s:3231/api/%s/channels/list/%s' % (server, version, host)
+    url = 'https://%s/api/%s/channels/list/%s' % (server, version, host)
     response = robot_util.getWithRetry(url)
     log.debug("getChatChannels : %s", response)
     return json.loads(response)
@@ -147,8 +147,8 @@ def setupWebSocket(robot_config, onHandleMessage):
             bootMessage = bootMessage + ". Git repo is behind by {}.".format(commits.group(0))
 
 #    log.info("using socket io to connect to control %s", controlHostPort)
-    log.info("configuring web socket ws://%s:3231/" % server)
-    webSocket = websocket.WebSocketApp("ws://%s:3231/" % server,
+    log.info("configuring web socket wss://%s/" % server)
+    webSocket = websocket.WebSocketApp("wss://%s/" % server,
                                 on_message=onHandleMessage,
                                 on_error=onHandleWebSocketError,
                                 on_open=onHandleWebSocketOpen,
@@ -175,7 +175,7 @@ def sendChatMessage(message):
 
 def isInternetConnected():
     try:
-        url = 'http://{}:3231'.format(server)
+        url = 'https://{}'.format(server)
         urllib2.urlopen(url, timeout=1)
         log.debug("Server Detected")
         return True

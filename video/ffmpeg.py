@@ -257,7 +257,7 @@ def startVideoCapture():
                         ' -r 25 {in_options} -i {video_device} {video_filter}'
                         ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
                         ' -muxdelay 0.001 {out_options}'
-                        ' http://{server}:1567/transmit?name={channel}-video')
+                        ' http://{server}/transmit?name={channel}-video')
                         
        videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
                             input_format=video_input_format,
@@ -303,7 +303,7 @@ def startAudioCapture():
     audioCommandLine += (' {in_options} -i {audio_device} -f mpegts'
                          ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
                          ' -muxdelay 0.001 {out_options}'
-                         ' http://{server}:1567/transmit?name={channel}-audio')
+                         ' http://{server}/transmit?name={channel}-audio')
 
     audioCommandLine = audioCommandLine.format(ffmpeg=ffmpeg_location,
                             audio_input_format=audio_input_format,
