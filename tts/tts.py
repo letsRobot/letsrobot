@@ -109,7 +109,7 @@ def say(args):
         else:
             message = ""
             if args["type"] == "self":
-                message = args['sender'] + ""
+                message = args['sender'] + " "
 
             message += args["message"]
             log.debug("message : %s", message)
