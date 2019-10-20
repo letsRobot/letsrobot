@@ -52,7 +52,6 @@ owner = None
 robot_key = None
 api_key = None
 stationary = None
-car_mode = None
 exclusive = False
 exclusive_mods = False 
 exclusive_user = ''
@@ -69,7 +68,6 @@ def setup(config):
     global buttons_json
     global mods
     global robot_config
-    global car_mode
 
     robot_config = config
 
@@ -283,22 +281,6 @@ def stationary_handler(command, args):
         else:
             robot_util.sendChatMessage("Stationary mode disabled")
 
-def car_handler(command, args):
-    global car_mode
-    if is_authed(args['sender']) == 2:  # Owner
-        if len(command) > 1:
-            if command[1] == 'on':
-                car_mode = True
-            elif command[1] == 'off':
-                car_mode == False
-        else:
-            car_mode = not car_mode
-        log.info("car mode is %s", car_mode)
-        if car_mode:
-            robot_util.sendChatMessage("Car mode enabled.")
-        else:
-            robot_util.sendChatMessage("Car mode disabled")
-
 def test_messages(command, args):
    log.debug(command)
    log.debug(args)
@@ -324,12 +306,11 @@ def save_handler(command, args):
 commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.unban'      :    {'func':unban_handler, 'perm':2},
               '.timeout'    :    {'func':timeout_handler, 'perm':2},
-              '.untimeout'   :   {'func':untimeout_handler, 'perm':2},
+              '.untimeout'   :    {'func':untimeout_handler, 'perm':2},
               '.devmode'    :    {'func':devmode_handler, 'perm':2},
               '.tts'        :    {'func':tts_handler, 'perm':2},
               '.stationary' :    {'func':stationary_handler, 'perm':2},
               '.table'      :    {'func':stationary_handler, 'perm':2},
-              '.car'        :    {'func':car_handler, 'perm':2} ,
               '.whitelist'  :    {'func':whitelist_handler, 'perm':2},
               '.exclusive'  :    {'func':exclusive_handler, 'perm':2},
               '.help'       :    {'func':help_handler, 'perm':0},
@@ -363,14 +344,6 @@ def move_auth(args):
         if direction == 'f' or direction == 'b':
             log.debug("No forward for you.....")
             return 
-
-    # Check if car mode is enabled
-    if car_mode:
-        approvedCarModeCommands = ['l', 'r', 'brightness_down']
-        direction = args['button']['command']
-        if direction not in approvedCarModeCommands:
-            log.debug("No %s for you.....", direction)
-            return
 
     # Check if command is in the whitelist required commands
     if args['button']['command'] in whiteListCommand:

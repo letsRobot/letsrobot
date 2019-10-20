@@ -107,11 +107,7 @@ def say(args):
             log.debug("message : %s", args)
             tts_module.say(args)
         else:
-            message = ""
-            if args["type"] == "self":
-                message = args['sender'] + ""
-
-            message += args["message"]
+            message = args["message"]
             log.debug("message : %s", message)
             if delay_tts:
                 log.info('TTS message delayed')
