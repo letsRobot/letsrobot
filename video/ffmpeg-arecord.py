@@ -34,7 +34,7 @@ def startAudioCapture():
                        ' {ffmpeg} -i - -ar {audio_sample_rate} -f mpegts'
                        ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
                        ' -bufsize 8192k -muxdelay 0.001 {out_options}'
-                       ' http://{server}:1567/transmit?name={channel}-audio')
+                       ' http://{server}/transmit?name={channel}-audio')
 
     while not networking.authenticated:
         time.sleep(1)
