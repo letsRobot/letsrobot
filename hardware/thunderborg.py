@@ -51,7 +51,7 @@ def setup(robot_config):
 
 
 def move(args):
-    direction = args['button']['command'].upper()
+    direction = args['button']['command']
     inverseRight = rightMotorMax * -1
     inverseLeft = leftMotorMax * -1
 
