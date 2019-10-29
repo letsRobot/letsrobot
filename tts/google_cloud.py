@@ -97,7 +97,8 @@ def setup(robot_config):
     audio_config = texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
         pitch=voicePitch,
-        speaking_rate=voiceSpeakingRate
+        speaking_rate=voiceSpeakingRate,
+        effects_profile_id=["small-bluetooth-speaker-class-device"]
     )
 
     tempDir = tempfile.gettempdir()
