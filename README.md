@@ -53,6 +53,7 @@ The RasPi will need the following things install so it can talk to your motors a
 
    - `owner` should be the username you have registered the robot under on the remo.tv site.
    - `robot_key` is the API key for your robot that you made on the site.
+      - Your API key is LONG. It should look something like `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJib3QtNTVjZjJmMjUtNjBhNS00ZDJkLTk5YzMtOGZmOGRiYWU4ZDQ1IiwiaWF0IjoxNTczNTExMDA2LCJzdWIiOiIifQ.LGXSBSyQ4T4X5xU_w3QJD6R3lLjrrkw_QktOIDzRW5U`. If it is not this long, you have not copied the full key.
    - `turn_delay` is only used by the `motor_hat` and `mdd10`. This changes how long your bot turns for. I suggest you leave this at the default value until after you bot is moving.
    - `straight_delay` is only used by the `motor_hat` and `mdd10`. This changes how long your bot turns for. I suggest you leave this at the default value until after you bot is moving.
    - `type` should be the hardware type for the motor controller of your bot. Available types are currently.
