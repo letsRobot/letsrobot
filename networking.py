@@ -166,8 +166,7 @@ def sendChatMessage(message):
     log.info("Sending Message : %s" % message)
     webSocket.send(json.dumps(
         {"e": "ROBOT_MESSAGE_SENT", 
-         "d": {"username": "Lawn", 
-               "message": "%s" % message,
+         "d": {"message": "%s" % message,
                "chatId": "%s" % chat,
                "server_id": "%s" % server
         }

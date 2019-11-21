@@ -36,6 +36,7 @@ audio_device = None
 audio_codec = None
 audio_channels = None
 audio_bitrate = None
+video_framerate = 25
 audio_sample_rate = None
 video_codec = None
 video_bitrate = None
@@ -77,6 +78,7 @@ def setup(robot_config):
     global audio_sample_rate
     global video_codec
     global video_bitrate
+    global video_framerate
     global video_filter
     global video_device
     global audio_input_format
@@ -117,6 +119,8 @@ def setup(robot_config):
         video_device = robot_config.get('camera', 'camera_device')
         video_codec = robot_config.get('ffmpeg', 'video_codec')
         video_bitrate = robot_config.get('ffmpeg', 'video_bitrate')        
+        if robot_config.has_option('ffmpeg', 'video_framerate'):
+            video_framerate = robot_config.get('ffmpeg', 'video_framerate')
         video_input_format = robot_config.get('ffmpeg', 'video_input_format')
         video_input_options = robot_config.get('ffmpeg', 'video_input_options')
         video_output_options = robot_config.get('ffmpeg', 'video_output_options')
@@ -253,14 +257,19 @@ def startVideoCapture():
 
     if networking.internetStatus:
     
-       videoCommandLine = ('{ffmpeg} -f {input_format} -framerate 25 -video_size {xres}x{yres}'
-                        ' -r 25 {in_options} -i {video_device} {video_filter}'
+       videoCommandLine = '{ffmpeg} -f {input_format} -framerate {framerate}'
+       
+       if video_input_format != "mjpeg":
+           videoCommandLine += '-video_size {xres}x{yres}'
+
+       videoCommandLine += (' -r {framerate} {in_options} -i {video_device} {video_filter}'
                         ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
                         ' -muxdelay 0.001 {out_options}'
                         ' http://{server}/transmit?name={channel}-video')
                         
        videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
                             input_format=video_input_format,
+                            framerate=video_framerate,
                             in_options=video_input_options,
                             video_device=video_device, 
                             video_filter=video_filter,
