@@ -26,15 +26,14 @@ fallback_tts = None
 def new_voice(command, args):
     global users
 
-    if (args['anonymous'] != True):
-        user = args['name']
-        if len(command) > 1:
-            if command[1] in voices:
-                users[user] = command[1]
-            else:
-                users[user] = random.choice(voices)
+    user = args['sender']
+    if len(command) > 1:
+        if command[1] in voices:
+            users[user] = command[1]
+        else:
+            users[user] = random.choice(voices)
 
-            robot_util.sendChatMessage(".%s your voice is now %s" %(user, users[user]))
+        robot_util.sendChatMessage(".%s your voice is now %s" %(user, users[user]))
 
 def setup(robot_config):
     global client
@@ -100,12 +99,9 @@ def say(*args):
         user = args[1]['name']
 
         if random_voice:
-            if (args[1]['anonymous'] == True):
-                voice = 'Mizuki'
-            else:
-                if user not in users:
-                    users[user] = random.choice(voices)
-                voice = users[user]    
+            if user not in users:
+                users[user] = random.choice(voices)
+            voice = users[user]    
         
             log.info(user + " voice " + voice + ": " + message)
         else:
