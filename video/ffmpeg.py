@@ -260,7 +260,7 @@ def startVideoCapture():
        videoCommandLine = '{ffmpeg} -f {input_format} -framerate {framerate}'
        
        if video_input_format != "mjpeg":
-           videoCommandLine += '-video_size {xres}x{yres}'
+           videoCommandLine += ' -video_size {xres}x{yres}'
 
        videoCommandLine += (' -r {framerate} {in_options} -i {video_device} {video_filter}'
                         ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
