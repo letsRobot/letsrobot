@@ -96,7 +96,7 @@ def say(*args):
             fallback_tts.say(message)
         
     else:
-        user = args[1]['name']
+        user = args['sender']
 
         if random_voice:
             if user not in users:
