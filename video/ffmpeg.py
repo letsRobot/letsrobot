@@ -208,7 +208,7 @@ def startFFMPEG(command, name, atExit, process):
             error = ffmpeg_process.communicate()
             log.debug("ffmpeg {} error message : {}".format(name, error))
             try:
-                log.error("ffmpeg {} : {}".format(name, error[1].decode().split('] ')[1]))
+                log.error("ffmpeg {} : {}".format(name, error[1].decode().split('] ')[1:]))
             except IndexError:
                 pass
         else:
