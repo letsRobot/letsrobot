@@ -1,6 +1,6 @@
 ## remo.tv is an open telerobotics platform designed for controling and sharing control of robots online in real time.
-## WARNING: This software is currently under development, so you may encounter frequent issues as updates are made. You can check out the [wiki](https://github.com/remotv/controller/wiki) for a more indepth view of what's currently supported. 
-This controller software is designed to run on your robot and will connect with our development server. It's tuned to support Raspberry Pi based robots, however there is extensive support for other hardware configurations.
+## Check out the [wiki](https://github.com/remotv/controller/wiki) for a more indepth view of what's currently supported. 
+This controller software is designed to run on your robot and connect with Remo.TV. It's tuned to support Raspberry Pi based robots, however there is extensive support for other hardware configurations.
 
 ## Basic setup
 If this is your first time working with a Raspberry Pi or Linux, we recommend following our [initializtion tutorial](https://github.com/remotv/controller/wiki/Initializing-the-Raspberry-Pi) to get started.
