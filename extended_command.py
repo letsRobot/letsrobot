@@ -337,7 +337,7 @@ def update_handler(command, args):
         if "behind" in isOod:
             commits = re.search(r'\d+(\scommits|\scommit)', isOod)
             robot_util.sendChatMessage(
-                "Repo is behind by {} commit(s). Update? (.y)".format(commits.group(0)))
+                "Repo is behind by {}. Update? (.y)".format(commits.group(0)))
             update_fetched = True
         else:
             robot_util.sendChatMessage(
