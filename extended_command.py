@@ -350,6 +350,7 @@ def do_update_handler(command, args):
         os.system('git pull')
         robot_util.sendChatMessage(
             'Update completed. Restart for changes to take effect.')
+        update_fetched = False
 
 
 # This is a dictionary of commands and their handler functions
