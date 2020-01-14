@@ -322,7 +322,7 @@ commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.help'       :    {'func':help_handler, 'perm':0},
               '.save'       :    {'func':save_handler, 'perm':2},
               '.test'       :    {'func':test_messages, 'perm':0},
-              '.update'     :    {'funct':update_handler, 'perm':2}
+              '.update'     :    {'func':update_handler, 'perm':2}
 	        }
 
 def handler(args):
