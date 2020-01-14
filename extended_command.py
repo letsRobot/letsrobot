@@ -302,6 +302,12 @@ def save_handler(command, args):
       robot_config.write('controller.conf')
       robot_util.sendChatMessage('.Config file saved.')
 
+def update_handler(command, args):
+    if is_authed(args['sender']) == 2:
+        os.system('git pull')
+        robot_util.sendChatMessage('Update complete. Restart for changes to take effect.')
+
+
 # This is a dictionary of commands and their handler functions
 commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.unban'      :    {'func':unban_handler, 'perm':2},
@@ -315,7 +321,8 @@ commands={    '.ban'        :    {'func':ban_handler, 'perm':2},
               '.exclusive'  :    {'func':exclusive_handler, 'perm':2},
               '.help'       :    {'func':help_handler, 'perm':0},
               '.save'       :    {'func':save_handler, 'perm':2},
-              '.test'       :    {'func':test_messages, 'perm':0}
+              '.test'       :    {'func':test_messages, 'perm':0},
+              '.update'     :    {'funct':update_handler, 'perm':2}
 	        }
 
 def handler(args):
