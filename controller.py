@@ -106,7 +106,7 @@ def write(self, config_file):
 
     # delete the existing config backup
     if os.path.exists(config_file + '.bak'):
-        os.remove(config_file + '.bak');
+        os.remove(config_file + '.bak')
 
     os.rename(config_file, config_file+'.bak')
 
