@@ -182,6 +182,8 @@ parser.add_argument('--no-mic', dest='no_mic', action='store_true')
 parser.set_defaults(no_mic=False)
 parser.add_argument('--no-camera', dest='no_camera', action='store_true')
 parser.set_defaults(no_camera=False)
+parser.add_argument('--test', dest='test_mode', action='store_true')
+parser.set_defaults(test_mode=False)
 commandArgs = parser.parse_args()
 
 log.debug('command line arguments : %s', commandArgs)
@@ -204,6 +206,11 @@ if commandArgs.no_camera:
 robotKey = commandArgs.robot_key
 ext_chat = commandArgs.ext_chat_command
 enable_async = robot_config.getboolean('misc', 'enable_async')
+
+# check test_mode
+test_mode = commandArgs.test_mode
+if test_mode:
+    log.critical("Remo.TV Controller starting in test mode")
 
 if ext_chat:
     import extended_command
@@ -303,8 +310,9 @@ import tts.tts as tts
 tts.setup(robot_config)
 
 # Connect to the networking sockets
-log.info("Loading networking")
-networking.setupWebSocket(robot_config, handle_message)
+if not test_mode:
+   log.info("Loading networking")
+   networking.setupWebSocket(robot_config, handle_message)
 
 # If custom hardware extensions have been enabled, load them if they exist. Otherwise load the default
 # controller for the specified hardware type.
@@ -355,7 +363,8 @@ else:
 
 # Setup the video encoding
 video_module.setup(robot_config)
-video_module.start()
+if not test_mode:
+   video_module.start()
 
 #load the extended chat commands
 if ext_chat:
@@ -379,11 +388,13 @@ if commandArgs.custom_chat:
        log.warning("Unable to find chat_custom.py")
     
 atexit.register(log.debug, "Attempting to clean up and exit nicely")
+if not test_mode:
+    log.critical('RemoTV Controller Started')
+    while not terminate.locked():
+        time.sleep(1)
+        watchdog.watch()
 
-log.critical('RemoTV Controller Started')
-while not terminate.locked():
-    time.sleep(1)
-    watchdog.watch()
-
-log.critical('RemoTV Controller Exiting')
+    log.critical('RemoTV Controller Exiting')
+else:
+    log.critical('RemoTV Controller Test Complete')
 sys.exit()
