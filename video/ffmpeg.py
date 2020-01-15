@@ -242,18 +242,15 @@ def startVideoCapture():
 
     # set brightness
     if (brightness is not None):
-        log.info("setting brightness : %s", brightness)
-        os.system("v4l2-ctl -c brightness={brightness}".format(brightness=brightness))
+        v4l2SetCtrl("brightness", brightness)
 
     # set contrast
     if (contrast is not None):
-        log.info("setting contrast : %s", contrast)
-        os.system("v4l2-ctl -c contrast={contrast}".format(contrast=contrast))
+        v4l2SetCtrl("contrast", contrast)
 
     # set saturation
     if (saturation is not None):
-        log.info("setting saturation : %s", saturation)
-        os.system("v4l2-ctl -c saturation={saturation}".format(saturation=saturation))
+        v4l2SetCtrl("saturation", saturation)
 
     if networking.internetStatus:
     
@@ -368,6 +365,16 @@ def videoChatHandler(command, args):
         else:
             networking.sendChatMessge("command only available to owner")
 
+def v4l2SetCtrl(control, level):
+    command = "{v4l2_ctl} -d {device} -c {control}={level}".format(
+            v4l2_ctl=v4l2_ctl_location,
+            device=video_device,
+            control=control,
+            level=str(level)
+    )
+    os.system(command)
+    log.info("{control} set to {level}".format(control=contrl, level=level))
+
 
 def brightnessChatHandler(command, args):
     global brightness
@@ -379,8 +386,7 @@ def brightnessChatHandler(command, args):
                 exit() #Not a number    
             if new_brightness <= 255 and new_brightness >= 0:
                 brightness = new_brightness
-                os.system(v4l2_ctl_location + " --set-ctrl brightness=" + str(brightness))
-                log.info("brightness set to %.2f" % brightness)
+                v4l2SetCtrl("brightness", brightness)
 
 def contrastChatHandler(command, args):
     global contrast
@@ -392,8 +398,7 @@ def contrastChatHandler(command, args):
                 exit() #not a number
             if new_contrast <= 255 and new_contrast >= 0:
                 contrast = new_contrast
-                os.system(v4l2_ctl_location + " --set-ctrl contrast=" + str(contrast))
-                log.info("contrast set to %.2f" % contrast)
+                v4l2SetCtrl("contrast", contrast)
 
 def saturationChatHandler(command, args):
     if len(command) > 2:
@@ -404,8 +409,7 @@ def saturationChatHandler(command, args):
                 exit() #not a number
             if new_saturation <= 255 and new_saturation >= 0:
                 saturation = new_saturation
-                os.system(v4l2_ctl_location + " --set-ctrl saturation=" + str(saturation))
-                log.info("saturation set to %.2f" % saturation)
+                v4l2SetCtrl("saturation", saturation)
 
 def audioChatHandler(command, args):
     global audio_process
