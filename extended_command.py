@@ -4,6 +4,7 @@ import schedule
 import robot_util
 import logging
 import re
+import update
 
 log = logging.getLogger('RemoTV.extended_command')
 
@@ -347,10 +348,18 @@ def update_handler(command, args):
 def do_update_handler(command, args):
     global update_fetched
     if is_authed(args['sender']) == 2 and update_fetched:
-        os.system('git pull')
-        robot_util.sendChatMessage(
-            'Update completed. Restart for changes to take effect.')
-        update_fetched = False
+        if update.checkLocalChanges(): 
+            result = os.system('git pull')
+            if result == 0:
+                robot_util.sendChatMessage(
+                    'Update completed. Restart for changes to take effect.')
+                update_fetched = False
+            else:
+                robot_util.sendChatMessage(
+                    'Update Failed. run "git pull" locally to determine error.')
+        else:
+            robot_util.sendChatMessage(
+                'Automatic Update aborted, you have modified core files.')
 
 
 # This is a dictionary of commands and their handler functions
