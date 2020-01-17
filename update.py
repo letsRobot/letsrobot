@@ -54,20 +54,20 @@ def doUpdate():
 
    # run the update
    try:
-      subprocess.run(["git", "pull"], check=True)
+      subprocess.check_output(["git", "pull"])
    except subprocess.CalledProcessError as error:
       log.error(error)
       # attempt to revert to old head
-      subprocess.run(["git", "reset","--hard" ,old_head])
+      subprocess.call(["git", "reset","--hard" ,old_head])
       return False
 
    # test the updated controller.
    try:
-      subprocess.run([sys.executable, "controller.py", "--test"], check=True)
+      subprocess.check_output([sys.executable, "controller.py", "--test"])
    except subprocess.CalledProcessError as error:
       log.error(error)
       # attempt to revert to old head
-      subprocess.run(["git", "reset", "--hard", old_head])
+      subprocess.call(["git", "reset", "--hard", old_head])
       return False
    return True
 
@@ -111,7 +111,10 @@ if __name__ == "__main__":
 
    if checkForUpdates():
       print("Updates Available.")
-      key = input("Apply updates (y/n)? ").rstrip()
+      if (sys.version_info > (3, 0)):
+         key = input('Apply updates (y/n)? ').rstrip()
+      else:
+         key = raw_input('Apply updates (y/n)? ').rstrip()
       key = str(key.lower())
       if key == "y":
          if checkLocalChanges():
