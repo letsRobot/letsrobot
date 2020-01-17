@@ -86,6 +86,8 @@ def setup(config):
     mods = ""
     log.info("Moderators : %s", mods)
 
+    update.setup(config)
+
 # check if the user is the owner or moderator, 0 for not, 1 for moderator, 2 for owner
 
 
@@ -330,38 +332,6 @@ def save_handler(command, args):
         robot_config.write('controller.conf')
         robot_util.sendChatMessage('.Config file saved.')
 
-
-def update_handler(command, args):
-    global update_fetched
-    if is_authed(args['sender']) == 2:
-        isOod = os.popen('git fetch && git status').read().rstrip()
-        if "behind" in isOod:
-            commits = re.search(r'\d+(\scommits|\scommit)', isOod)
-            robot_util.sendChatMessage(
-                "Repo is behind by {}. Update? (.y)".format(commits.group(0)))
-            update_fetched = True
-        else:
-            robot_util.sendChatMessage(
-                "Repo is already up to date. Nothing to do!")
-
-
-def do_update_handler(command, args):
-    global update_fetched
-    if is_authed(args['sender']) == 2 and update_fetched:
-        if update.checkLocalChanges(): 
-            result = os.system('git pull')
-            if result == 0:
-                robot_util.sendChatMessage(
-                    'Update completed. Restart for changes to take effect.')
-                update_fetched = False
-            else:
-                robot_util.sendChatMessage(
-                    'Update Failed. run "git pull" locally to determine error.')
-        else:
-            robot_util.sendChatMessage(
-                'Automatic Update aborted, you have modified core files.')
-
-
 # This is a dictionary of commands and their handler functions
 commands = {'.ban'         :   {'func': ban_handler, 'perm': 2},
             '.unban'       :   {'func': unban_handler, 'perm': 2},
@@ -375,9 +345,7 @@ commands = {'.ban'         :   {'func': ban_handler, 'perm': 2},
             '.exclusive'   :   {'func': exclusive_handler, 'perm': 2},
             '.help'        :   {'func': help_handler, 'perm': 0},
             '.save'        :   {'func': save_handler, 'perm': 2},
-            '.test'        :   {'func': test_messages, 'perm': 0},
-            '.update'      :   {'func': update_handler, 'perm': 2},
-            '.y'           :   {'func':do_update_handler, 'perm': 2}
+            '.test'        :   {'func': test_messages, 'perm': 0}
             }
 
 
