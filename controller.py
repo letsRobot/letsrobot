@@ -239,7 +239,8 @@ def handle_message(ws, message):
 
     elif event == "MESSAGE_RECEIVED":
         if data['channel_id'] == networking.channel_id:
-            on_handle_chat_message(data)
+            if data['type'] != "robot":
+               on_handle_chat_message(data)
 
     elif event == "ROBOT_VALIDATED":
         networking.handleConnectChatChannel(data["host"])

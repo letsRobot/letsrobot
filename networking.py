@@ -168,7 +168,8 @@ def sendChatMessage(message):
         {"e": "ROBOT_MESSAGE_SENT", 
          "d": {"message": "%s" % message,
                "chatId": "%s" % chat,
-               "server_id": "%s" % server
+               "server_id": "%s" % server,
+               "channel_id": "%s" % channel_id
         }
     }))
 
