@@ -20,6 +20,8 @@ def setup(robot_config):
     #LED controlling
     spi = spidev.SpiDev()
     spi.open(0,0)
+    spi.max_speed_hz = 1000000
+
     #VCC -> RPi Pin 2
     #GND -> RPi Pin 6
     #DIN -> RPi Pin 19
