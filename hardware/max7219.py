@@ -115,4 +115,4 @@ def move(args):
         SetLED_E_Tongue()
     if command == 'LED_E_SURPRISED':
         SetLED_On()
-        SetLED_E_Suprised()
+        SetLED_E_Surprised()
