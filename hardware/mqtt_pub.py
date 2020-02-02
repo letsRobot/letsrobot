@@ -11,6 +11,8 @@ mqtthost=None
 mqttPort=None
 mqttTopic=None
 mqttClient=None
+mqttUsername=None
+mqttPassword=None
 
 def sendmqttCommand(command):
     global mqttClient
@@ -20,7 +22,7 @@ def sendmqttCommand(command):
         mqttClient.connect(mqtthost, mqttPort)
     except:
         log.error("failed to connect to MQTT Broker")
-    
+
     rc = mqttClient.publish(mqttTopic,command)
     mqttClient.disconnect()
 
@@ -35,11 +37,23 @@ def setup(robot_config):
     global mqttPort
     global mqttTopic
     global mqttClient
+    global mqttUsername
+    global mqttPassword
 
     mqtthost = robot_config.get('mqtt_pub', 'host')
     mqttPort = robot_config.getint('mqtt_pub', 'port')
     mqttTopic = robot_config.get('mqtt_pub', 'topic')
     mqttClient = mqttc.Client("robot")      #TODO client can b the robot ID
+
+    #Handle connecting with username and maybe password. 
+    #This will allow connections to a secure mqtt broker via mosquito on DigitalOcean or similar
+
+    mqttUsername = robot_config.get('mqtt_pub', 'user')
+    mqttPassword = robot_config.get('mqtt_pub', 'pass')
+    if mqttUsername is not None:
+        mqttClient.username_pw_set(mqttUsername, password=mqttPassword)
+        if mqttPassword is not None:
+            mqttClient.tls_set_context() #Tell client to enable ssl, but only if there is a password
     
     mqttClient.on_publish = on_publish
     mqttClient.on_disconnect = on_disconnect
