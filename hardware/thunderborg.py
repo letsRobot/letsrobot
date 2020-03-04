@@ -12,7 +12,7 @@ except:
     log.critical(
         'Cannot start ThunderBorg. ThunderBorgLib.py missing. Do the following')
     log.critical(
-        'wget -O ~/examples.zip http://www.piborg.org/downlaods/thunderborg/examples.zip')
+        'wget -O ~/examples.zip http://www.piborg.org/downloads/thunderborg/examples.zip')
     log.critical('unzip ~/examples.zip')
     log.critical(
         'cp ~/examples/ThunderBorg.py ~/remotv/hardware/ThunderBorgLib.py')
