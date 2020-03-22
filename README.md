@@ -184,7 +184,7 @@ Missing something?, you can add it, open source! Instructions for adding new har
 
 ## Chat Commands
 
-When `ext_chat` is enabled, the following chat commands are available. To use, just type them into the chat box on your bots page. These chat commands have no effect on how the site behaves, they only affect the bot. There are some functions that duplicate functions on the site. These changes are not saved and are lots on reboot.
+When `ext_chat` is enabled, the following chat commands are available. To use, just type them into the chat box on your bots page. These chat commands have no effect on how the site behaves, they only affect the bot. There are some functions that duplicate functions on the site. These changes are not saved and are lost on reboot.
 
 - `.devmode X` Set dev mode. In dev mode, only the owner can drive. If demode is set to mods, your local mods can also drive [on|off|mods].
 - `.anon control X` Sets if anonymous users can drive your bot [on|off].
