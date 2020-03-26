@@ -94,7 +94,7 @@ The RasPi will need the following things install so it can talk to your motors a
      - `espeak`
      - `fesitval`
      - `pico`
-     - Amazon Polly
+     - Amazon Polly (`polly`)
      - `cozmo_tts`
      - `google_cloud`
 
@@ -180,7 +180,7 @@ The following hardware is supported.
 - Pololu Dual MC33926 Motor Driver (experimental)
 - Pololu DRV8835 Dual Motor Driver
 
-Missing something?, you can add it, open source! Instructions for adding new hardware can be found [here.](EXTENDING_CONTROLLER.md)
+Missing something? You can add it, open source! Instructions for adding new hardware can be found [here.](https://github.com/remotv/controller/wiki/Extending-Controller)
 
 ## Chat Commands
 
