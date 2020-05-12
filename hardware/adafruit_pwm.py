@@ -1,8 +1,14 @@
-import Adafruit_PCA9685
 import logging
 import time
 
 log = logging.getLogger('RemoTV.hardware.adafruit_pwm')
+
+try:
+    import Adafruit_PCA9685
+except ImportError:
+    log.critical("You need to install Adafruit_PCA9685")
+    log.critical("Please install Adafruit_PCA9685 for python and restart this script.")
+    log.critical("To install: pip install adafruit_pca9685")
 
 pwm = None
 
