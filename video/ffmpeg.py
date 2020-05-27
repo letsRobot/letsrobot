@@ -262,6 +262,7 @@ def startVideoCapture():
        videoCommandLine += (' -r {framerate} {in_options} -i {video_device} {video_filter}'
                         ' -f mpegts -codec:v {video_codec} -b:v {video_bitrate}k -bf 0'
                         ' -muxdelay 0.001 {out_options}'
+                        ' -headers \'Authorization: "Bearer {robotKey}"\''
                         ' http://{server}/transmit?name={channel}-video')
                         
        videoCommandLine = videoCommandLine.format(ffmpeg=ffmpeg_location,
@@ -276,7 +277,8 @@ def startVideoCapture():
                             server=server,
                             channel=networking.channel_id,
                             xres=x_res, 
-                            yres=y_res)
+                            yres=y_res,
+                            robotKey=robotKey)
 
        log.debug("videoCommandLine : %s", videoCommandLine)
        startFFMPEG(videoCommandLine, 'Video',  atExitVideoCapture, 'video_process')
@@ -309,6 +311,7 @@ def startAudioCapture():
     audioCommandLine += (' {in_options} -i {audio_device} -f mpegts'
                          ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
                          ' -muxdelay 0.001 {out_options}'
+                         ' -headers \'Authorization: "Bearer {robotKey}"\''
                          ' http://{server}/transmit?name={channel}-audio')
 
     audioCommandLine = audioCommandLine.format(ffmpeg=ffmpeg_location,
@@ -321,7 +324,8 @@ def startAudioCapture():
                             audio_bitrate=audio_bitrate,
                             out_options=audio_output_options,
                             server=server,
-                            channel=networking.channel_id)
+                            channel=networking.channel_id,
+                            robotKey=robotKey)
                             
     log.debug("audioCommandLine : %s", audioCommandLine)
     startFFMPEG(audioCommandLine, 'Audio',  atExitAudioCapture, 'audio_process')
