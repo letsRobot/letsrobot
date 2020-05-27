@@ -34,6 +34,7 @@ def startAudioCapture():
                        ' {ffmpeg} -i - -ar {audio_sample_rate} -f mpegts'
                        ' -codec:a {audio_codec}  -b:a {audio_bitrate}k'
                        ' -bufsize 8192k -muxdelay 0.001 {out_options}'
+                       ' -headers \'Authorization: "Bearer {robotKey}"\''
                        ' http://{server}/transmit?name={channel}-audio')
 
     while not networking.authenticated:
@@ -50,7 +51,8 @@ def startAudioCapture():
                             audio_bitrate=ffmpeg.audio_bitrate,
                             out_options=ffmpeg.audio_output_options,
                             server=ffmpeg.server,
-                            channel=networking.channel_id)
+                            channel=networking.channel_id,
+                            robotKey=ffmpeg.robotKey)
 
     log.debug("audioCommandLine : %s", audioCommandLine)
     ffmpeg.startFFMPEG(audioCommandLine, 'ffmpeg-arecord Audio',  ffmpeg.atExitAudioCapture, 'audio_process')

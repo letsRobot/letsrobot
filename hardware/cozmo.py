@@ -23,6 +23,7 @@ charge_low = 3.5
 charge_high = 4.5
 low_battery = 0
 stay_on_dock = 0
+robotKey = None
 
 default_anims_for_keys = ["anim_bored_01",  # 0 drat
                           "anim_poked_giggle",  # 1 giggle
@@ -138,6 +139,9 @@ def setup(robot_config):
     global annotated
     global colour
     global ffmpeg_location
+    global robotKey
+
+    robotKey = robot_config.get('robot', 'robot_key')
 
     ffmpeg_location = robot_config.get('ffmpeg', 'ffmpeg_location')
 
@@ -229,7 +233,7 @@ def run_video():
         while not networking.authenticated:
             time.sleep(1)
 
-        p = Popen([ffmpeg_location, '-nostats', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25','-b:v', '400k', "-f","mpegts", "http://{}:1567/transmit?name={}-video".format(server, networking.channel_id)], stdin=PIPE)
+        p = Popen([ffmpeg_location, '-nostats', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', '25', '-i', '-', '-vcodec', 'mpeg1video', '-r', '25','-b:v', '400k', "-f","mpegts", "-headers", "'Authorization: \"Bearer {}\"'".format(robotKey), "http://{}:1567/transmit?name={}-video".format(server, networking.channel_id)], stdin=PIPE)
         
         try:
             while True:
